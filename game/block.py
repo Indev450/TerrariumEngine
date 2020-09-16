@@ -4,36 +4,58 @@ from .game_object import GameObject
 
 
 class Block(GameObject):
-    WIDTH = 32
-    HEIGHT = 32
+    WIDTH = 16
+    HEIGHT = 16
 
     registered_blocks = {"std:air": {
         "entry": None,
-        "id": 0,
+        "id": -1,
     }}
-    _registered_blocks = []  # int ids for registered entries
+
+    _registered_blocks = [None]  # int ids for registered entries
                                  # None - air block
 
     tile = None
 
     ID = 0
 
+    LIGHT = 0
+
     def __init__(self, *position):
         super().__init__(*position, self.WIDTH, self.HEIGHT)
 
-    def init_graphics(self, width, height):
-        self.image = self.get_tile()
+        self.image = self.tile
+
+        self.grid_x = int(position[0] / self.WIDTH)
+        self.grid_y = int(position[1] / self.HEIGHT)
+
+        self.light = self.LIGHT
+
+    def set_light(self, light):
+        if light > self.light:
+            self.light = min(255, max(0, light))
+
+    def light_blocks(self, blocks):
+        for y in range(self.grid_y - 1, self.grid_y + 2):
+            for x in range(self.grid_x - 1, self.grid_x + 2):
+                if ((0 <= x < len(blocks[0]) and 0 <= y < len(blocks))
+                    and (x != self.grid_x and y != self.grid_y)):
+                    block = blocks[y][x]
+                    if block is not None:
+                        block.set_light(self.light*0.75)
 
     def getid(self):
-        return self.id
+        return self.ID
 
     @classmethod
-    def preload(self):
-        pass
-
-    @classmethod
-    def get_tile(cls):
-        return cls.tile
+    def light_blocks_air(cls, x, y, blocks):
+        for _y in range(y - 1, y + 2):
+            for _x in range(x - 1, x + 2):
+                if ((0 <= _x < len(blocks[0]) and 0 <= _y < len(blocks))
+                    and (_x != x and _y != y)):
+                    block = blocks[_y][_x]
+                    if block is not None:
+                        block.set_light(255*0.75)
 
     @classmethod
     def by_id(cls, id):
@@ -58,14 +80,6 @@ class Block(GameObject):
             "entry": block_type,
             "id": None,
         }
-
-    @classmethod
-    def on_preload(cls):
-        for block in cls.registered_blocks.values():
-            if block["entry"] is not None:
-                block["entry"].preload()
-
-        cls.sort_registered_entries()
 
     @classmethod
     def registered_count(cls):

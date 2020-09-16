@@ -1,10 +1,15 @@
 import pygame as pg
 
 from .block import Block
+from .chunk import Chunk
+
 from .camera import Camera
 
 class World:
     instance = None
+
+    CHUNK_WIDTH = 10
+    CHUNK_HEIGHT = 10
 
     def __init__(self, blocks):
 
@@ -19,6 +24,15 @@ class World:
             blocks[y][x],
             x*Block.WIDTH,
             y*Block.HEIGHT) for x in range(self.WORLD_WIDTH)] for y in range(self.WORLD_HEIGHT)]
+
+        self.chunks_x = int(self.WORLD_WIDTH / self.CHUNK_WIDTH) + 1
+        self.chunks_y = int(self.WORLD_WIDTH / self.CHUNK_WIDTH) + 1
+
+        self.chunks = [[None for x in range(self.chunks_x)] for y in range(self.chunks_y)]
+
+        self.chunks_loaded = []
+
+        self.load_chunk(0, 0)
 
         self.camera = Camera.get()
 
@@ -36,20 +50,9 @@ class World:
         return range(max(0, int(y1/Block.HEIGHT)), min(int(y2/Block.HEIGHT)+1, self.WORLD_HEIGHT))
 
     def draw(self, screen):
-        info = pg.display.Info()
-        cam_x, cam_y = self.camera.get_position()
-        cam_x = int(cam_x/Block.WIDTH)
-        cam_y = int(cam_y/Block.HEIGHT)
-        left = -1
-        top = -1
-        right = int(info.current_w/Block.WIDTH) + 1
-        bottom = int(info.current_h/Block.HEIGHT) + 1
         objects_drawn = 0
-        for y in range(top, bottom):
-            for x in range(left, right):
-                if self.blocks[max(0, min(y+cam_y, self.WORLD_HEIGHT-1))][max(0, min(x+cam_x, self.WORLD_WIDTH-1))] is not None:
-                    objects_drawn += self.blocks[max(0, min(y+cam_y, self.WORLD_HEIGHT-1))][max(0, min(x+cam_x, self.WORLD_WIDTH-1))].draw(screen)
-                    # Long boi
+        for chunk in self.chunks_loaded:
+            objects_drawn += chunk.draw(screen)
         return objects_drawn
 
     def setblock(self, x, y, id):
@@ -58,6 +61,70 @@ class World:
         self.blocks[y][x] = self.block_by_id(id,
             x*Block.WIDTH,
             y*Block.HEIGHT)
+
+        chunk_x, chunk_y = self.chunk_pos(x*Block.WIDTH, y*Block.HEIGHT)
+
+        if self.chunks[chunk_y][chunk_x] is not None:
+            self.chunks[chunk_y][chunk_x].update()
+        else:
+            self.load_chunk(chunk_x, chunk_y)
+
+    def chunk_pos(self, x, y):
+        x = int(x / Block.WIDTH / self.CHUNK_WIDTH)
+        y = int(y / Block.HEIGHT / self.CHUNK_HEIGHT)
+
+        return x, y
+
+    def update(self, dtime):
+        info = pg.display.Info()
+        cam_x, cam_y = self.camera.get_position()
+
+        left, top = self.chunk_pos(cam_x, cam_y)
+
+        left -= 2
+        top -= 2
+
+        left, top = self.bound_chunk_position(left, top)
+
+        right = left + int(info.current_w / Block.WIDTH / self.CHUNK_WIDTH) + 4
+        bottom = top + int(info.current_h / Block.HEIGHT / self.CHUNK_HEIGHT) + 4
+
+        right, bottom = self.bound_chunk_position(right, bottom)
+
+        for y in range(top, bottom+1):
+            for x in range(left, right+1):
+                self.load_chunk(x, y)
+
+        for chunk in self.chunks_loaded:
+            if chunk.deltimer(dtime):
+                self.del_chunk(*self.chunk_pos(chunk.rect.x, chunk.rect.y))
+
+    def bound_chunk_position(self, x, y):
+        x = max(0, min(self.chunks_x-1, x))
+        y = max(0, min(self.chunks_y-1, y))
+
+        return (x, y)
+
+    def load_chunk(self, x, y):
+        if self.chunks[y][x] is not None:
+            return
+
+        c = Chunk(self.blocks, 
+                  x*self.CHUNK_WIDTH, y*self.CHUNK_HEIGHT,
+                  self.CHUNK_WIDTH, self.CHUNK_HEIGHT)
+        self.chunks[y][x] = c
+
+        self.chunks_loaded.append(c)
+
+    def del_chunk(self, x, y):
+        c = self.chunks[y][x]
+
+        if c is None:
+            return
+
+        self.chunks[y][x] = None
+
+        self.chunks_loaded.remove(c)
 
     @classmethod
     def block_by_id(cls, id, x, y):

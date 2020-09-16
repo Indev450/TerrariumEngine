@@ -16,7 +16,7 @@ class GameActivity(Activity):
     def __init__(self, blocks):
         super().__init__()
 
-        Block.on_preload()
+        Block.sort_registered_entries()
 
         Camera.init()
 
@@ -43,6 +43,8 @@ class GameActivity(Activity):
         if not self.paused:
             self.player.update_presses(**self.controls)
             self.player.update(dtime)
+
+            self.world.update(dtime)
 
             self.camera.update_position()
 
@@ -89,6 +91,17 @@ class GameActivity(Activity):
                 x = int(x/Block.WIDTH)
                 y = int(y/Block.HEIGHT)
                 self.world.setblock(x, y, 0)
+            elif event.button == 3:
+                x, y = event.pos
+                cam_x, cam_y = self.camera.get_position()
+                x += cam_x
+                y += cam_y
+                x = int(x/Block.WIDTH/World.CHUNK_WIDTH)
+                y = int(y/Block.HEIGHT/World.CHUNK_WIDTH)
+                try:
+                    print(f"Chunk loaded at {x, y}:", self.world.chunks[x][y] is not None)
+                except IndexError:
+                    print(f"Chunk loaded at {x, y}: False")
         elif not (event.type == pg.MOUSEBUTTONUP and not self.overlay.is_visible()):
             super().on_event(event)
 

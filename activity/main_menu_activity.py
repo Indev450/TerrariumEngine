@@ -1,9 +1,10 @@
 import os
 import sys
+import logging
 
 import pygame as pg
 
-from .activity import Activity, newactivity
+from .activity import Activity, newactivity, getactivity
 from .game_activity import GameActivity
 
 from utils.calls import Call
@@ -81,18 +82,23 @@ class MainMenuActivity(Activity):
         self.show_message("Mapgen Started")
 
     def show_message(self, message):
+        print(message)
         self.overlay.hide("mainmenu")
-        self.overlay.show("message")
         self.overlay.get("message").set_text(message)
+        self.overlay.show("message")
 
     def run_world(self):
         try:
             file = open('world.tcworld', 'rb')
         except FileNotFoundError:
-            print("Error: save file not found")
-            return
+            return self.show_message("Save file not found")
 
-        newactivity(GameActivity, decode(file.read()))
+        try:
+            newactivity(GameActivity, decode(file.read()))
+        except Exception as e:
+            logging.exception(None)
+            activity = newactivity(MainMenuActivity)
+            getactivity().show_message(f"{type(e).__name__}: {str(e)}")
 
         file.close()
 

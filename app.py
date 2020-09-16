@@ -20,8 +20,8 @@ import game.stdblocks  # TODO - turn standart things into mods
 pg.init()
 
 class App:
-    WIN_WIDTH = 1024
-    WIN_HEIGHT = 840
+    WIN_WIDTH = 1366
+    WIN_HEIGHT = 768
 
     FONT = pg.font.Font('resources/fonts/dpcomic.ttf', 30)
 
@@ -51,7 +51,7 @@ class App:
 
             t = pg.time.get_ticks()
 
-            dtime = (t-last_update_time) / 1000.0  # TODO - use actual delta time
+            dtime = (t-last_update_time) / 1000.0
 
             last_update_time = t
 
@@ -62,12 +62,14 @@ class App:
 
             Activity.current.update(dtime)
 
-            Activity.current.draw(self.screen)
+            objects_drawn = Activity.current.draw(self.screen)
+
+            pg.display.set_caption(f"Terraclone (fps: {int(timer.get_fps())})")
 
             if Overlay.instance is not None:
                 Overlay.instance.draw(self.screen)
 
-            pg.display.update()
+            pg.display.flip()
 
     def set_frame_rate(self, value):
         """Set frame rate. If value < 0, it disables timer.tick()"""

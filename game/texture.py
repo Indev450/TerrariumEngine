@@ -2,6 +2,8 @@ import enum
 
 import pygame as pg
 
+from utils.color import randcolor
+
 _used_textures = []
 
 
@@ -29,7 +31,7 @@ class Texture:
 
 class AnimatedTexture(Texture):
 
-    instances = {}
+    instances = []
 
     def __init__(self, names, speed=1):
         self.textures = [gettexture(name) for name in names]
@@ -55,9 +57,7 @@ class AnimatedTexture(Texture):
                 self.index = 0
 
 
-class TiledTexture:
-
-    instances = {}
+class TiledTexture(Texture):
 
     def __init__(self, name, tiles_x, tiles_y):
         self.texture = gettexture(name, preload=True)
@@ -88,6 +88,19 @@ class TiledTexture:
                      min(self.tile_height, self.height-x*self.tile_height)))
 
 
+class BlankTexture(Texture):
+
+    def __init__(self, size, color):
+        self.image = pg.Surface(size)
+        self.image.fill(color)
+
+    def load(self):
+        pass
+
+    def get(self):
+        return self.image
+
+
 def gettexture(name, preload=False):
     global _used_textures
 
@@ -107,16 +120,16 @@ def gettexture(name, preload=False):
     return t
 
 
-def getanimtexture(*names, speed=1, preload=False):
+def getblank(*size):
+    return BlankTexture(size, pg.Color(randcolor()))
+
+
+def getanimated(*names, speed=1, preload=False):
     global _used_textures
 
-    t = None
-
-    if name not in AnimatedTexture.instances.keys():
-        t = AnimatedTexture(name)
-        AnimatedTexture.instances[name] = t
-    else:
-        t = AnimatedTexture.instances[name]
+    t = AnimatedTexture(names, speed)
+    
+    AnimatedTexture.instances.append(t)
 
     if preload:
         t.load()
@@ -128,16 +141,10 @@ def getanimtexture(*names, speed=1, preload=False):
     return t
 
 
-def gettiledtexture(name, tiles_x, tiles_y):
+def gettiled(name, tiles_x, tiles_y):
     global _used_textures
 
-    t = None
-
-    if name not in TiledTexture.instances.keys():
-        t = TiledTexture(name)
-        TiledTexture.instances[name] = t
-    else:
-        t = TiledTexture.instances[name]
+    t = TiledTexture(name, tiles_x, tiles_y)
 
     if preload:
         t.load()
@@ -147,15 +154,17 @@ def gettiledtexture(name, tiles_x, tiles_y):
     return t
 
 
-def load():
+def load(force=False):
     global _used_textures
 
     for name in _used_textures:
-        Texture(name).load(force=True)
+        Texture(name).load(force=force)
+
+
+def reload():
+    load(force=True)
 
 
 def update_animation(dtime):
-    global _used_textures
-
     for texture in AnimatedTexture.instances:
         texture.update(dtime)

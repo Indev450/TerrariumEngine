@@ -1,6 +1,3 @@
-import argparse
-import importlib
-
 from game.block import Block
 
 from worldfile.worldfile import encode

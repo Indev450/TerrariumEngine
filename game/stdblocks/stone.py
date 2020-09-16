@@ -2,12 +2,11 @@ import pygame as pg
 
 from game.block import Block
 
+from game.texture import gettexture
+
 
 class StoneBlock(Block):
-
-    @classmethod
-    def preload(cls):
-        cls.tile = pg.image.load("resources/textures/blocks/stone.png").convert()
+    tile = gettexture("resources/textures/blocks/stone16x16.png")
 
 
 Block.register("std:stone", StoneBlock)

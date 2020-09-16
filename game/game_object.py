@@ -2,7 +2,8 @@ import pygame as pg
 
 from .camera import Camera
 
-from utils.color import randcolor
+from game.texture import getblank
+
 
 class GameObject(pg.sprite.Sprite):
     """Most base game object. Has basic implementation of init_graphics() and draw().
@@ -14,15 +15,9 @@ class GameObject(pg.sprite.Sprite):
         self.rect = pg.Rect(x, y, width, height)
         # All game objects should have a rect
 
-        self.init_graphics(width, height)
-        # Initialize everything you need to draw object
+        self.image = getblank(width, height)
 
         self.camera = Camera.get()
-
-    def init_graphics(self, width, height):
-        self.image = pg.Surface((width, height))
-
-        self.image.fill(pg.Color(randcolor()))
 
     def draw(self, screen):
         info = pg.display.Info()
@@ -31,6 +26,6 @@ class GameObject(pg.sprite.Sprite):
         draw_y = self.rect.y - offset_y
         if (-self.rect.width <= draw_x <= info.current_w and
            -self.rect.height <= draw_y <= info.current_h):
-            screen.blit(self.image, (draw_x, draw_y))
+            screen.blit(self.image.get(), (draw_x, draw_y))
             return 1
         return 0

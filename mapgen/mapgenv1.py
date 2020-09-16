@@ -38,7 +38,7 @@ class MapgenV1(Mapgen):
         self.save()
 
     def noise2(self, x, y):
-        return math.tan(self.pnf2(x/self.width*10, y/self.height*10))
+        return math.tan(self.pnf2(x/self.width*Block.WIDTH, y/self.height*Block.HEIGHT))
 
     def noise1(self, x):
         v = math.tan(self.pnf1(x/self.width))
