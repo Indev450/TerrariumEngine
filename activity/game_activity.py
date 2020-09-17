@@ -96,12 +96,9 @@ class GameActivity(Activity):
                 cam_x, cam_y = self.camera.get_position()
                 x += cam_x
                 y += cam_y
-                x = int(x/Block.WIDTH/World.CHUNK_WIDTH)
-                y = int(y/Block.HEIGHT/World.CHUNK_WIDTH)
-                try:
-                    print(f"Chunk loaded at {x, y}:", self.world.chunks[x][y] is not None)
-                except IndexError:
-                    print(f"Chunk loaded at {x, y}: False")
+                x = int(x/Block.WIDTH)
+                y = int(y/Block.HEIGHT)
+                self.world.setblock(x, y, 1)
         elif not (event.type == pg.MOUSEBUTTONUP and not self.overlay.is_visible()):
             super().on_event(event)
 
