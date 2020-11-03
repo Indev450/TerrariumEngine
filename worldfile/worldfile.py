@@ -55,3 +55,35 @@ def decode(data):
         result.append(resultline)
 
     return result
+
+
+def show(filename):
+    file = None
+    
+    try:
+        file = open(filename, 'rb')
+    except FileNotFoundError:
+        print(f"{filename}: no such file or directory")
+    else:
+        mv = memoryview(file.read())
+        
+        width = int.from_bytes(mv[:4], 'little')
+        height = int.from_bytes(mv[4:8], 'little')
+
+        blocksize = mv[8]
+        
+        print(f'{filename}: Terrarium world, {width}x{height} blocks, {blocksize} bytes per block')
+
+
+def main():
+    import sys
+
+    if len(sys.argv) < 2:
+        print('Not enought arguments')
+    else:
+        filename = sys.argv[1]
+        show(filename)
+
+
+if __name__ == "__main__":
+    main()
