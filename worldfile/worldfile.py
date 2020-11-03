@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 def encode(blocks, blocksize):
     """Encode world data for saving in binary file
 
