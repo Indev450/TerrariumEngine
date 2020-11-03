@@ -8,8 +8,8 @@ from .camera import Camera
 class World:
     instance = None
 
-    CHUNK_WIDTH = 10
-    CHUNK_HEIGHT = 10
+    CHUNK_WIDTH = 20
+    CHUNK_HEIGHT = 20
 
     def __init__(self, blocks):
 
