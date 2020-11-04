@@ -14,8 +14,6 @@ class MapgenV1(Mapgen):
 
         self.stdstone = Block.id_by_strid("std:stone")
 
-        print(self.stdstone)
-
         self.pnf1 = PerlinNoiseFactory(dimension=1)
 
         self.pnf2 = PerlinNoiseFactory(dimension=2)
@@ -29,7 +27,9 @@ class MapgenV1(Mapgen):
             for x in range(self.width):
                 if self.blocks[y][x] == 0:
                     continue
-                self.blocks[y][x] = self.stdstone if self.noise2(x, y) < -0.1 else 0
+
+                if self.noise2(x, y) < -0.2:
+                    self.blocks[y][x] = 0
 
         for module in self.mods:
             if hasattr(module, "on_generated"):
@@ -38,11 +38,14 @@ class MapgenV1(Mapgen):
         self.save()
 
     def noise2(self, x, y):
-        return math.tan(self.pnf2(x/self.width*Block.WIDTH, y/self.height*Block.HEIGHT))
+        return math.tan(self.pnf2(
+            x/self.width*Block.WIDTH,
+            y/self.height*Block.HEIGHT))
 
     def noise1(self, x):
         v = math.tan(self.pnf1(x/self.width))
         return self.height*0.3 + 10*v
+
 
 def get_mapgen():
     return MapgenV1
