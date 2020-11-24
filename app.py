@@ -17,11 +17,15 @@ from ui.element import UIElement
 
 import game.stdblocks  # TODO - turn standart things into mods
 
-pg.init()
+
+if not pg.get_init():
+    pg.init()
+    pg.fastevent.init()
+
 
 class App:
-    WIN_WIDTH = 1366
-    WIN_HEIGHT = 768
+    WIN_WIDTH = 800
+    WIN_HEIGHT = 640
 
     FONT = pg.font.Font('resources/fonts/dpcomic.ttf', 30)
 
@@ -32,9 +36,9 @@ class App:
 
         self.frame_rate = 60
 
-        self.screen = pg.display.set_mode((self.WIN_WIDTH, self.WIN_HEIGHT))
+        self.screen = pg.display.set_mode((self.WIN_WIDTH, self.WIN_HEIGHT), pg.DOUBLEBUF)
 
-        pg.display.set_caption("Terraclone")
+        pg.display.set_caption("Terrarium")
 
         textures.load()
 
@@ -55,16 +59,16 @@ class App:
 
             last_update_time = t
 
-            for event in pg.event.get():
+            for event in pg.fastevent.get():
                 Activity.current.on_event(event)
 
             textures.update_animation(dtime)
 
             Activity.current.update(dtime)
 
-            objects_drawn = Activity.current.draw(self.screen)
+            Activity.current.draw(self.screen)
 
-            pg.display.set_caption(f"Terraclone (fps: {int(timer.get_fps())})")
+            pg.display.set_caption(f"Terrarium (fps: {int(timer.get_fps())})")
 
             if Overlay.instance is not None:
                 Overlay.instance.draw(self.screen)
