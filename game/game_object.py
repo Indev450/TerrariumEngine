@@ -27,5 +27,3 @@ class GameObject(pg.sprite.Sprite):
         if (-self.rect.width <= draw_x <= info.current_w and
            -self.rect.height <= draw_y <= info.current_h):
             screen.blit(self.image.get(), (draw_x, draw_y))
-            return 1
-        return 0

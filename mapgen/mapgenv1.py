@@ -12,7 +12,8 @@ class MapgenV1(Mapgen):
     def __init__(self, mods, output, width, height):
         super().__init__(mods, output, width, height)
 
-        self.stdstone = Block.id_by_strid("std:stone")
+        self.std_stone = Block.id_by_strid("std:stone")
+        self.std_stone_wall = Block.id_by_strid("std:stone_wall")
 
         self.pnf1 = PerlinNoiseFactory(dimension=1)
 
@@ -21,15 +22,16 @@ class MapgenV1(Mapgen):
     def run(self):
         for x in range(self.width):
             for y in range(int(self.noise1(x)), self.height):
-                self.blocks[y][x] = self.stdstone
+                self.put_foreground(x, y, self.std_stone)
+                self.put_background(x, y, self.std_stone_wall)
 
         for y in range(self.height):
             for x in range(self.width):
-                if self.blocks[y][x] == 0:
+                if self.get_foreground(x, y) == 0:
                     continue
 
                 if self.noise2(x, y) < -0.2:
-                    self.blocks[y][x] = 0
+                    self.put_foreground(x, y, 0)
 
         for module in self.mods:
             if hasattr(module, "on_generated"):

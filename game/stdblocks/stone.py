@@ -6,7 +6,12 @@ from game.texture import gettexture
 
 
 class StoneBlock(Block):
-    tile = gettexture("resources/textures/blocks/stone16x16.png")
+    tile = gettexture("resources/textures/blocks/stone.png")
+
+
+class StoneWallBlock(Block):
+    tile = gettexture("resources/textures/blocks/stone_wall.png")
 
 
 Block.register("std:stone", StoneBlock)
+Block.register("std:stone_wall", StoneWallBlock)

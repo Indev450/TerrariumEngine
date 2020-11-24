@@ -1,23 +1,37 @@
 #!/usr/bin/python3
 
-def encode(blocks, blocksize):
+CURRENT_VERSION = 1
+
+
+def encode(foreground, midground, background, blocksize):
     """Encode world data for saving in binary file
 
-    blocks - 2d array of block identifiers
-    blocksize - size of block identifier
+    foreground, midground, and background - 2d arrays of block sidentifiers
+    blocksize - size of block identifier (bytes)
 
     Returns bytes"""
 
-    out = b''
+    out = CURRENT_VERSION.to_bytes(1, 'little')  # File format version
+    
+    width = len(foreground[0])
+    height = len(foreground)
+    # width and height for fg, mg, and bg are equal
 
-    out += len(blocks[0]).to_bytes(4, 'little')  # Width
-    out += len(blocks).to_bytes(4, 'little')  # Height
+    out += width.to_bytes(4, 'little')
+    out += height.to_bytes(4, 'little')
 
-    out += blocksize.to_bytes(1, 'little')
+    out += blocksize.to_bytes(1, 'little')  # Bytes per block
+    
+    cells = 0
 
-    for line in blocks:
-        for block in line:
-            out += block.to_bytes(blocksize, 'little')
+    for y in range(height):
+        for x in range(width):
+            out += foreground[y][x].to_bytes(blocksize, 'little')
+            out += midground[y][x].to_bytes(blocksize, 'little')
+            out += background[y][x].to_bytes(blocksize, 'little')
+            cells += 1
+    
+    print(f"Wrote {cells} cells of world {width}x{height}")
 
     return out
 
@@ -25,56 +39,95 @@ def encode(blocks, blocksize):
 def decode(data):
     """Decode world data from bytes
 
-    Returns 2d array of block identifiers"""
+    Returns tuple of 3 2d arrays of block identifiers"""
     mv = memoryview(data)
+    
+    version = mv[0]
+    
+    if version != CURRENT_VERSION:
+        raise ValueError(f"Unsupported world file version - {version} "
+                         "(is this actually a world file?)")
 
-    width = int.from_bytes(mv[:4], 'little')
-    height = int.from_bytes(mv[4:8], 'little')
+    width = int.from_bytes(mv[1:5], 'little')
+    height = int.from_bytes(mv[5:9], 'little')
 
-    blocksize = mv[8]
+    blocksize = mv[9]
 
-    world = mv[9:]
+    world = mv[10:]
 
-    if len(world) != width*height*blocksize:
+    if len(world) != width*height*blocksize*3:  # 3 - three layers
+                                                # fg, mg, and bg
         raise ValueError(
-            f"wrong world size ({width*height*blocksize} "
+            f"wrong world size ({width*height*blocksize*3} bytes "
             f"expected, got {len(world)})")
 
-    result = []
+    foreground = []
+    midground = []
+    background = []
+    read = 0
 
     for i in range(height):
-        line = world[width*i:width*(i+1)]
-        resultline = []
+        line = world[width*i*3:width*(i+1)*3]
+
+        fg_line = []
+        mg_line = []
+        bg_line = []
 
         if not line:
-            break
+            continue
 
-        for j in range(width):
-            resultline.append(
+        for j in range(0, width*3, 3):
+            fg_line.append(
                 int.from_bytes(
                     line[j*blocksize:j*blocksize+blocksize], 'little'))
+            mg_line.append(
+                int.from_bytes(
+                    line[(j+1)*blocksize:(j+1)*blocksize+blocksize], 'little'))
+            bg_line.append(
+                int.from_bytes(
+                    line[(j+2)*blocksize:(j+2)*blocksize+blocksize], 'little'))
+            read += 1
 
-        result.append(resultline)
+        foreground.append(fg_line)
+        midground.append(mg_line)
+        background.append(bg_line)
+    
+    print(f"Read {read} cells from world {width}x{height}")
 
-    return result
+    return (foreground, midground, background)
 
 
 def show(filename):
+    '''
+    file-like utility that prints information about terrarium file
+    
+    Supported versions: 1
+    '''
     file = None
     
     try:
         file = open(filename, 'rb')
     except FileNotFoundError:
         print(f"{filename}: no such file or directory")
+    except IsADirectoryError:
+        print(f"{filename}: is a directory")
     else:
         mv = memoryview(file.read())
         
-        width = int.from_bytes(mv[:4], 'little')
-        height = int.from_bytes(mv[4:8], 'little')
+        version = mv[0]
 
-        blocksize = mv[8]
+        if version == 1:
+            width = int.from_bytes(mv[1:5], 'little')
+            height = int.from_bytes(mv[5:9], 'little')
+
+            blocksize = mv[9]
         
-        print(f'{filename}: Terrarium world, {width}x{height} blocks, {blocksize} bytes per block')
+            print(f'{filename}: Terrarium world version {version}, '
+                  f'{width}x{height} blocks, {blocksize} bytes per '
+                   'block (3 layers)')
+        else:
+            print(f'{filename}: unsupported world version: {version} '
+                  '(is this actually a Terrarium world?)')
 
 
 def main():
@@ -82,9 +135,15 @@ def main():
 
     if len(sys.argv) < 2:
         print('Not enought arguments')
+    elif len(sys.argv) > 2:
+        print('Too many arguments')
     else:
         filename = sys.argv[1]
-        show(filename)
+        if (filename.endswith('.tworld') or
+            filename.endswith('.tcworld')):  # Old file extension
+            show(filename)
+        else:
+            print(f'{filename}: not a Terrarium world')
 
 
 if __name__ == "__main__":

@@ -24,7 +24,7 @@ def get_config():
             "mapgens": {
                 "mapgenv1": {
                     "name": "Mapgen V1",
-                    "description": "Default TerraClone mapgen",
+                    "description": "Default Terrarium mapgen",
                     "module": "mapgen.mapgenv1",
                 }
             }
@@ -76,7 +76,7 @@ def main():
     
     parser.add_argument("--mapgen", default="mapgenv1")
     parser.add_argument("--mods", default="")
-    parser.add_argument("--output", default="world.tcworld")
+    parser.add_argument("--output", default="world.tworld")
     parser.add_argument("--width", default="1000")
     parser.add_argument("--height", default="500")
 
