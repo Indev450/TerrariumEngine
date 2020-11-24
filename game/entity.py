@@ -46,7 +46,9 @@ class Entity(GameObject):
         self.collide(True)
     
     def collide(self, by_x):
-        block = self.world.is_collide(self, self.on_collide_x if by_x else self.on_collide_y)
+        block = self.world.is_collide(
+            self,
+            self.on_collide_x if by_x else self.on_collide_y)
 
     def on_collide_x(self, block):
         if self.xv > 0:

@@ -26,8 +26,8 @@ class Block(GameObject):
 
         self.image = self.tile
 
-        self.grid_x = int(position[0] / self.WIDTH)
-        self.grid_y = int(position[1] / self.HEIGHT)
+        self.grid_x = position[0] // self.WIDTH
+        self.grid_y = position[1] // self.HEIGHT
 
         self.light = self.LIGHT
 
@@ -78,7 +78,7 @@ class Block(GameObject):
     def register(cls, idstr, block_type):
         cls.registered_blocks[idstr] = {
             "entry": block_type,
-            "id": None,
+            "id": -1,
         }
 
     @classmethod
@@ -87,7 +87,7 @@ class Block(GameObject):
 
     @classmethod
     def sort_registered_entries(cls):
-        cls._registered_blocks = [None]
+        cls._registered_blocks = [None]  # None - std:air
 
         keys = list(cls.registered_blocks.keys())
         keys.sort()

@@ -8,8 +8,8 @@ from .block import Block
 class Chunk:
     KEEP_ALIVE_TIME = 5
 
-    def __init__(self, blocks, x, y, width, height):
-        self.blocks = blocks
+    def __init__(self, world, x, y, width, height):
+        self.world = world
 
         size = (Block.WIDTH*width, Block.HEIGHT*height)
 
@@ -17,10 +17,10 @@ class Chunk:
         self.surf.fill(pg.Color(0, 0, 0, 0))
 
         self.x1 = x
-        self.x2 = min(x+width, len(blocks[0]))
+        self.x2 = min(x+width, world.WORLD_WIDTH)
 
         self.y1 = y
-        self.y2 = min(y+height, len(blocks))
+        self.y2 = min(y+height, world.WORLD_HEIGHT)
 
         real_x = x * Block.WIDTH
         real_y = y * Block.HEIGHT
@@ -41,13 +41,17 @@ class Chunk:
 
         for y in range(self.y1, self.y2):
             for x in range(self.x1, self.x2):
-                if self.blocks[y][x] is None:
+                tiles = self.world.get_tiles(x, y)
+
+                if not tiles:
                     continue
+                
+                image = compare_tiles(tiles)
 
                 local_x = (x-self.x1) * Block.WIDTH
                 local_y = (y-self.y1) * Block.HEIGHT
 
-                self.surf.blit(self.blocks[y][x].image.get(), (local_x, local_y))
+                self.surf.blit(image, (local_x, local_y))
 
     def deltimer(self, dtime):
         self.alive_time -= dtime
@@ -67,3 +71,12 @@ class Chunk:
 
             return 1
         return 0
+
+
+def compare_tiles(tiles):
+    output = pg.Surface((Block.WIDTH, Block.HEIGHT)).convert_alpha()
+    output.fill(pg.Color(0, 0, 0, 0))
+    
+    output.blits([(tile.image.get(), (0, 0)) for tile in tiles])
+
+    return output
