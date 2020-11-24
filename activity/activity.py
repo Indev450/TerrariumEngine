@@ -9,12 +9,29 @@ class Activity:
     current = None
 
     def __init__(self):
+        self.allowed_events = []
+        
         self.app = app.App.get()
 
         self.overlay = newoverlay()
+        
+        self.allow_event(pg.QUIT)
+        self.allow_event(pg.MOUSEBUTTONUP)
+        self.allow_event(pg.MOUSEBUTTONDOWN)
+    
+    def allow_event(self, etype):
+        if etype in self.allowed_events:
+            print(f"{type(self)}: event {etype} already enabled")
+        self.allowed_events.append(etype)
+
+    def disallow_event(self, etype):
+        try:
+            self.allowed_events.remove(etype)
+        except ValueError:
+            print(f"{type(self)}: event {etype} already disabled")
 
     def on_begin(self):
-        pass
+        pg.event.set_allowed(self.allowed_events)
 
     def update(self, dtime):
         pass

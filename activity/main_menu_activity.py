@@ -71,8 +71,6 @@ class MainMenuActivity(Activity):
     def draw(self, screen):
         screen.blit(self.background, (0, 0))
 
-        return 0  # No objects drawn
-
     def update(self, dtime):
         pass
 
@@ -89,14 +87,14 @@ class MainMenuActivity(Activity):
 
     def run_world(self):
         try:
-            file = open('world.tcworld', 'rb')
+            file = open('world.tworld', 'rb')
         except FileNotFoundError:
             return self.show_message("Save file not found")
 
         try:
-            newactivity(GameActivity, decode(file.read()))
+            newactivity(GameActivity, *decode(file.read()))
         except Exception as e:
-            logging.exception(None)
+            logging.exception("run_mapgen():")
             activity = newactivity(MainMenuActivity)
             getactivity().show_message(f"{type(e).__name__}: {str(e)}")
 
