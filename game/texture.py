@@ -8,14 +8,18 @@ _used_textures = []
 
 
 class Texture:
-    TEXTURES = {}
+    """Most base texture class. 
+    It's basicly just a wraper around pygame.Surface"""
 
-    instances = {}
+    TEXTURES = {}  # Loaded surfaces
+
+    instances = {}  # Texture objects
 
     def __init__(self, name):
         self.name = name
 
     def load(self, force=False):
+        """Load surface. Should be called after pygame.display.set_mode()"""
         try:
             if self.TEXTURES.get(self.name) is None or force:
                 self.TEXTURES[self.name] = pg.image.load(self.name).convert_alpha()
@@ -23,6 +27,7 @@ class Texture:
             print(f"Could not load {self.name}: {e}")
 
     def get(self):
+        """Get surface object"""
         if self.TEXTURES.get(self.name) is None:
             print(f"Warning: texture {self.name} is not preloaded")
             self.load()
@@ -30,6 +35,8 @@ class Texture:
 
 
 class AnimatedTexture(Texture):
+    """Animated texture contains few references to Texture objects
+    which are containing animation frames. Better use AnimatedTiledTexture"""
 
     instances = []
 
@@ -50,6 +57,7 @@ class AnimatedTexture(Texture):
         return self.textures[self.index].get()
 
     def update(self, dtime):
+        """Update animation"""
         self.timer += dtime
         if self.timer >= self.speed:
             self.index += 1
@@ -59,6 +67,8 @@ class AnimatedTexture(Texture):
 
 
 class TiledTexture(Texture):
+    """Very useful texture for using tile maps.
+    Has interface to easily get some textures"""
 
     def __init__(self, name, tiles_x, tiles_y):
         self.texture = gettexture(name)
@@ -82,6 +92,7 @@ class TiledTexture(Texture):
         self.tile_height = self.height//self.tiles_y
 
     def get(self, x=0, y=0):
+        """Get tile at given position"""
         if x not in range(self.tiles_x) or y not in range(self.tiles_y):
             raise IndexError(
                 "invalid position on tile (tile: "
@@ -96,6 +107,7 @@ class TiledTexture(Texture):
 
 
 class AnimatedTiledTexture(AnimatedTexture):
+    """Most usefu wrapper for making animations for entities"""
 
     def __init__(self, texture, animspec, current="idle"):
         self.texture = texture
@@ -113,6 +125,7 @@ class AnimatedTiledTexture(AnimatedTexture):
         self.texture.load(force)
     
     def set_animation(self, name):
+        """Set current animation by its name"""
         if self.animspec.get(name) is None:
             raise NameError(f"animation {name} does not exists")
         
@@ -122,6 +135,7 @@ class AnimatedTiledTexture(AnimatedTexture):
         self.speed = self.animspec[name]["speed"]
     
     def get_animation(self):
+        """Get current animation name"""
         return self.current_name
 
     def get(self):
@@ -138,6 +152,7 @@ class AnimatedTiledTexture(AnimatedTexture):
 
 
 class BlankTexture(Texture):
+    """Blank textures are useful for testing"""
 
     def __init__(self, size, color):
         self.image = pg.Surface(size)
@@ -151,6 +166,9 @@ class BlankTexture(Texture):
 
 
 def gettexture(name, preload=False):
+    """Create Texture object which will load and convert pygame.Surface
+    when it become possible"""
+
     global _used_textures
 
     t = None
@@ -170,10 +188,13 @@ def gettexture(name, preload=False):
 
 
 def getblank(*size):
+    """Get random-colorized blank texture"""
     return BlankTexture(size, pg.Color(randcolor()))
 
 
 def getanimated(*names, speed=1, preload=False):
+    """Create AnimatedTexture object. Better use AnimatedTiledTexture
+    (animtiled)"""
     global _used_textures
 
     t = AnimatedTexture(names, speed)
@@ -189,6 +210,7 @@ def getanimated(*names, speed=1, preload=False):
 
 
 def gettiled(name, tiles_x, tiles_y, preload=False):
+    """Load tile map."""
     global _used_textures
 
     t = TiledTexture(name, tiles_x, tiles_y)
@@ -202,6 +224,16 @@ def gettiled(name, tiles_x, tiles_y, preload=False):
 
 
 def animtiled(texture, animspec, current="idle"):
+    """Apply animspec to TiledTexture.
+    anipspec is a dict with that structure:
+    {
+        "animation_name": {
+            "speed": 0.5,  # Time for each frame
+            "tiles": [],  # List of tuples (tile positions)
+        },
+        ...
+    }"""
+
     t = AnimatedTiledTexture(texture, animspec, current)
 
     AnimatedTexture.instances.append(t)
@@ -212,6 +244,8 @@ def animtiled(texture, animspec, current="idle"):
 
 
 def load(force=False):
+    """Try to load every texture. If force is true, every texture will
+    be loaded even if it already loaded"""
     global _used_textures
 
     for texture in _used_textures:
@@ -219,9 +253,11 @@ def load(force=False):
 
 
 def reload():
+    """Reload textures"""
     load(force=True)
 
 
 def update_animation(dtime):
+    """Update all animated textures"""
     for texture in AnimatedTexture.instances:
         texture.update(dtime)
