@@ -1,16 +1,20 @@
 import os
 import sys
 import logging
+import importlib
 
 import pygame as pg
 
 from .activity import Activity, newactivity, getactivity
 from .game_activity import GameActivity
+from .mapgen_activity import MapgenActivity
 
 from utils.calls import Call
 
 from ui.button import Button
 from ui.label import Label
+
+from runmapgen import get_config
 
 from worldfile.worldfile import decode
 
@@ -71,13 +75,30 @@ class MainMenuActivity(Activity):
     def draw(self, screen):
         screen.blit(self.background, (0, 0))
 
-    def update(self, dtime):
-        pass
-
     def run_mapgen(self):
-        os.popen(f"{sys.executable} runmapgen.py")
+        # TODO - add ability to choose map generator
+        import game.stdblocks  # TODO - turn standart things into mods
+        # There are many things to do :)
+        
+        config = get_config()
+        
+        mgconfig = config["mapgens"].get("mapgenv1")
 
-        self.show_message("Mapgen Started")
+        if mgconfig is None:
+            self.show_message('default mapgen not found')
+            return
+        
+        try:
+            mapgen_t = importlib.import_module(mgconfig['module']).get_mapgen()
+        except ModuleNotFoundError:
+            self.show_message('default mapgen not found')
+            return
+
+        try:
+            newactivity(MapgenActivity, self, mapgen_t, [], 'world.tworld', 1000, 500)
+        except Exception as e:
+            logging.exception("run_mapgen():")
+            self.show_message(f"{type(e).__name__}: {str(e)}")
 
     def show_message(self, message):
         print(message)

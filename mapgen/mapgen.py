@@ -8,7 +8,9 @@ from worldfile.worldfile import encode
 class Mapgen(mp.Process):
     """Base mapgen class"""
 
-    def __init__(self, mods, output, width, height):
+    def __init__(self, mods, output, width, height, status_v, done_v):
+        super().__init__()
+
         Block.sort_registered_entries()
 
         self.mods = mods
@@ -22,8 +24,8 @@ class Mapgen(mp.Process):
         self.midground = [[0 for i in range(self.width)] for i in range(self.height)]
         self.background = [[0 for i in range(self.width)] for i in range(self.height)]
         
-        self.status = mp.Value('s', 'Wait...')  # String status of a mapgen
-        self.complated = mp.Value('d', 0.0)
+        self.status = status_v  # String status of a mapgen
+        self.done = done_v  # How much work done (in percent)
 
     def save(self):
         blocksize = int(Block.registered_count()/256) + 1
@@ -34,6 +36,8 @@ class Mapgen(mp.Process):
             blocksize)
         self.ofile.write(data)
         self.ofile.close()
+        
+        self.set_status(done=-1)
     
     def put_foreground(self, x, y, blockid):
         self.foreground[y][x] = blockid
@@ -53,7 +57,14 @@ class Mapgen(mp.Process):
     def get_background(self, x, y):
         return self.background[y][x]
     
-    def set_status(self, string=None, complated=None):
+    def set_status(self, string=None, done=None):
+        if string is not None:
+            with self.status.get_lock():
+                self.status.value = string
+        
+        if done is not None:
+            with self.done.get_lock():
+                self.done.value = done
 
     def run(self):
-        pass
+        self.set_status(string=f"Started mapgen process with pid {self.pid}")

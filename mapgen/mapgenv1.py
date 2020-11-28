@@ -9,8 +9,8 @@ from game.block import Block
 
 class MapgenV1(Mapgen):
 
-    def __init__(self, mods, output, width, height):
-        super().__init__(mods, output, width, height)
+    def __init__(self, mods, output, width, height, status_v, done_v):
+        super().__init__(mods, output, width, height, status_v, done_v)
 
         self.std_stone = Block.id_by_strid("std:stone")
         self.std_stone_wall = Block.id_by_strid("std:stone_wall")
@@ -20,10 +20,17 @@ class MapgenV1(Mapgen):
         self.pnf2 = PerlinNoiseFactory(dimension=2)
 
     def run(self):
+        super().run()
+        
+        self.set_status(string="Generating terrain...", done=0)
+
         for x in range(self.width):
             for y in range(int(self.noise1(x)), self.height):
                 self.put_foreground(x, y, self.std_stone)
                 self.put_background(x, y, self.std_stone_wall)
+            self.set_status(done=(x/self.width)*100)
+        
+        self.set_status(string="Generating caves...", done=0)
 
         for y in range(self.height):
             for x in range(self.width):
@@ -32,10 +39,13 @@ class MapgenV1(Mapgen):
 
                 if self.noise2(x, y) < -0.2:
                     self.put_foreground(x, y, 0)
+            self.set_status(done=(y/self.height)*100)
 
         for module in self.mods:
             if hasattr(module, "on_generated"):
                 module.on_generated(self)
+        
+        self.set_status(string="Saving the world...", done=0)
 
         self.save()
 
