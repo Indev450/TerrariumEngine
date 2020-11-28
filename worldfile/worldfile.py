@@ -32,7 +32,7 @@ def encode(foreground, midground, background, blocksize):
 
     for y in range(height):
         for x in range(width):
-            pos = HEADERSIZE + (y*width+x*3)
+            pos = HEADERSIZE + (y*width*3+x*3)
             result[pos:(pos+blocksize)] = foreground[y][x].to_bytes(blocksize, 'little')
 
             pos += blocksize
