@@ -6,8 +6,8 @@ from game.texture import getblank
 
 
 class GameObject(pg.sprite.Sprite):
-    """Most base game object. Has basic implementation of init_graphics() and draw().
-    Other game object types should redefine them."""
+    """Most base game object. Has basic implementation of draw().
+    Other game object types should can it."""
 
     def __init__(self, x, y, width, height):
         super().__init__()
@@ -20,6 +20,8 @@ class GameObject(pg.sprite.Sprite):
         self.camera = Camera.get()
 
     def draw(self, screen):
+        """Draw object on the screen. Checks is it in the camera
+        bounds, and if not - skips drawing"""
         info = pg.display.Info()
         offset_x, offset_y = self.camera.get_position()
         draw_x = self.rect.x - offset_x
