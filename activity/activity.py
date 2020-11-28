@@ -78,3 +78,12 @@ def newactivity(type_, *args, **kwargs):
     Activity.current = activity
     
     activity.on_begin()
+
+
+def setactivity(activity):
+    current = getactivity()
+
+    if current is not None:
+        current.on_end()
+
+    Activity.current = activity
