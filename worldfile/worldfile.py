@@ -1,5 +1,7 @@
 #!/usr/bin/python3
 
+import itertools
+
 CURRENT_VERSION = 1
 
 
@@ -10,30 +12,40 @@ def encode(foreground, midground, background, blocksize):
     blocksize - size of block identifier (bytes)
 
     Returns bytes"""
-
-    out = CURRENT_VERSION.to_bytes(1, 'little')  # File format version
     
+    HEADERSIZE = 10
+
     width = len(foreground[0])
     height = len(foreground)
     # width and height for fg, mg, and bg are equal
+    
+    result = memoryview(bytearray(HEADERSIZE + width*height*3*blocksize))
 
-    out += width.to_bytes(4, 'little')
-    out += height.to_bytes(4, 'little')
+    result[0:1] = CURRENT_VERSION.to_bytes(1, 'little')  # File format version
 
-    out += blocksize.to_bytes(1, 'little')  # Bytes per block
+    result[1:5] = width.to_bytes(4, 'little')
+    result[5:9] = height.to_bytes(4, 'little')
+
+    result[9:10] =  blocksize.to_bytes(1, 'little')  # Bytes per block
     
     cells = 0
 
     for y in range(height):
         for x in range(width):
-            out += foreground[y][x].to_bytes(blocksize, 'little')
-            out += midground[y][x].to_bytes(blocksize, 'little')
-            out += background[y][x].to_bytes(blocksize, 'little')
+            pos = HEADERSIZE + (y*width+x*3)
+            result[pos:(pos+blocksize)] = foreground[y][x].to_bytes(blocksize, 'little')
+
+            pos += blocksize
+            result[pos:(pos+blocksize)] = midground[y][x].to_bytes(blocksize, 'little')
+            
+            pos += blocksize
+            result[pos:(pos+blocksize)] = background[y][x].to_bytes(blocksize, 'little')
+            
             cells += 1
     
     print(f"Wrote {cells} cells of world {width}x{height}")
 
-    return out
+    return result.tobytes()
 
 
 def decode(data):
