@@ -5,6 +5,11 @@ from ui.overlay import newoverlay
 import app
 
 class Activity:
+    """Activity controls game logic, can handle pygame events, etc
+    
+    This class contains reference to curent activity which will be rendered
+    by the App class.
+    """
 
     current = None
 
@@ -20,26 +25,34 @@ class Activity:
         self.allow_event(pg.MOUSEBUTTONDOWN)
     
     def allow_event(self, etype):
+        """Allow some pygame event"""
         if etype in self.allowed_events:
             print(f"{type(self)}: event {etype} already enabled")
         self.allowed_events.append(etype)
 
     def disallow_event(self, etype):
+        """Disable some pygame event"""
         try:
             self.allowed_events.remove(etype)
         except ValueError:
             print(f"{type(self)}: event {etype} already disabled")
 
     def on_begin(self):
+        """Called when activity created though newactivity()"""
         pg.event.set_allowed(self.allowed_events)
 
     def update(self, dtime):
+        """Called every frame, dtime is a time elapsed since
+        last update was called"""
         pass
 
     def draw(self, screen):
+        """Draw some activity content, like background, entities,
+        blocks, etc"""
         pass
 
     def on_event(self, event):
+        """Called for each event from pygame.event.get()"""
         if event.type == pg.QUIT:
             print("Quit message received")
 
@@ -60,14 +73,19 @@ class Activity:
                 self.overlay.on_release()
 
     def on_end(self):
+        """Called when activity was replaced by another one
+        (in newactivity() or setactivity())"""
         pass
 
 
 def getactivity():
+    """Get current activity"""
     return Activity.current
 
 
 def newactivity(type_, *args, **kwargs):
+    """Create and set activity of given type,
+    returns new created activity"""
     current = getactivity()
 
     if current is not None:
@@ -81,6 +99,8 @@ def newactivity(type_, *args, **kwargs):
 
 
 def setactivity(activity):
+    """Sets already created activity. Remember that you should re-initialize
+    activitys overay and ui (i'll fix that later)"""
     current = getactivity()
 
     if current is not None:
