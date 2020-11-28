@@ -3,10 +3,10 @@ from .game_object import GameObject
 
 
 class Entity(GameObject):
-    GRAVITY = 25
-    BRAKING = 0.7
-    MIN_SPEED = 0.2  # Min horizontal speed
-    MAX_SPEED = 5
+    GRAVITY = 25  # Fall speed
+    BRAKING = 0.7  # To avoid endless motion of object
+    MIN_SPEED = 0.2  # Minimum horizontal speed
+    MAX_SPEED = 5  # Maximum horizontal speed
     MAX_FALL = -20  # Maximum of fall speed
 
     def __init__(self, position=(0, 0), velocity=(0, 0), size=(10, 10)):
@@ -21,6 +21,7 @@ class Entity(GameObject):
         self.world = World.get()
 
     def update(self, dtime):
+        """Called every frame. Updates entitys physics"""
         acceleration = self.xv - self.xv*self.BRAKING
 
         self.xv -= acceleration * dtime * self.friction
@@ -46,11 +47,13 @@ class Entity(GameObject):
         self.collide(True)
     
     def collide(self, by_x):
-        block = self.world.is_collide(
+        """Checks collision for one dimension"""
+        self.world.is_collide(
             self,
-            self.on_collide_x if by_x else self.on_collide_y)
+            self._on_collide_x if by_x else self._on_collide_y)
 
-    def on_collide_x(self, block):
+    def _on_collide_x(self, block):
+        """Collide callback for x"""
         if self.xv > 0:
             self.rect.right = block.rect.left
             self.xv = 0
@@ -59,7 +62,8 @@ class Entity(GameObject):
             self.rect.left = block.rect.right
             self.xv = 0
 
-    def on_collide_y(self, block):
+    def _on_collide_y(self, block):
+        """Collide callback for y"""
         if self.yv > 0:
             self.rect.bottom = block.rect.top
             self.on_ground = True
