@@ -30,10 +30,11 @@ class Button(UIElement):
         self.image = self.get_image(text=text)
 
     def on_click(self, position):
-        self.on_pressed()
         self.image = self.get_image(pressed=True, text=self.text)
 
-    def on_release(self):
+    def on_release(self, position):
+        if self.rect.collidepoint(*position):
+            self.on_pressed()
         self.image = self.get_image(text=self.text)
 
     def get_image(self, pressed=False, text=""):

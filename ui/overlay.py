@@ -22,10 +22,10 @@ class Overlay:
                self.elements[name]['element'].rect.collidepoint(*position)):
                 self.elements[name]['element'].on_click(position)
 
-    def on_release(self):
+    def on_release(self, position):
         for name in self.elements.keys():
-            if self.elements[name]['visible']:
-                self.elements[name]['element'].on_release()
+            if self.elements[name]['visible']: 
+               self.elements[name]['element'].on_release(position)
 
     def on_scroll(self, up):
         for name in self.elements.keys():
@@ -34,11 +34,13 @@ class Overlay:
 
     def show(self, name):
         if not self.elements.get(name):
+            print(f"Warning: cannot show UI element '{name}', element not found")
             return
         self.elements[name]['visible'] = True
 
     def hide(self, name):
         if not self.elements.get(name):
+            print(f"Warning: cannot hide UI element '{name}', element not found")
             return
         self.elements[name]['visible'] = False
 
@@ -57,7 +59,9 @@ class Overlay:
     def is_enabled(self):
         return self.enabled
 
-    def is_visible(self):
+    def is_visible(self, name=None):
+        if name is not None:
+            return self.elements.get(name, {}).get('visible')
         return any([element['visible'] for element in self.elements.values()])
 
 

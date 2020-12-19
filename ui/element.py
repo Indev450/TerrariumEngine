@@ -17,7 +17,7 @@ class UIElement:
         else:
             self.children = []
         # We can't use [] as default argument, because in each new object it will be
-        # same list object, so it can cause problems
+        # same list object, so it can cause problems (it's a python problem)
 
         self.parent = parent
         
@@ -67,9 +67,9 @@ class UIElement:
             if child.rect.collidepoint(*position):
                 child.on_click(position)
 
-    def on_release(self):
+    def on_release(self, position):
         for child in self.children:
-            child.on_release()
+            child.on_release(position)
 
     def on_scroll(self, up):
         for child in self.children:

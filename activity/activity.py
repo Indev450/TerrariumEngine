@@ -70,7 +70,7 @@ class Activity:
 
         elif event.type == pg.MOUSEBUTTONUP and self.overlay.is_enabled():
             if event.button == 1:
-                self.overlay.on_release()
+                self.overlay.on_release(event.pos)
 
     def on_end(self):
         """Called when activity was replaced by another one
