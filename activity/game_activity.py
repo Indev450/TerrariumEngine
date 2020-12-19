@@ -4,6 +4,13 @@ from game.block import Block
 from game.player import Player
 from game.camera import Camera
 from game.world import World, blocks2ids
+from game.meta_manager import MetaManager
+from game.entity_manager import EntityManager
+
+from ui.label import Label
+from ui.inv_hotbar import InventoryHotbar
+from ui.hotbar_selected import HotbarSelected
+from ui.inventory_cell import InventoryCell
 
 from worldfile.worldfile import encode
 
@@ -15,9 +22,11 @@ class GameActivity(Activity):
 
     def __init__(self, *blocks):
         super().__init__()
+        import game.stditems
 
         Block.sort_registered_entries()  # Create int identifiers for
                                          # block definitions
+        Player.register()
 
         Camera.init()  # Create camera object
 
@@ -26,8 +35,70 @@ class GameActivity(Activity):
         self.background.fill(self.BG_COLOR)
 
         self.world = World(*blocks)
+        
+        self.meta_manager = MetaManager.load('world.meta')
+        
+        self.entity_manager = EntityManager.load('world.entities')
 
-        self.player = Player()
+        self.player = self.entity_manager.getentity('player')
+        
+        inv = None
+
+        if self.player is None:
+            self.player = Player()
+            
+            self.entity_manager.addentity(self.player, 'player')
+            
+            inv = self.player.get_inventory()
+            
+            inv.set_item('hotbar', 0, game.stditems.StoneItem, 10)
+            inv.set_item('hotbar', 1, game.stditems.StoneItem, 4)
+        
+        inv = self.player.get_inventory()
+
+        hotbar = InventoryHotbar(
+            position_f=(0.1, 0.01),
+            size_f=(0.8, 0.14))
+            
+        inv_width = inv.get_size('hotbar')
+        inv_height = inv.get_size('main') // inv_width
+        
+        cell_width = 0.1
+        cell_height = 0.2
+        
+        space_x = (0.9 - cell_width*inv_width) / (inv_width + 1)  # Rockets go brrr
+        space_y = (0.9 - cell_height*inv_height) / inv_height
+        # Free space between slots
+        
+        offset = 0.05
+
+        for i in range(inv_width):
+            x = (i+1)*space_x + 0.1*i
+            InventoryCell(inv.get_item_ref('hotbar', i),
+                          parent=hotbar,
+                          position_f=(x+offset, 0.1),
+                          size_f=(cell_width, 0.8))
+        
+        x = (self.player.selected_item+1)*space_x + 0.1*self.player.selected_item
+        self.hotbar_selected = HotbarSelected(
+                          parent=hotbar,
+                          position_f=(x+offset, 0.1),
+                          size_f=(cell_width, 0.8))
+
+        main_inventory = InventoryHotbar(
+            position_f=(0.1, 0.2),
+            size_f=(0.8, 0.6))
+
+        for x in range(inv_width):
+            for y in range(inv_height):
+                InventoryCell(inv.get_item_ref('main', y*inv_width + x),
+                              parent=main_inventory,
+                              position_f=((x+1)*space_x + cell_width*x + offset, 
+                                          space_y*y + cell_height*y + offset),
+                              size_f=(cell_width, cell_height))
+        
+        self.overlay.add_element('hotbar', hotbar, True)
+        self.overlay.add_element('inventory', main_inventory)
 
         self.camera = Camera.get()
         self.camera.set_obj(self.player)
@@ -37,17 +108,73 @@ class GameActivity(Activity):
             'left': False,
             'right': False,
             'up': False,
+            'mouse': {
+                'pressed': False,
+                'press_time': 0,
+                },
         }
 
         self.paused = False
         
         self.allow_event(pg.KEYUP)
         self.allow_event(pg.KEYDOWN)
+    
+    def update_selected_item(self):
+        inv_width = self.player.inventory.get_size('hotbar')
+        inv_height = self.player.inventory.get_size('main') // inv_width
+        
+        cell_width = 0.1
+        cell_height = 0.2
+        
+        space_x = (0.9 - cell_width*inv_width) / (inv_width + 1)  # Rockets go brrr
+        space_y = (0.9 - cell_height*inv_height) / inv_height
+        # Free space between slots
+        
+        offset = 0.05
+        
+        x = (self.player.selected_item+1)*space_x + 0.1*self.player.selected_item
+        
+        self.hotbar_selected.set_rect(
+            position_f=(x+offset, 0.1),
+            size_f=(cell_width, 0.8))
+    
+    def toggle_inventory_visibility(self):
+        if self.overlay.is_visible('inventory'):
+            self.overlay.hide('inventory')
+        else:
+            self.overlay.show('inventory')
 
     def update(self, dtime):
         if not self.paused:
-            self.player.update_presses(**self.controls)
-            self.player.update(dtime)
+            if self.controls['mouse']['pressed']:
+                istack = self.player.inventory.get_item('hotbar', self.player.selected_item)
+                
+                if not istack.empty():
+                    x, y = pg.mouse.get_pos()
+                    
+                    cam_x, cam_y = self.camera.get_position()
+                    
+                    x += cam_x
+                    y += cam_y
+                    
+                    x = int(x//Block.WIDTH)
+                    y = int(y//Block.HEIGHT)
+                    
+                    if self.controls['mouse']['press_time'] == 0:
+                        istack.item_t.on_press(self.player, istack, (x, y))
+                        self.controls['mouse']['press_time'] += dtime
+                    else:
+                        istack.item_t.on_keep_press(
+                            self.player,
+                            istack,
+                            (x, y), 
+                            self.controls['mouse']['press_time'])
+                        self.controls['mouse']['press_time'] += dtime
+
+            self.player.update_presses(left=self.controls['left'],
+                                       right=self.controls['right'],
+                                       up=self.controls['up'])
+            self.entity_manager.update(dtime)
 
             self.world.update(dtime)
 
@@ -67,6 +194,12 @@ class GameActivity(Activity):
     def play(self):
         self.overlay.hide('pause')
         self.paused = False
+    
+    def toggle_pause(self):
+        if self.paused:
+            self.play()
+        else:
+            self.pause()
 
     def on_event(self, event):
         if event.type == pg.KEYDOWN:
@@ -78,6 +211,15 @@ class GameActivity(Activity):
 
             elif event.key == pg.K_SPACE:
                 self.controls['up'] = True
+            
+            elif event.key == pg.K_i:
+                self.toggle_inventory_visibility()
+            
+            elif event.key == pg.K_ESCAPE:
+                if self.overlay.is_visible('inventory'):
+                    self.toggle_inventory_visibility()
+                else:
+                    self.toggle_pause()
 
         elif event.type == pg.KEYUP:
             if event.key == pg.K_a:
@@ -89,9 +231,10 @@ class GameActivity(Activity):
             elif event.key == pg.K_SPACE:
                 self.controls['up'] = False
 
-        elif event.type == pg.MOUSEBUTTONDOWN and not self.overlay.is_visible():
+        elif event.type == pg.MOUSEBUTTONDOWN and not self.overlay.is_visible('inventory'):
             if event.button == 1:
-                x, y = event.pos
+                self.controls['mouse']['pressed'] = True
+                '''x, y = event.pos
 
                 cam_x, cam_y = self.camera.get_position()
 
@@ -101,7 +244,7 @@ class GameActivity(Activity):
                 x = int(x//Block.WIDTH)
                 y = int(y//Block.HEIGHT)
 
-                self.world.setblock(x, y, 0)
+                self.world.set_fg_block(x, y, 0)
 
             elif event.button == 3:
                 x, y = event.pos
@@ -114,7 +257,22 @@ class GameActivity(Activity):
                 x = int(x//Block.WIDTH)
                 y = int(y//Block.HEIGHT)
 
-                self.world.setblock(x, y, 1)
+                self.world.set_fg_block(x, y, 1)
+            '''
+            elif event.button in (4, 5):
+                self.player.selected_item += 1 if event.button == 5 else -1
+                
+                if self.player.selected_item < 0:
+                    self.player.selected_item = self.player.inventory.get_size('hotbar')-1
+                elif self.player.selected_item >= self.player.inventory.get_size('hotbar'):
+                    self.player.selected_item = 0
+                
+                self.update_selected_item()
+        
+        elif event.type == pg.MOUSEBUTTONUP:
+            if event.button == 1:
+                self.controls['mouse']['pressed'] = False
+                self.controls['mouse']['press_time'] = 0
 
         elif not (event.type == pg.MOUSEBUTTONUP and
                   not self.overlay.is_visible()):
@@ -130,6 +288,9 @@ class GameActivity(Activity):
             blocks2ids(self.world.midground),
             blocks2ids(self.world.background),
             blocksize)
+        
+        self.meta_manager.save('world.meta')
+        self.entity_manager.save('world.entities')
 
         file = open('world.tworld', 'wb')
 

@@ -20,6 +20,8 @@ class Block(GameObject):
     ID = 0
 
     LIGHT = 0
+    
+    REPLACABLE = False
 
     def __init__(self, *position):
         super().__init__(*position, self.WIDTH, self.HEIGHT)
@@ -96,3 +98,91 @@ class Block(GameObject):
             cls._registered_blocks.append(cls.registered_blocks[keys[i]]["entry"])
             cls.registered_blocks[keys[i]]['id'] = i
             cls._registered_blocks[i].ID = i
+
+
+# ---------------------------------------------------------------
+# TODO - make this functions better
+
+
+def _place_block_into(blockname, into=0):  # 0 - fg, 1 - mg, 2 - bg
+    def _place_block(player, itemstack, position):
+        world = player.world
+        
+        position = int(position[0]), int(position[1])
+
+        if into == 0:
+            dstblock = world.get_fg_block(*position)
+        elif into == 1:
+            dstblock = world.get_mg_block(*position)
+        else:
+            dstblock = world.get_bg_block(*position)
+
+        if dstblock is None or dstblock.REPLACABLE:
+            if into == 0:
+                world.set_fg_block(*position, Block.id_by_strid(blockname))
+            elif into == 1:
+                world.set_mg_block(*position, Block.id_by_strid(blockname))
+            else:
+                world.set_bg_block(*position, Block.id_by_strid(blockname))
+            
+            itemstack.consume_items(1)
+    
+    return _place_block
+
+
+def _place_block_into_keep(blockname, into=0):  # 0 - fg, 1 - mg, 2 - bg
+    _keep_place_block_users = {}
+    
+    def _place_block_keep(player, itemstack, position, use_time):
+        world = player.world
+
+        position = int(position[0]), int(position[1])
+        
+        if _keep_place_block_users.get(player) is None:
+            _keep_place_block_users[player] = 0
+        
+        if use_time - _keep_place_block_users[player] > 0.25:
+            if into == 0:
+                dstblock = world.get_fg_block(*position)
+            elif into == 1:
+                dstblock = world.get_mg_block(*position)
+            else:
+                dstblock = world.get_bg_block(*position)
+
+            if dstblock is None or dstblock.REPLACABLE:
+                if into == 0:
+                    world.set_fg_block(*position, Block.id_by_strid(blockname))
+                elif into == 1:
+                    world.set_mg_block(*position, Block.id_by_strid(blockname))
+                else:
+                    world.set_bg_block(*position, Block.id_by_strid(blockname))
+                
+                itemstack.consume_items(1)
+                
+                _keep_place_block_users[player] = use_time
+    
+    return _place_block_keep
+
+
+def place_fg_block(blockname):
+    return _place_block_into(blockname, 0)
+
+
+def place_mg_block(blockname):
+    return _place_block_into(blockname, 1)
+
+
+def place_bg_block(blockname):
+    return _place_block_into(blockname, 2)
+
+
+def place_fg_block_keep(blockname):
+    return _place_block_into_keep(blockname, 0)
+
+
+def place_mg_block_keep(blockname):
+    return _place_block_into_keep(blockname, 1)
+
+
+def place_bg_block_keep(blockname):
+    return _place_block_into_keep(blockname, 2)

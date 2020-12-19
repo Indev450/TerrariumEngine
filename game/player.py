@@ -2,8 +2,12 @@ from .entity import Entity
 
 from .texture import gettiled, animtiled
 
+from .inventory import Inventory
+
 
 class Player(Entity):
+    ID = 'std:player'
+    
     SPEED = 30
     JUMP = 10
     WIDTH = 20
@@ -37,6 +41,14 @@ class Player(Entity):
             "tiles": [(0, 2)]
         },
     }
+    
+    @classmethod
+    def from_save(cls, save):
+        player = super().from_save(save)
+        
+        player.inventory = Inventory().load(save['data']['inventory'])
+        
+        return player
 
     def __init__(self, position=(0, 0), velocity=(0, 0)):
         super().__init__(position, velocity, (self.WIDTH, self.HEIGHT))
@@ -45,6 +57,14 @@ class Player(Entity):
         self.turned_left = True
 
         self.image = animtiled(self.TEXTURE, self.ANIMSPEC, "idle_left")
+        
+        self.inventory = Inventory(self)
+        
+        self.inventory.set_size('hotbar', 8)
+        self.inventory.set_size('main', 8*4)
+        self.inventory.set_size('buffer', 1)
+
+        self.selected_item = 0
 
     def update_presses(self, left=False, right=False, up=False):
         if left:
@@ -76,4 +96,12 @@ class Player(Entity):
         
         if self.xv == 0 and self.on_ground:
             self.set_animation("idle_" + ("left" if self.turned_left else "right"))
+    
+    def get_inventory(self):
+        return self.inventory
+    
+    def on_save(self):
+        return {
+            'inventory': self.inventory.dump(),
+        }
 

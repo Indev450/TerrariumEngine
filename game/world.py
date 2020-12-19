@@ -80,11 +80,11 @@ class World:
                 lambda chunk: chunk.draw(screen),
                 self.chunks_loaded))
 
-    def setblock(self, x, y, id):
+    def _setblock_into(self, blocks, x, y, id):
         if not self.within_bounds(x, y):
             return
 
-        self.foreground[y][x] = self.block_by_id(id,
+        blocks[y][x] = self.block_by_id(id,
             x*Block.WIDTH,
             y*Block.HEIGHT)
 
@@ -95,6 +95,30 @@ class World:
         else:
             self.load_chunk(chunk_x, chunk_y)
     
+    def _getblock_from(self, blocks, x, y):
+        if not self.within_bounds(x, y):
+            return
+        
+        return blocks[y][x]
+    
+    def set_fg_block(self, x, y, id):
+        self._setblock_into(self.foreground, x, y, id)
+
+    def set_mg_block(self, x, y, id):
+        self._setblock_into(self.midground, x, y, id)
+
+    def set_bg_block(self, x, y, id):
+        self._setblock_into(self.background, x, y, id)
+
+    def get_fg_block(self, x, y):
+        return self._getblock_from(self.foreground, x, y)
+
+    def get_mg_block(self, x, y):
+        return self._getblock_from(self.midground, x, y)
+
+    def get_bg_block(self, x, y):
+        return self._getblock_from(self.background, x, y)
+
     def within_bounds(self, x, y):
         return 0 <= x < self.WORLD_WIDTH and 0 <= y < self.WORLD_HEIGHT
     

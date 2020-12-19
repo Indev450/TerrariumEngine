@@ -6,8 +6,7 @@ from game.texture import getblank
 
 
 class GameObject(pg.sprite.Sprite):
-    """Most base game object. Has basic implementation of draw().
-    Other game object types should can it."""
+    """Most base game object. Has basic implementation of draw()"""
 
     def __init__(self, x, y, width, height):
         super().__init__()
@@ -29,3 +28,6 @@ class GameObject(pg.sprite.Sprite):
         if (-self.rect.width <= draw_x <= info.current_w and
            -self.rect.height <= draw_y <= info.current_h):
             screen.blit(self.image.get(), (draw_x, draw_y))
+    
+    def get_position(self):
+        return self.rect.topleft

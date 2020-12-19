@@ -3,11 +3,30 @@ from .game_object import GameObject
 
 
 class Entity(GameObject):
+    registered = {}
+    ID = ''
+    
     GRAVITY = 25  # Fall speed
     BRAKING = 0.7  # To avoid endless motion of object
     MIN_SPEED = 0.2  # Minimum horizontal speed
     MAX_SPEED = 5  # Maximum horizontal speed
     MAX_FALL = -20  # Maximum of fall speed
+    
+    @classmethod
+    def register(cls):
+        if cls.registered.get(cls.ID) is not None:
+            traceback.print_stack()
+            print(f'Warning: entity {cls.ID} already registered')
+        cls.registered[cls.ID] = cls
+    
+    @classmethod
+    def get(cls, key):
+        return cls.registered.get(key)
+
+    @classmethod
+    def from_save(cls, save):
+        return cls(position=save['entity']['position'],
+                   velocity=save['entity']['velocity'])
 
     def __init__(self, position=(0, 0), velocity=(0, 0), size=(10, 10)):
         super().__init__(*position, *size)
@@ -51,6 +70,15 @@ class Entity(GameObject):
         self.world.is_collide(
             self,
             self._on_collide_x if by_x else self._on_collide_y)
+    
+    def on_save(self):
+        """Called when game saves. Can be used to save
+        some meta, or self. Should return json-supporting
+        object or None"""
+        pass
+    
+    def get_velocity(self):
+        return self.xv, self.yv
 
     def _on_collide_x(self, block):
         """Collide callback for x"""
