@@ -15,8 +15,6 @@ from activity.main_menu_activity import MainMenuActivity
 from ui.overlay import Overlay
 from ui.element import UIElement
 
-import game.stdblocks  # TODO - turn standart things into mods
-
 
 if not pg.get_init():
     pg.init()

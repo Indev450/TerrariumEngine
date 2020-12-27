@@ -67,8 +67,8 @@ class MainMenuActivity(Activity):
             parent=message,
             on_pressed=self.hide_message,
             text="OK",
-            position_f=(0.325, 0.5),
-            size_f=(0.15, 0.1))
+            position_f=(0.4, 0.8),
+            size_f=(0.2, 0.1))
 
         self.overlay.add_element("message", message)
 
@@ -77,8 +77,6 @@ class MainMenuActivity(Activity):
 
     def run_mapgen(self):
         # TODO - add ability to choose map generator
-        import game.stdblocks  # TODO - turn standart things into mods
-        # There are many things to do :)
         
         config = get_config()
         
@@ -95,7 +93,9 @@ class MainMenuActivity(Activity):
             return
 
         try:
-            newactivity(MapgenActivity, self, mapgen_t, [], 'world.tworld', 1000, 500)
+            newactivity(MapgenActivity,
+                        self, mapgen_t,
+                        'world.tworld', 1000, 500)
         except Exception as e:
             logging.exception("run_mapgen():")
             self.show_message(f"{type(e).__name__}: {str(e)}")
@@ -115,7 +115,7 @@ class MainMenuActivity(Activity):
         try:
             newactivity(GameActivity, *decode(file.read()))
         except Exception as e:
-            logging.exception("run_mapgen():")
+            logging.exception("run_world():")
             activity = newactivity(MainMenuActivity)
             getactivity().show_message(f"{type(e).__name__}: {str(e)}")
 

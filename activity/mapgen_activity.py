@@ -7,14 +7,15 @@ import pygame as pg
 from .activity import Activity, setactivity
 
 from ui.overlay import newoverlay
-
 from ui.label import Label
+
+from mods.manager import getmanager
 
 
 class MapgenActivity(Activity):
     BG_COLOR = pg.Color('#5555FF')
     
-    def __init__(self, restore_activity, mapgen_t, mods, output, width, height):
+    def __init__(self, restore_activity, mapgen_t, output, width, height):
         super().__init__()
         
         self.background = pg.Surface((self.app.WIN_WIDTH, self.app.WIN_HEIGHT))
@@ -28,7 +29,7 @@ class MapgenActivity(Activity):
 
         self.done = mp.Value('d', self.curdone)
         
-        self.mapgen = mapgen_t(mods,
+        self.mapgen = mapgen_t(getmanager().load_mods(),
                                output,
                                width,
                                height,

@@ -6,6 +6,10 @@ from game.camera import Camera
 from game.world import World, blocks2ids
 from game.meta_manager import MetaManager
 from game.entity_manager import EntityManager
+from game.texture import reload
+from game.item import Item
+
+from mods.manager import getmanager
 
 from ui.label import Label
 from ui.inv_hotbar import InventoryHotbar
@@ -22,7 +26,12 @@ class GameActivity(Activity):
 
     def __init__(self, *blocks):
         super().__init__()
-        import game.stditems
+        
+        modmanager = getmanager()
+        
+        modmanager.load_mods()
+        
+        reload()  # Reload all textures from mods
 
         Block.sort_registered_entries()  # Create int identifiers for
                                          # block definitions
@@ -48,13 +57,10 @@ class GameActivity(Activity):
             self.player = Player()
             
             self.entity_manager.addentity(self.player, 'player')
-            
-            inv = self.player.get_inventory()
-            
-            inv.set_item('hotbar', 0, game.stditems.StoneItem, 10)
-            inv.set_item('hotbar', 1, game.stditems.StoneItem, 4)
         
         inv = self.player.get_inventory()
+        
+        modmanager.call_handlers('on_player_join', self.player)
 
         hotbar = InventoryHotbar(
             position_f=(0.1, 0.01),

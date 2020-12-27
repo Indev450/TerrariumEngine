@@ -4,12 +4,14 @@ from .game_object import GameObject
 
 
 class Block(GameObject):
+    id = "builtin:none"
+    
     WIDTH = 16
     HEIGHT = 16
 
     registered_blocks = {"std:air": {
         "entry": None,
-        "id": -1,
+        "id": 0,
     }}
 
     _registered_blocks = [None]  # int ids for registered entries
@@ -77,9 +79,9 @@ class Block(GameObject):
             return block["entry"]
 
     @classmethod
-    def register(cls, idstr, block_type):
-        cls.registered_blocks[idstr] = {
-            "entry": block_type,
+    def register(cls):
+        cls.registered_blocks[cls.id] = {
+            "entry": cls,
             "id": -1,
         }
 
@@ -104,7 +106,7 @@ class Block(GameObject):
 # TODO - make this functions better
 
 
-def _place_block_into(blockname, into=0):  # 0 - fg, 1 - mg, 2 - bg
+def _place_block_into(blockname, into=0, consume=True, force=False):  # 0 - fg, 1 - mg, 2 - bg
     def _place_block(player, itemstack, position):
         world = player.world
         
@@ -117,7 +119,7 @@ def _place_block_into(blockname, into=0):  # 0 - fg, 1 - mg, 2 - bg
         else:
             dstblock = world.get_bg_block(*position)
 
-        if dstblock is None or dstblock.REPLACABLE:
+        if force or dstblock is None or dstblock.REPLACABLE:
             if into == 0:
                 world.set_fg_block(*position, Block.id_by_strid(blockname))
             elif into == 1:
@@ -125,12 +127,13 @@ def _place_block_into(blockname, into=0):  # 0 - fg, 1 - mg, 2 - bg
             else:
                 world.set_bg_block(*position, Block.id_by_strid(blockname))
             
-            itemstack.consume_items(1)
+            if consume:
+                itemstack.consume_items(1)
     
     return _place_block
 
 
-def _place_block_into_keep(blockname, into=0):  # 0 - fg, 1 - mg, 2 - bg
+def _place_block_into_keep(blockname, into=0, consume=True, force=False):  # 0 - fg, 1 - mg, 2 - bg
     _keep_place_block_users = {}
     
     def _place_block_keep(player, itemstack, position, use_time):
@@ -141,7 +144,10 @@ def _place_block_into_keep(blockname, into=0):  # 0 - fg, 1 - mg, 2 - bg
         if _keep_place_block_users.get(player) is None:
             _keep_place_block_users[player] = 0
         
-        if use_time - _keep_place_block_users[player] > 0.25:
+        if _keep_place_block_users[player] > use_time:
+            _keep_place_block_users[player] = use_time
+        
+        if use_time - _keep_place_block_users[player] > 0.1:
             if into == 0:
                 dstblock = world.get_fg_block(*position)
             elif into == 1:
@@ -149,7 +155,7 @@ def _place_block_into_keep(blockname, into=0):  # 0 - fg, 1 - mg, 2 - bg
             else:
                 dstblock = world.get_bg_block(*position)
 
-            if dstblock is None or dstblock.REPLACABLE:
+            if force or dstblock is None or dstblock.REPLACABLE:
                 if into == 0:
                     world.set_fg_block(*position, Block.id_by_strid(blockname))
                 elif into == 1:
@@ -157,32 +163,33 @@ def _place_block_into_keep(blockname, into=0):  # 0 - fg, 1 - mg, 2 - bg
                 else:
                     world.set_bg_block(*position, Block.id_by_strid(blockname))
                 
-                itemstack.consume_items(1)
+                if consume:
+                    itemstack.consume_items(1)
                 
                 _keep_place_block_users[player] = use_time
     
     return _place_block_keep
 
 
-def place_fg_block(blockname):
-    return _place_block_into(blockname, 0)
+def place_fg_block(blockname, consume=True, force=False):
+    return _place_block_into(blockname, 0, consume, force)
 
 
-def place_mg_block(blockname):
-    return _place_block_into(blockname, 1)
+def place_mg_block(blockname, consume=True, force=False):
+    return _place_block_into(blockname, 1, consume, force)
 
 
-def place_bg_block(blockname):
-    return _place_block_into(blockname, 2)
+def place_bg_block(blockname, consume=True, force=False):
+    return _place_block_into(blockname, 2, consume, force)
 
 
-def place_fg_block_keep(blockname):
-    return _place_block_into_keep(blockname, 0)
+def place_fg_block_keep(blockname, consume=True, force=False):
+    return _place_block_into_keep(blockname, 0, consume, force)
 
 
-def place_mg_block_keep(blockname):
-    return _place_block_into_keep(blockname, 1)
+def place_mg_block_keep(blockname, consume=True, force=False):
+    return _place_block_into_keep(blockname, 1, consume, force)
 
 
-def place_bg_block_keep(blockname):
-    return _place_block_into_keep(blockname, 2)
+def place_bg_block_keep(blockname, consume=True, force=False):
+    return _place_block_into_keep(blockname, 2, consume, force)
