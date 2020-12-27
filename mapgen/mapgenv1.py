@@ -1,10 +1,12 @@
 import math
 
-from .lib.perlin import PerlinNoiseFactory
-
 from .mapgen import Mapgen
 
+from lib.perlin import PerlinNoiseFactory
+
 from game.block import Block
+
+from mods.manager import ModManager
 
 
 class MapgenV1(Mapgen):
@@ -18,6 +20,11 @@ class MapgenV1(Mapgen):
         self.pnf1 = PerlinNoiseFactory(dimension=1)
 
         self.pnf2 = PerlinNoiseFactory(dimension=2)
+        
+        self.noise_scale_x = 1/500.0
+        self.noise_scale_y = 1/650.0
+        
+        self.biomes = {}
 
     def run(self):
         super().run()
@@ -40,10 +47,17 @@ class MapgenV1(Mapgen):
                 if self.noise2(x, y) < -0.2:
                     self.put_foreground(x, y, 0)
             self.set_status(done=(y/self.height)*100)
-
-        for module in self.mods:
-            if hasattr(module, "on_generated"):
-                module.on_generated(self)
+            
+        self.set_status(string="Generating biomes...", done=0)
+        
+        biomes = len(self.biomes.keys())
+        biomes_processed = 0
+        
+        for biome in self.biomes.keys():
+            self.process_biome(biome)
+            
+            biomes_processed += 1
+            self.set_status(done=(biomes_processed/biomes)*100)
         
         self.set_status(string="Saving the world...", done=0)
 
@@ -51,12 +65,32 @@ class MapgenV1(Mapgen):
 
     def noise2(self, x, y):
         return math.tan(self.pnf2(
-            x/self.width*Block.WIDTH,
-            y/self.height*Block.HEIGHT))
+            x/(self.noise_scale_x*self.width*Block.WIDTH),
+            y/(self.noise_scale_y*self.height*Block.HEIGHT)))
 
     def noise1(self, x):
-        v = math.tan(self.pnf1(x/self.width))
+        v = math.tan(self.pnf1(x/(self.noise_scale_x*self.width*Block.WIDTH)))
         return self.height*0.3 + 10*v
+    
+    def add_biome(self, biome):
+        self.biomes[biome.id] = biome
+    
+    def process_biome(self, id):
+        biome = self.biomes.get(id)
+        
+        if biome is None:
+            print(f'Error: could not process biome {id}: no such biome')
+            return
+        
+        left, top, right, bottom = biome.get_bounds(self.width, self.height)
+        
+        for x in range(left, right+1):
+            for y in range(top, bottom+1):
+                try:
+                    self.put_blocks(x, y, biome.get_blocks_at(
+                        x, y, self.noise2(x, y), self.get_blocks(x, y)))
+                except IndexError:
+                    pass
 
 
 def get_mapgen():

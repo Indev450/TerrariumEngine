@@ -4,6 +4,8 @@ from game.block import Block
 
 from worldfile.worldfile import encode
 
+from mods.manager import getmanager
+
 
 class Mapgen(mp.Process):
     """Base mapgen class"""
@@ -12,7 +14,7 @@ class Mapgen(mp.Process):
         super().__init__()
 
         Block.sort_registered_entries()
-
+        
         self.mods = mods
 
         self.ofile = open(output, 'wb')
@@ -38,6 +40,18 @@ class Mapgen(mp.Process):
         self.ofile.close()
         
         self.set_status(done=-1)
+    
+    def put_blocks(self, x, y, blocks):
+        self.put_foreground(x, y, blocks[0])
+        self.put_midground(x, y, blocks[1])
+        self.put_background(x, y, blocks[2])
+    
+    def get_blocks(self, x, y):
+        return (
+            self.get_foreground(x, y),
+            self.get_midground(x, y),
+            self.get_background(x, y),
+        )
     
     def put_foreground(self, x, y, blockid):
         self.foreground[y][x] = blockid
@@ -67,4 +81,8 @@ class Mapgen(mp.Process):
                 self.done.value = done
 
     def run(self):
-        self.set_status(string=f"Started mapgen process with pid {self.pid}")
+        self.set_status(string="Initializing mods...", done=0)
+        
+        manager = getmanager()
+        
+        manager.call_handlers('handle_mapgen', self)
