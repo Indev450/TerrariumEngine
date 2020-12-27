@@ -43,14 +43,12 @@ class Entity(GameObject):
         """Called every frame. Updates entitys physics"""
         acceleration = self.xv - self.xv*self.BRAKING
 
-        self.xv -= acceleration * dtime * self.friction
+        
+        if not (self.xv > self.MAX_SPEED or self.xv < -self.MAX_SPEED):
+            self.xv -= acceleration * dtime * self.friction
 
         if abs(self.xv) < self.MIN_SPEED:
             self.xv = 0
-        elif self.xv > self.MAX_SPEED:
-            self.xv = self.MAX_SPEED
-        elif self.xv < -self.MAX_SPEED:
-            self.xv = -self.MAX_SPEED
 
         if not self.on_ground:
             self.yv += self.GRAVITY * dtime
