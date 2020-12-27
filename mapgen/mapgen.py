@@ -85,4 +85,4 @@ class Mapgen(mp.Process):
         
         manager = getmanager()
         
-        manager.call_handlers('handle_mapgen', self)
+        manager.call_handlers('init_mapgen', self)
