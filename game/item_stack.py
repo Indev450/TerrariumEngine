@@ -97,7 +97,22 @@ class ItemStack:
     def can_merge(self, itemstack):
         if self.item_t is not None:
             return self.item_t.can_merge(self, itemstack)
-        return False
+        return True
+    
+    def merge(self, itemstack):
+        if self.item_t is None:
+            self.set_type(itemstack.item_t,
+                          itemstack.get_count(),
+                          itemstack.item_data)
+            
+            itemstack.set_type(None)
+        elif self.can_merge(itemstack):
+            left = self.add_items(itemstack.get_count())
+            
+            if left != 0:
+                itemstack.set_count(left)
+            else:
+                itemstack.set_type(None)
 
     def empty(self):
         return self.count <= 0 or self.item_t is None

@@ -54,7 +54,9 @@ class Item:
         and they don't have any data'''
         return (itemstack1.item_t is itemstack2.item_t and
                 not itemstack1.item_data and
-                not itemstack2.item_data)
+                not itemstack2.item_data and
+                not (itemstack1.item_t.maxcount == itemstack1.get_count() or
+                     itemstack2.item_t.maxcount == itemstack2.get_count()))
 
     @classmethod
     def bound_items_count(cls, count):
