@@ -91,7 +91,7 @@ class Player(Entity):
 
         if self.left:
             self.xv -= self.SPEED * dtime
-        elif self.right:
+        if self.right:
             self.xv += self.SPEED * dtime
         
         if self.xv == 0 and self.on_ground:
