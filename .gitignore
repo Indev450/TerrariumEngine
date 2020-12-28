@@ -1,2 +1,14 @@
 __pycache__
 *.pyc
+
+# Map generator config
+mgconfig.json
+
+# World save file
+world.tworld
+
+# World metadata
+world.meta
+
+# World entities
+world.entities
