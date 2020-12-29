@@ -240,31 +240,6 @@ class GameActivity(Activity):
         elif event.type == pg.MOUSEBUTTONDOWN and not self.overlay.is_visible('inventory'):
             if event.button == 1:
                 self.controls['mouse']['pressed'] = True
-                '''x, y = event.pos
-
-                cam_x, cam_y = self.camera.get_position()
-
-                x += cam_x
-                y += cam_y
-
-                x = int(x//Block.WIDTH)
-                y = int(y//Block.HEIGHT)
-
-                self.world.set_fg_block(x, y, 0)
-
-            elif event.button == 3:
-                x, y = event.pos
-
-                cam_x, cam_y = self.camera.get_position()
-
-                x += cam_x
-                y += cam_y
-
-                x = int(x//Block.WIDTH)
-                y = int(y//Block.HEIGHT)
-
-                self.world.set_fg_block(x, y, 1)
-            '''
             elif event.button in (4, 5):
                 self.player.selected_item += 1 if event.button == 5 else -1
                 
