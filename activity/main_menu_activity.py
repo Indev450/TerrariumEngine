@@ -10,6 +10,7 @@ from .game_activity import GameActivity
 from .mapgen_activity import MapgenActivity
 
 from utils.calls import Call
+from utils.saves import check_save_path
 
 from ui.button import Button
 from ui.label import Label
@@ -77,7 +78,9 @@ class MainMenuActivity(Activity):
 
     def run_mapgen(self):
         # TODO - add ability to choose map generator
-        
+        # TODO - add ability to choose world save path
+        path = 'world'
+
         config = get_config()
         
         mgconfig = config["mapgens"].get("mapgenv1")
@@ -95,7 +98,7 @@ class MainMenuActivity(Activity):
         try:
             newactivity(MapgenActivity,
                         self, mapgen_t,
-                        'world.tworld', 1000, 500)
+                        path, 1000, 500)
         except Exception as e:
             logging.exception("run_mapgen():")
             self.show_message(f"{type(e).__name__}: {str(e)}")
@@ -107,19 +110,18 @@ class MainMenuActivity(Activity):
         self.overlay.show("message")
 
     def run_world(self):
-        try:
-            file = open('world.tworld', 'rb')
-        except FileNotFoundError:
+        # TODO - add ability to choose loaded world
+        path = 'world'
+        
+        if not check_save_path(path):
             return self.show_message("Save file not found")
 
         try:
-            newactivity(GameActivity, *decode(file.read()))
+            newactivity(GameActivity, path)
         except Exception as e:
             logging.exception("run_world():")
             activity = newactivity(MainMenuActivity)
             getactivity().show_message(f"{type(e).__name__}: {str(e)}")
-
-        file.close()
 
     def hide_message(self):
         self.overlay.hide("message")

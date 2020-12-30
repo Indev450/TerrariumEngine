@@ -1,3 +1,5 @@
+import os
+
 from ctypes import py_object
 
 import multiprocessing as mp
@@ -11,12 +13,16 @@ from ui.label import Label
 
 from mods.manager import getmanager
 
+from utils.saves import create_save_path
+
 
 class MapgenActivity(Activity):
     BG_COLOR = pg.Color('#5555FF')
     
-    def __init__(self, restore_activity, mapgen_t, output, width, height):
+    def __init__(self, restore_activity, mapgen_t, path, width, height):
         super().__init__()
+        
+        create_save_path(path)
         
         self.background = pg.Surface((self.app.WIN_WIDTH, self.app.WIN_HEIGHT))
         self.background.fill(self.BG_COLOR)
@@ -30,7 +36,7 @@ class MapgenActivity(Activity):
         self.done = mp.Value('d', self.curdone)
         
         self.mapgen = mapgen_t(getmanager().load_mods(),
-                               output,
+                               os.path.join('saves', path),
                                width,
                                height,
                                self.status,
@@ -86,5 +92,4 @@ class MapgenActivity(Activity):
     
     def update_info(self):
         self.overlay.get('info').set_text(f'{self.curstatus} {self.curdone:.4} %')
-    
-    
+        

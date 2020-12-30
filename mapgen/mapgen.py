@@ -1,3 +1,5 @@
+import os
+
 import multiprocessing as mp
 
 from game.block import Block
@@ -17,7 +19,7 @@ class Mapgen(mp.Process):
         
         self.mods = mods
 
-        self.ofile = open(output, 'wb')
+        self.ofile = open(os.path.join(output, 'world.tworld'), 'wb')
 
         self.width = width
         self.height = height

@@ -1,3 +1,5 @@
+import os
+
 import pygame as pg
 
 from game.block import Block
@@ -16,7 +18,7 @@ from ui.inv_hotbar import InventoryHotbar
 from ui.hotbar_selected import HotbarSelected
 from ui.inventory_cell import InventoryCell
 
-from worldfile.worldfile import encode
+from worldfile.worldfile import decode, encode
 
 from .activity import Activity
 
@@ -24,7 +26,7 @@ from .activity import Activity
 class GameActivity(Activity):
     BG_COLOR = pg.Color('#5555FF')
 
-    def __init__(self, *blocks):
+    def __init__(self, path):
         super().__init__()
         
         modmanager = getmanager()
@@ -42,16 +44,25 @@ class GameActivity(Activity):
         self.background = pg.Surface(
             (self.app.WIN_WIDTH, self.app.WIN_HEIGHT))
         self.background.fill(self.BG_COLOR)
+        
+        savepath = os.path.join('saves', path)
+        self.worldpath = os.path.join(savepath, 'world.tworld')
+        self.metapath = os.path.join(savepath, 'world.meta')
+        self.entitiespath = os.path.join(savepath, 'world.entities')
+        
+        file = open(self.worldpath, 'rb')
+        
+        blocks = decode(file.read())
+        
+        file.close()
 
         self.world = World(*blocks)
         
-        self.meta_manager = MetaManager.load('world.meta')
+        self.meta_manager = MetaManager.load(self.metapath)
         
-        self.entity_manager = EntityManager.load('world.entities')
+        self.entity_manager = EntityManager.load(self.entitiespath)
 
         self.player = self.entity_manager.getentity('player')
-        
-        inv = None
 
         if self.player is None:
             self.player = Player()
@@ -124,6 +135,12 @@ class GameActivity(Activity):
         
         self.allow_event(pg.KEYUP)
         self.allow_event(pg.KEYDOWN)
+        
+        self._skipupdate = True
+        # Loading blocks is too long process, so after is dtime becomes
+        # a little bigger than often, so entities can teleport pass
+        # blocks. This is temporary solution.
+        # TODO - fix that problem by better way
     
     def update_selected_item(self):
         inv_width = self.player.inventory.get_size('hotbar')
@@ -151,6 +168,10 @@ class GameActivity(Activity):
             self.overlay.show('inventory')
 
     def update(self, dtime):
+        if self._skipupdate:
+            self._skipupdate = False
+            return
+            
         if not self.paused:
             if self.controls['mouse']['pressed']:
                 istack = self.player.inventory.get_item('hotbar', self.player.selected_item)
@@ -270,10 +291,10 @@ class GameActivity(Activity):
             blocks2ids(self.world.background),
             blocksize)
         
-        self.meta_manager.save('world.meta')
-        self.entity_manager.save('world.entities')
+        self.meta_manager.save(self.metapath)
+        self.entity_manager.save(self.entitiespath)
 
-        file = open('world.tworld', 'wb')
+        file = open(self.worldpath, 'wb')
 
         file.write(data)
 
