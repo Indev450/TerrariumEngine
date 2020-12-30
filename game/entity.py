@@ -24,11 +24,16 @@ class Entity(GameObject):
         return cls.registered.get(key)
 
     @classmethod
-    def from_save(cls, save):
-        return cls(position=save['entity']['position'],
+    def from_save(cls, manager, save):
+        return cls(manager,
+                   position=save['entity']['position'],
                    velocity=save['entity']['velocity'])
 
-    def __init__(self, position=(0, 0), velocity=(0, 0), size=(10, 10)):
+    def __init__(self,
+                 manager=None,
+                 position=(0, 0),
+                 velocity=(0, 0),
+                 size=(10, 10)):
         super().__init__(*position, *size)
 
         self.xv, self.yv = velocity
@@ -38,6 +43,13 @@ class Entity(GameObject):
         self.on_ground = False
 
         self.world = World.get()
+        
+        self.manager = manager
+        
+        self.tags = []  # All tags added to entity
+    
+    def assign_to_manager(self, manager):
+        self.manager = manager
 
     def update(self, dtime):
         """Called every frame. Updates entitys physics"""
@@ -77,6 +89,22 @@ class Entity(GameObject):
     
     def get_velocity(self):
         return self.xv, self.yv
+    
+    def add_tag(self, tag):
+        if self.manager is None:
+            print('Error: cannot tag entity without manager')
+            return
+        
+        self.manager.tag_entity(self, tag)
+        self.tags.append(tag)
+    
+    def on_deleted(self):
+        if self.manager is None:
+            print('Error: cannot do default cleanup without manager')
+            return
+
+        for tag in self.tags:
+            self.manager.untag_entity(self, tag)
 
     def _on_collide_x(self, block):
         """Collide callback for x"""

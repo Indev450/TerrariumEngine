@@ -60,14 +60,13 @@ class GameActivity(Activity):
         
         self.meta_manager = MetaManager.load(self.metapath)
         
-        self.entity_manager = EntityManager.load(self.entitiespath)
+        self.entity_manager = EntityManager()
+        self.entity_manager.load(self.entitiespath)
 
         self.player = self.entity_manager.getentity('player')
 
         if self.player is None:
-            self.player = Player()
-            
-            self.entity_manager.addentity(self.player, 'player')
+            self.player, _ = self.entity_manager.newentity('builtin:player', 'player')
         
         inv = self.player.get_inventory()
         

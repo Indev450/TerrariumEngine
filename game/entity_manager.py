@@ -8,8 +8,9 @@ from .invalid_entity import InvalidEntity
 class EntityManager:
     instance = None
     
-    @classmethod
-    def load(cls, fn):
+    def load(self, fn):
+        self.tags = {}  # Clear tags
+        
         _data = {}
 
         try:
@@ -34,10 +35,9 @@ class EntityManager:
                 entcls = InvalidEntity
                 # If mod that adds this entity was deleted we will keep entity
 
-            data[key] = entcls.from_save(entsave)
+            data[key] = entcls.from_save(self, entsave)
         
-        cls.instance = cls(data)
-        return cls.instance
+        self.data = data
 
     @classmethod
     def get(cls):
@@ -45,18 +45,40 @@ class EntityManager:
     
     def __init__(self, data=None):
         self.data = data or {}
+        self.tags = {}
+    
+    def tag_entity(self, entity, tag):
+        if self.tags.get(tag) is None:
+            self.tags[tag] = []
+        
+        self.tags[tag].append(entity)
+    
+    def untag_entity(self, entity, tag):
+        if not self.tags.get(tag):
+            return
+        
+        try:
+            self.tags[tag].remove(entity)
+        except ValueError:
+            print(f'Warning: cannot untag entity: entity has no tag {tag}')
+    
+    def get_tagged_entities(self, tag):
+        return self.tags.get(tag, [])
     
     def addentity(self, ent, key=None):
+        ent.assign_to_manager(self)
+        
         if key is None:
             key = uuid.uuid1()
         
         self.data[key] = ent
         return key
     
-    def newentity(self, id, *args, **kwargs):
-        key = uuid.uuid1()
+    def newentity(self, id, key, *args, **kwargs):
+        if key is None:
+            key = uuid.uuid1()
         
-        ent = Entity.get(id)(*args, **kwargs)
+        ent = Entity.get(id)(manager, *args, **kwargs)
         
         self.data[key] = ent
         
@@ -64,6 +86,7 @@ class EntityManager:
 
     def delentity(self, key):
         if self.data.get(key):
+            self.data[key].on_deleted()
             del self.data[key]
 
     def getentity(self, key):
