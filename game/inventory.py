@@ -79,6 +79,9 @@ class Inventory:
         
         istack = ItemStack(item_t, count, data)
         
+        return self.add_item_stack(name, istack)
+
+    def add_item_stack(self, name, istack):
         for i in range(len(self.data[name])):
             origstack = self.data[name][i]
             
