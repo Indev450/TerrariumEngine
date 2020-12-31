@@ -154,12 +154,15 @@ class AnimatedTiledTexture(AnimatedTexture):
 class BlankTexture(Texture):
     """Blank textures are useful for testing"""
 
-    def __init__(self, size, color):
+    def __init__(self, size, color, alpha=False):
         self.image = pg.Surface(size)
         self.image.fill(color)
+        
+        self.alpha = alpha
 
-    def load(self):
-        pass
+    def load(self, force=False):
+        if self.alpha:
+            self.image = self.image.convert_alpha()
 
     def get(self):
         return self.image
@@ -194,7 +197,9 @@ def getblank(*size):
 
 def gettransparent(*size):
     """Void texture"""
-    return BlankTexture(size, pg.Color(0, 0, 0, 0))
+    t = BlankTexture(size, pg.Color(0, 0, 0, 0), True)
+    
+    _used_textures.append(t)
 
 
 def getanimated(*names, speed=1, preload=False):
