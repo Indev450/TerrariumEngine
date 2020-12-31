@@ -192,6 +192,11 @@ def getblank(*size):
     return BlankTexture(size, pg.Color(randcolor()))
 
 
+def gettransparent(*size):
+    """Void texture"""
+    return BlankTexture(size, pg.Color(0, 0, 0, 0))
+
+
 def getanimated(*names, speed=1, preload=False):
     """Create AnimatedTexture object. Better use AnimatedTiledTexture
     (animtiled)"""
