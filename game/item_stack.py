@@ -137,3 +137,6 @@ class ItemStack:
         self.set_type(item_t, count, data)
         
         return self
+    
+    def copy(self):
+        return ItemStack(self.item_t, self.count, self.data)
