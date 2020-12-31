@@ -1,6 +1,6 @@
 import pygame as pg
 
-from .block import Block
+import game.block as block
 from .chunk import Chunk
 
 from .camera import Camera
@@ -10,8 +10,8 @@ def ids2blocks(blockids, width, height):
     """Make 2d array of Block objects from 2d array of block ids"""
     return [[World.block_by_id(
                 blockids[y][x],
-                x*Block.WIDTH,
-                y*Block.HEIGHT) for x in range(width)] for y in range(height)]
+                x*block.Block.WIDTH,
+                y*block.Block.HEIGHT) for x in range(width)] for y in range(height)]
 
 
 def blocks2ids(blocks):
@@ -69,10 +69,10 @@ class World:
                     on_collide(self.foreground[y][x])
 
     def worldrange_x(self, x1, x2):
-        return range(max(0, x1//Block.WIDTH), min(x2//Block.WIDTH + 1, self.WORLD_WIDTH))
+        return range(max(0, x1//block.Block.WIDTH), min(x2//block.Block.WIDTH + 1, self.WORLD_WIDTH))
 
     def worldrange_y(self, y1, y2):
-        return range(max(0, y1//Block.HEIGHT), min(y2//Block.HEIGHT + 1, self.WORLD_HEIGHT))
+        return range(max(0, y1//block.Block.HEIGHT), min(y2//block.Block.HEIGHT + 1, self.WORLD_HEIGHT))
 
     def draw(self, screen):
         list(
@@ -83,12 +83,15 @@ class World:
     def _setblock_into(self, blocks, x, y, id):
         if not self.within_bounds(x, y):
             return
+        
+        if blocks[y][x] is not None:
+            blocks[y][x].on_destroy()
 
         blocks[y][x] = self.block_by_id(id,
-            x*Block.WIDTH,
-            y*Block.HEIGHT)
+            x*block.Block.WIDTH,
+            y*block.Block.HEIGHT)
 
-        chunk_x, chunk_y = self.chunk_pos(x*Block.WIDTH, y*Block.HEIGHT)
+        chunk_x, chunk_y = self.chunk_pos(x*block.Block.WIDTH, y*block.Block.HEIGHT)
 
         if self.chunks[chunk_y][chunk_x] is not None:
             self.chunks[chunk_y][chunk_x].update()
@@ -142,8 +145,8 @@ class World:
             return result
 
     def chunk_pos(self, x, y):
-        x = int(x / Block.WIDTH / self.CHUNK_WIDTH)
-        y = int(y / Block.HEIGHT / self.CHUNK_HEIGHT)
+        x = int(x / block.Block.WIDTH / self.CHUNK_WIDTH)
+        y = int(y / block.Block.HEIGHT / self.CHUNK_HEIGHT)
 
         return x, y
 
@@ -158,8 +161,8 @@ class World:
 
         left, top = self.bound_chunk_position(left, top)
 
-        right = left + int(info.current_w / Block.WIDTH / self.CHUNK_WIDTH) + 4
-        bottom = top + int(info.current_h / Block.HEIGHT / self.CHUNK_HEIGHT) + 4
+        right = left + int(info.current_w / block.Block.WIDTH / self.CHUNK_WIDTH) + 4
+        bottom = top + int(info.current_h / block.Block.HEIGHT / self.CHUNK_HEIGHT) + 4
 
         right, bottom = self.bound_chunk_position(right, bottom)
 
@@ -201,7 +204,7 @@ class World:
     @classmethod
     def block_by_id(cls, id, x, y):
         """Initialize required block by id at given position"""
-        return None if id == 0 else Block.by_id(id)(x, y)
+        return None if id == 0 else block.Block.by_id(id)(x, y)
 
     @classmethod
     def id_from_block(cls, block):

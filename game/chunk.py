@@ -2,7 +2,7 @@ import pygame as pg
 
 from .camera import Camera
 
-from .block import Block
+import game.block as block
 
 
 class Chunk:
@@ -11,7 +11,7 @@ class Chunk:
     def __init__(self, world, x, y, width, height):
         self.world = world
 
-        size = (Block.WIDTH*width, Block.HEIGHT*height)
+        size = (block.Block.WIDTH*width, block.Block.HEIGHT*height)
 
         self.surf = pg.Surface(size).convert_alpha()
         self.surf.fill(pg.Color(0, 0, 0, 0))
@@ -22,8 +22,8 @@ class Chunk:
         self.y1 = y
         self.y2 = min(y+height, world.WORLD_HEIGHT)
 
-        real_x = x * Block.WIDTH
-        real_y = y * Block.HEIGHT
+        real_x = x * block.Block.WIDTH
+        real_y = y * block.Block.HEIGHT
 
         real_width, real_height = size
 
@@ -48,8 +48,8 @@ class Chunk:
                 
                 image = compare_tiles(tiles)
 
-                local_x = (x-self.x1) * Block.WIDTH
-                local_y = (y-self.y1) * Block.HEIGHT
+                local_x = (x-self.x1) * block.Block.WIDTH
+                local_y = (y-self.y1) * block.Block.HEIGHT
 
                 self.surf.blit(image, (local_x, local_y))
 
@@ -74,7 +74,7 @@ class Chunk:
 
 
 def compare_tiles(tiles):
-    output = pg.Surface((Block.WIDTH, Block.HEIGHT)).convert_alpha()
+    output = pg.Surface((block.Block.WIDTH, block.Block.HEIGHT)).convert_alpha()
     output.fill(pg.Color(0, 0, 0, 0))
     
     output.blits([(tile.image.get(), (0, 0)) for tile in tiles])
