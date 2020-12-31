@@ -1,3 +1,5 @@
+import traceback
+
 from .world import World
 from .game_object import GameObject
 
@@ -24,13 +26,15 @@ class Entity(GameObject):
         return cls.registered.get(key)
 
     @classmethod
-    def from_save(cls, manager, save):
+    def from_save(cls, manager, uuid, save):
         return cls(manager,
+                   uuid,
                    position=save['entity']['position'],
                    velocity=save['entity']['velocity'])
 
     def __init__(self,
                  manager=None,
+                 uuid=None,
                  position=(0, 0),
                  velocity=(0, 0),
                  size=(10, 10)):
@@ -45,6 +49,8 @@ class Entity(GameObject):
         self.world = World.get()
         
         self.manager = manager
+        
+        self.uuid = uuid
         
         self.tags = []  # All tags added to entity
     

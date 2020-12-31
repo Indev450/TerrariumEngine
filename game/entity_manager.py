@@ -35,12 +35,17 @@ class EntityManager:
                 entcls = InvalidEntity
                 # If mod that adds this entity was deleted we will keep entity
 
-            data[key] = entcls.from_save(self, entsave)
+            data[key] = entcls.from_save(self, key, entsave)
         
         self.data = data
 
     @classmethod
     def get(cls):
+        return cls.instance
+    
+    @classmethod
+    def new(cls):
+        cls.instance = cls()
         return cls.instance
     
     def __init__(self, data=None):
@@ -69,16 +74,19 @@ class EntityManager:
         ent.assign_to_manager(self)
         
         if key is None:
-            key = uuid.uuid1()
+            key = str(uuid.uuid1())
         
         self.data[key] = ent
+        
+        ent.uuid = key
+        
         return key
     
     def newentity(self, id, key, *args, **kwargs):
         if key is None:
-            key = uuid.uuid1()
+            key = str(uuid.uuid1())
         
-        ent = Entity.get(id)(self, *args, **kwargs)
+        ent = Entity.get(id)(self, key, *args, **kwargs)
         
         self.data[key] = ent
         
@@ -93,7 +101,7 @@ class EntityManager:
         return self.data.get(key)
     
     def update(self, dtime):
-        for ent in self.data.values():
+        for ent in list(self.data.values()):
             ent.update(dtime)
 
     def draw(self, screen):

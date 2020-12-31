@@ -43,15 +43,15 @@ class Player(Entity):
     }
     
     @classmethod
-    def from_save(cls, manager, save):
-        player = super().from_save(manager, save)
+    def from_save(cls, manager, uuid, save):
+        player = super().from_save(manager, uuid, save)
         
         player.inventory = Inventory().load(save['data']['inventory'])
         
         return player
 
-    def __init__(self, manager, position=(0, 0), velocity=(0, 0)):
-        super().__init__(manager, position, velocity, (self.WIDTH, self.HEIGHT))
+    def __init__(self, manager=None, uuid=None, position=(0, 0), velocity=(0, 0)):
+        super().__init__(manager, uuid, position, velocity, (self.WIDTH, self.HEIGHT))
         self.left = self.right = self.up = False
 
         self.turned_left = True
