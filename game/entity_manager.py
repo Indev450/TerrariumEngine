@@ -78,7 +78,7 @@ class EntityManager:
         if key is None:
             key = uuid.uuid1()
         
-        ent = Entity.get(id)(manager, *args, **kwargs)
+        ent = Entity.get(id)(self, *args, **kwargs)
         
         self.data[key] = ent
         
