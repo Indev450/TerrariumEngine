@@ -65,6 +65,8 @@ class Player(Entity):
         self.inventory.set_size('buffer', 1)
 
         self.selected_item = 0
+        
+        self.add_tag('player')
 
     def update_presses(self, left=False, right=False, up=False):
         if left:
