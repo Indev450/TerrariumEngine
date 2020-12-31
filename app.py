@@ -1,11 +1,4 @@
-import time
-
 import pygame as pg
-
-from game.world import World
-from game.player import Player
-from game.camera import Camera
-from game.block import Block
 
 import game.texture as textures
 
@@ -13,7 +6,6 @@ from activity.activity import Activity, newactivity
 from activity.main_menu_activity import MainMenuActivity
 
 from ui.overlay import Overlay
-from ui.element import UIElement
 
 
 if not pg.get_init():
