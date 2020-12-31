@@ -14,6 +14,25 @@ class ItemStackChange(enum.Enum):
 
 class ItemStack:
     '''Contains info about stored items in this stack'''
+    
+    @classmethod
+    def from_str(cls, string):
+        item, *count = string.split()
+        
+        if not count:
+            count = (1,)
+        
+        item_t = Item.get(item)
+        
+        if item_t is None:
+            print(f'Error: invalid item id: {item}')
+            return cls()
+        
+        if count[0] < 1:
+            return cls()
+        
+        return cls(item_t, count[0])
+        
 
     def __init__(self, item_t=None, count=0, data=None):
         self.item_t = item_t
