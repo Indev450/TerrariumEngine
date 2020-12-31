@@ -2,9 +2,14 @@ import pygame as pg
 
 from .game_object import GameObject
 
+import game.entity_manager as entitymanager
+import game.item_stack as itemstack
+
 
 class Block(GameObject):
     id = "builtin:none"
+    
+    drops = []
     
     WIDTH = 16
     HEIGHT = 16
@@ -20,8 +25,6 @@ class Block(GameObject):
     tile = None
 
     ID = 0
-
-    LIGHT = 0
     
     REPLACABLE = False
 
@@ -33,23 +36,34 @@ class Block(GameObject):
         self.grid_x = position[0] // self.WIDTH
         self.grid_y = position[1] // self.HEIGHT
 
-        self.light = self.LIGHT
-
-    def set_light(self, light):
-        if light > self.light:
-            self.light = min(255, max(0, light))
-
-    def light_blocks(self, blocks):
-        for y in range(self.grid_y - 1, self.grid_y + 2):
-            for x in range(self.grid_x - 1, self.grid_x + 2):
-                if ((0 <= x < len(blocks[0]) and 0 <= y < len(blocks))
-                    and (x != self.grid_x and y != self.grid_y)):
-                    block = blocks[y][x]
-                    if block is not None:
-                        block.set_light(self.light*0.75)
-
     def getid(self):
         return self.ID
+    
+    def on_destroy(self):
+        entmanager = entitymanager.EntityManager.get()
+        
+        if entmanager is None:
+            print('Warning: could not drop items without EntityManager')
+            return
+        
+        for drop in self.get_drops():
+            ientity, _ = entmanager.newentity('builtin:item_entity', None,
+                                           position=self.rect.topleft)
+            
+            ientity.set_item_stack(drop)
+    
+    def get_drops(self):
+        '''Called in default on_destroy function. Should return
+        list of ItemStacks'''
+        drops = []
+        
+        for drop in self.drops:
+            if isinstance(drop, itemstack.ItemStack):
+                drops.append(drop.copy())
+            elif isinstance(drop, str):
+                drops.append(itemstack.ItemStack.from_str(drop))
+        
+        return drops
 
     @classmethod
     def light_blocks_air(cls, x, y, blocks):

@@ -4,6 +4,7 @@ import pygame as pg
 
 from game.block import Block
 from game.player import Player
+from game.item_entity import ItemEntity
 from game.camera import Camera
 from game.world import World, blocks2ids
 from game.meta_manager import MetaManager
@@ -38,6 +39,7 @@ class GameActivity(Activity):
         Block.sort_registered_entries()  # Create int identifiers for
                                          # block definitions
         Player.register()
+        ItemEntity.register()
 
         Camera.init()  # Create camera object
 
@@ -60,7 +62,7 @@ class GameActivity(Activity):
         
         self.meta_manager = MetaManager.load(self.metapath)
         
-        self.entity_manager = EntityManager()
+        self.entity_manager = EntityManager.new()
         self.entity_manager.load(self.entitiespath)
 
         self.player = self.entity_manager.getentity('player')
@@ -210,8 +212,8 @@ class GameActivity(Activity):
         screen.blit(self.background, (0, 0))
 
         self.world.draw(screen)
-
-        self.player.draw(screen)
+        
+        self.entity_manager.draw(screen)
 
     def pause(self):
         self.overlay.show('pause')
