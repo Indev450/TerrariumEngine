@@ -53,6 +53,8 @@ class ItemEntity(Entity):
             if player.rect.colliderect(self.rect):
                 player.get_inventory().add_item_stack('hotbar', self.item_stack)
                 
+                self.item_stack.item_t.on_picked_up(player, self.item_stack)
+                
                 if not self.item_stack.empty():
                     player.get_inventory().add_item_stack('main', self.item_stack)
                 
