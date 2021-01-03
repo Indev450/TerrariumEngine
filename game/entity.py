@@ -45,6 +45,8 @@ class Entity(GameObject):
         self.friction = 20
 
         self.on_ground = False
+        
+        self.ignore_collision = False
 
         self.world = World.get()
         
@@ -76,10 +78,14 @@ class Entity(GameObject):
 
         self.on_ground = False
         self.rect.y += self.yv
-        self.collide(False)
+        
+        if not self.ignore_collision:
+            self.collide(False)
 
         self.rect.x += self.xv
-        self.collide(True)
+        
+        if not self.ignore_collision:
+            self.collide(True)
     
     def collide(self, by_x):
         """Checks collision for one dimension"""
@@ -103,6 +109,17 @@ class Entity(GameObject):
         
         self.manager.tag_entity(self, tag)
         self.tags.append(tag)
+    
+    def del_tag(self, tag):
+        if self.manager is None:
+            print('Error: cannot untag entity without manager')
+            return
+            
+        if tag not in self.tags:
+            print(f'Warning: entity has no such tag: {tag}')
+        
+        self.manager.untag_entity(self, tag)
+        self.tags.remove(tag)
     
     def on_deleted(self):
         if self.manager is None:
