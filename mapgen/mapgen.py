@@ -30,6 +30,9 @@ class Mapgen(mp.Process):
         
         self.status = status_v  # String status of a mapgen
         self.done = done_v  # How much work done (in percent)
+    
+    def is_position_valid(self, x, y):
+        return 0 <= x < self.width and 0 <= y < self.height
 
     def save(self):
         blocksize = int(Block.registered_count()/256) + 1
@@ -56,23 +59,29 @@ class Mapgen(mp.Process):
         )
     
     def put_foreground(self, x, y, blockid):
-        self.foreground[y][x] = blockid
+        if self.is_position_valid(x, y):
+            self.foreground[y][x] = blockid
 
     def put_midground(self, x, y, blockid):
-        self.midground[y][x] = blockid
+        if self.is_position_valid(x, y):
+            self.midground[y][x] = blockid
 
     def put_background(self, x, y, blockid):
-        self.background[y][x] = blockid
+        if self.is_position_valid(x, y):
+            self.background[y][x] = blockid
     
     def get_foreground(self, x, y):
-        return self.foreground[y][x]
-    
+        if self.is_position_valid(x, y):
+            return self.foreground[y][x]
+        
     def get_midground(self, x, y):
-        return self.midground[y][x]
+        if self.is_position_valid(x, y):
+            return self.midground[y][x]
     
     def get_background(self, x, y):
-        return self.background[y][x]
-    
+        if self.is_position_valid(x, y):
+            return self.background[y][x]
+        
     def set_status(self, string=None, done=None):
         if string is not None:
             with self.status.get_lock():
