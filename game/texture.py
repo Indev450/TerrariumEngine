@@ -81,6 +81,8 @@ class TiledTexture(Texture):
 
         self.tile_width = 0
         self.tile_height = 0
+        
+        self.current_x = self.current_y = 0
 
     def load(self, force=False):
         self.texture.load(force)
@@ -90,9 +92,19 @@ class TiledTexture(Texture):
 
         self.tile_width = self.width//self.tiles_x
         self.tile_height = self.height//self.tiles_y
+    
+    def select(self, x=None, y=None):
+        x = x if x is not None else self.current_x
+        y = y if y is not None else self.current_y
+        
+        self.current_x = x
+        self.current_y = y
 
-    def get(self, x=0, y=0):
+    def get(self, x=None, y=None):
         """Get tile at given position"""
+        x = x if x is not None else self.current_x
+        y = y if y is not None else self.current_y
+        
         if x not in range(self.tiles_x) or y not in range(self.tiles_y):
             raise IndexError(
                 "invalid position on tile (tile: "
@@ -133,6 +145,9 @@ class AnimatedTiledTexture(AnimatedTexture):
         self.index = 0
 
         self.speed = self.animspec[name]["speed"]
+    
+    def set_speed(self, speed=None):
+        self.speed = speed or self.animspec[self.current_name]["speed"]
     
     def get_animation(self):
         """Get current animation name"""
