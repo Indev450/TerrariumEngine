@@ -20,6 +20,11 @@ class DirtBlock(Block):
     tile = gettexture(modpath("textures/blocks/dirt.png"))
 
 
+class DirtWithGrassBlock(Block):
+    id = 'std:dirt_with_grass'
+    tile = gettexture(modpath("textures/blocks/dirt_with_grass.png"))
+
+
 class DirtWallBlock(Block):
     id = 'std:dirt_wall'
     tile = gettexture(modpath("textures/blocks/dirt_wall.png"))
@@ -28,5 +33,6 @@ class DirtWallBlock(Block):
 StoneBlock.register()
 StoneWallBlock.register()
 DirtBlock.register()
+DirtWithGrassBlock.register()
 DirtWallBlock.register()
 
