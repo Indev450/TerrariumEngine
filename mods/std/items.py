@@ -9,8 +9,5 @@ class StoneItem(Item):
     ID = 'std:stone'
     image = gettexture(modpath('textures/items/blocks/stone.png'))
 
-
-StoneItem.on_press = place_fg_block('std:stone')
-StoneItem.on_keep_press = place_fg_block_keep('std:stone')
-
-StoneItem.register()
+    on_press = place_fg_block('std:stone')
+    on_keep_press = place_fg_block_keep('std:stone')

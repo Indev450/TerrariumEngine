@@ -9,8 +9,5 @@ class DebugPick(Item):
     ID = 'testing:debug_pick'
     image = gettexture(modpath('textures/items/tools/debug_pick.png'))
 
-
-DebugPick.on_press = place_fg_block('std:air', consume=False, force=True)
-DebugPick.on_keep_press = place_fg_block_keep('std:air', consume=False, force=True)
-
-DebugPick.register()
+    on_press = place_fg_block('std:air', consume=False, force=True)
+    on_keep_press = place_fg_block_keep('std:air', consume=False, force=True)

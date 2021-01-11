@@ -1,5 +1,8 @@
+from .items import DebugPick
+
+
 def on_load(modmanager):
-    import mods.testing.items
+    DebugPick.register()
     
     modmanager.add_handler(on_player_join=on_player_join)
 

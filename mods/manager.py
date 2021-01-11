@@ -28,6 +28,8 @@ class ModManager:
             path = f'mods{os.sep}{file}{os.sep}'
             
             if os.path.isdir(path) and not file == '__pycache__':
+                self._set_modpath(path)
+                
                 mod = importlib.import_module(f'mods.{file}')
                 
                 if not hasattr(mod, 'on_load'):
