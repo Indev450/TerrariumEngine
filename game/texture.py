@@ -25,6 +25,9 @@ class Texture:
                 self.TEXTURES[self.name] = pg.image.load(self.name).convert_alpha()
         except pg.error as e:
             print(f"Could not load {self.name}: {e}")
+        except FileNotFoundError:
+            print(f'Error: could not load texture {self.name}')
+            self.TEXTURES[self.name] = getblank(16, 16).image
 
     def get(self):
         """Get surface object"""
