@@ -15,7 +15,7 @@ class SurfaceBiome(Biome):
         self.dirt_wall = Block.id_by_strid('std:dirt_wall')
 
     def get_bounds(self, world_width, world_height):
-        return (0, 0, world_width-1, int(world_height/3))
+        return (0, 0, world_width, int(world_height/3))
     
     def get_blocks_at(self, x, y, orignoise, blocks):
         return (

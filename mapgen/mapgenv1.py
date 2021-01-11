@@ -84,8 +84,8 @@ class MapgenV1(Mapgen):
         
         left, top, right, bottom = biome.get_bounds(self.width, self.height)
         
-        for x in range(left, right+1):
-            for y in range(top, bottom+1):
+        for x in range(left, right):
+            for y in range(top, bottom):
                 try:
                     self.put_blocks(x, y, biome.get_blocks_at(
                         x, y, self.noise2(x, y), self.get_blocks(x, y)))
