@@ -1,3 +1,5 @@
+from game.sound import getsound
+
 import traceback
 
 
@@ -7,6 +9,8 @@ class Item:
     ID = ''
     
     maxcount = 999
+    
+    pick_up_sound = getsound('resources/sounds/items/item_pick_up.wav')
     
     registered = {}
 

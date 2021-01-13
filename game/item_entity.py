@@ -115,6 +115,9 @@ class ItemEntity(Entity):
             if player.rect.colliderect(self.rect):
                 self.item_stack.item_t.on_picked_up(player, self.item_stack)
                 
+                if self.item_stack.item_t.pick_up_sound is not None:
+                    self.item_stack.item_t.pick_up_sound.play()
+                
                 player.get_inventory().add_item_stack('hotbar', self.item_stack)
                 
                 if not self.item_stack.empty():
