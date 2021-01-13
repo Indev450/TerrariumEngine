@@ -1,6 +1,7 @@
 import pygame as pg
 
 import game.texture as textures
+import game.sound as sounds
 
 from activity.activity import Activity, newactivity
 from activity.main_menu_activity import MainMenuActivity
@@ -31,6 +32,7 @@ class App:
         pg.display.set_caption("Terrarium")
 
         textures.load()
+        sounds.load()
 
         newactivity(MainMenuActivity)
 

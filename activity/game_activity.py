@@ -2,6 +2,9 @@ import os
 
 import pygame as pg
 
+import game.texture as textures
+import game.sound as sounds
+
 from game.block import Block
 from game.player import Player
 from game.item_entity import ItemEntity
@@ -9,7 +12,6 @@ from game.camera import Camera
 from game.world import World, blocks2ids
 from game.meta_manager import MetaManager
 from game.entity_manager import EntityManager
-from game.texture import reload
 from game.item import Item
 
 from mods.manager import getmanager
@@ -34,7 +36,8 @@ class GameActivity(Activity):
         
         modmanager.load_mods()
         
-        reload()  # Reload all textures from mods
+        textures.reload()  # Reload all textures from mods
+        sounds.reload()  # Same with sounds
 
         Block.sort_registered_entries()  # Create int identifiers for
                                          # block definitions
