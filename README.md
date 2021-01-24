@@ -13,5 +13,5 @@
 ### Roadmap
    * For now, i'm planning to refactor the code and make basic modding API.
    * After that, i will try to make basic multiplayer to make game a little funnier
-   * Later, i see 2 ways: first - rewrite all code to C++ or Rust (make new engine), and second - rewrite code to Cython (keep engine)
+   * Later, i will try to rewrite engine code to C(++), Rust, or other language for better perfomance
 
