@@ -77,6 +77,6 @@ def compare_tiles(tiles):
     output = pg.Surface((block.Block.WIDTH, block.Block.HEIGHT)).convert_alpha()
     output.fill(pg.Color(0, 0, 0, 0))
     
-    output.blits([(tile.image.get(), (0, 0)) for tile in tiles])
+    output.blits([(tile.gettile(), (0, 0)) for tile in tiles])
 
     return output

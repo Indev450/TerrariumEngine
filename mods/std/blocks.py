@@ -1,12 +1,13 @@
 from game.block import Block
-from game.texture import gettexture
+from game.texture import gettexture, gettiled
 
 from mods.manager import modpath
 
 
 class StoneBlock(Block):
     id = 'std:stone'
-    tile = gettexture(modpath("textures/blocks/stone.png"))
+    drawtype = 'tiled'
+    tile = gettiled(modpath("textures/blocks/stone.png"), 8, 2)
     drops = ['std:stone']
 
 
@@ -17,12 +18,14 @@ class StoneWallBlock(Block):
 
 class DirtBlock(Block):
     id = 'std:dirt'
-    tile = gettexture(modpath("textures/blocks/dirt.png"))
+    drawtype = 'tiled'
+    tile = gettiled(modpath("textures/blocks/dirt.png"), 8, 2)
 
 
 class DirtWithGrassBlock(Block):
     id = 'std:dirt_with_grass'
-    tile = gettexture(modpath("textures/blocks/dirt_with_grass.png"))
+    drawtype = 'tiled'
+    tile = gettiled(modpath("textures/blocks/grassdirt.png"), 8, 2)
 
 
 class DirtWallBlock(Block):

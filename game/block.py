@@ -4,12 +4,42 @@ from .game_object import GameObject
 
 import game.entity_manager as entitymanager
 import game.item_stack as itemstack
+import game.world as worldm
+
+from tilemap.maketilemap import tilemap_positions, flags
+
+
+def get_tilemap_position(x, y, layer):
+    world = worldm.World.get()
+    
+    getblock = (world.get_fg_block if layer == 0 else
+                world.get_mg_block if layer == 1 else
+                world.get_bg_block if layer == 2 else lambda: 0)
+    
+    block_flags = 0
+    
+    up = getblock(x, y-1)
+    down = getblock(x, y+1)
+    left = getblock(x-1, y)
+    right = getblock(x+1, y)
+    
+    block_flags |= flags['up'] if up is None or not up.tilecomparable else 0
+    block_flags |= flags['down'] if down is None or not down.tilecomparable else 0
+    block_flags |= flags['left'] if left is None or not left.tilecomparable else 0
+    block_flags |= flags['right'] if right is None or not right.tilecomparable else 0
+    
+    return tilemap_positions[block_flags]
 
 
 class Block(GameObject):
     id = "builtin:none"
     
     drops = []
+    
+    drawtype = 'image'  # or 'tiled' or None
+    drawlayer = 0  # 0 - foreground, 1 - midground, 2 - background
+    
+    tilecomparable = True  # TODO - find out how to describe this
     
     WIDTH = 16
     HEIGHT = 16
@@ -64,16 +94,11 @@ class Block(GameObject):
                 drops.append(itemstack.ItemStack.from_str(drop))
         
         return drops
-
-    @classmethod
-    def light_blocks_air(cls, x, y, blocks):
-        for _y in range(y - 1, y + 2):
-            for _x in range(x - 1, x + 2):
-                if ((0 <= _x < len(blocks[0]) and 0 <= _y < len(blocks))
-                    and (_x != x and _y != y)):
-                    block = blocks[_y][_x]
-                    if block is not None:
-                        block.set_light(255*0.75)
+    
+    def gettile(self):
+        if self.drawtype == 'tiled':
+            self.image.select(*get_tilemap_position(self.grid_x, self.grid_y, self.drawlayer))
+        return self.image.get()
 
     @classmethod
     def by_id(cls, id):
