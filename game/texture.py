@@ -9,7 +9,7 @@ _used_textures = []
 
 class Texture:
     """Most base texture class. 
-    It's basicly just a wraper around pygame.Surface"""
+    It's basicly just a wrapper for pygame.Surface"""
 
     TEXTURES = {}  # Loaded surfaces
 
@@ -95,7 +95,7 @@ class TiledTexture(Texture):
 
         self.tile_width = self.width//self.tiles_x
         self.tile_height = self.height//self.tiles_y
-    
+        
     def select(self, x=None, y=None):
         x = x if x is not None else self.current_x
         y = y if y is not None else self.current_y
@@ -117,8 +117,8 @@ class TiledTexture(Texture):
         return self.texture.get().subsurface(
                     (x*self.tile_width,
                      y*self.tile_height,
-                     min(self.tile_width, self.width-x*self.tile_width - 1),
-                     min(self.tile_height, self.height-y*self.tile_height - 1)))
+                     min(self.tile_width, self.width-x*self.tile_width),
+                     min(self.tile_height, self.height-y*self.tile_height)))
 
 
 class AnimatedTiledTexture(AnimatedTexture):
