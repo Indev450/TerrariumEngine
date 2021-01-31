@@ -82,6 +82,10 @@ class Block(GameObject):
             
             ientity.set_item_stack(drop)
     
+    def on_place(self, x, y):
+        """Called when placed in world"""
+        pass
+    
     def get_drops(self):
         '''Called in default on_destroy function. Should return
         list of ItemStacks'''

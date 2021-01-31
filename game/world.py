@@ -90,6 +90,8 @@ class World:
         blocks[y][x] = self.block_by_id(id,
             x*block.Block.WIDTH,
             y*block.Block.HEIGHT)
+        
+        blocks[y][x].on_place(x, y)
 
         chunk_x, chunk_y = self.chunk_pos(x*block.Block.WIDTH, y*block.Block.HEIGHT)
 
