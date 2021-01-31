@@ -2,6 +2,7 @@ import pygame as pg
 
 import game.block as block
 from .chunk import Chunk
+from .tick import Ticker
 
 from .camera import Camera
 
@@ -59,6 +60,11 @@ class World:
         self.load_chunk(0, 0)
 
         self.camera = Camera.get()
+        
+        self.ticker = Ticker()
+    
+    def get_ticker(self):
+        return self.ticker
 
     def is_collide(self, entity, on_collide):
         # block_w = 16, ent.rect.left = 128, ent.rect.right = 138, range = (8, 9)
@@ -153,6 +159,8 @@ class World:
         return x, y
 
     def update(self, dtime):
+        self.ticker.update(dtime)
+        
         info = pg.display.Info()
         cam_x, cam_y = self.camera.get_position()
 
