@@ -1,6 +1,6 @@
 """Perlin noise implementation.
 
-Hippity hoppity your code is now my property"""
+Taken from https://gist.github.com/eevee/26f547457522755cb1fb8739d0ea89a1"""
 # Licensed under ISC
 from itertools import product
 import math
