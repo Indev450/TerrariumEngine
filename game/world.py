@@ -97,7 +97,8 @@ class World:
             x*block.Block.WIDTH,
             y*block.Block.HEIGHT)
         
-        blocks[y][x].on_place(x, y)
+        if blocks[y][x] is not None:
+            blocks[y][x].on_place(x, y)
 
         chunk_x, chunk_y = self.chunk_pos(x*block.Block.WIDTH, y*block.Block.HEIGHT)
 
