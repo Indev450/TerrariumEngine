@@ -11,7 +11,7 @@
    * I have tried to make 2-d sandbox game before, but i failed every time. This is the best try
 
 ### Roadmap
-   * For now, i'm planning to refactor the code and make basic modding API.
-   * After that, i will try to make basic multiplayer to make game a little funnier
-   * Later, i will try to rewrite engine code to C(++), Rust, or other language for better perfomance
-
+   * ~~For now, i'm planning to refactor the code and make basic modding API.~~
+   * ~~After that, i will try to make basic multiplayer to make game a little funnier~~
+   * ~~Later, i will try to rewrite engine code to C(++), Rust, or other language for better perfomance~~
+   * I decided to start learning rust NOW. I'll rewrite all engine code as soon as i learn rust (for modding i will use lua instead of python)
