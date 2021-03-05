@@ -57,6 +57,10 @@ class Block(GameObject):
     ID = 0
     
     REPLACABLE = False
+    
+    level = 1  # If tool has too low level, it wouldn't dig this block
+    types = None  # Types of tools that can be used to dig this block
+                  # None means it can be digged by every item
 
     def __init__(self, *position):
         super().__init__(*position, self.WIDTH, self.HEIGHT)

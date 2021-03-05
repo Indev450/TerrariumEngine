@@ -106,12 +106,28 @@ class World:
             self.chunks[chunk_y][chunk_x].update()
         else:
             self.load_chunk(chunk_x, chunk_y)
-    
+
     def _getblock_from(self, blocks, x, y):
         if not self.within_bounds(x, y):
             return
         
         return blocks[y][x]
+
+    def set_block_layer(self, x, y, layer, id):
+        if not 0 <= layer < 3:
+            print(f'Error: invalid layer: {layer}')
+        
+        self._setblock_into(
+            (self.foreground, self.midground, self.background)[layer],
+            x, y, id)
+
+    def get_block_layer(self, x, y, layer):
+        if not 0 <= layer < 3:
+            print(f'Error: invalid layer: {layer}')
+        
+        return self._setblock_into(
+            (self.foreground, self.midground, self.background)[layer],
+            x, y)
     
     def set_fg_block(self, x, y, id):
         self._setblock_into(self.foreground, x, y, id)
