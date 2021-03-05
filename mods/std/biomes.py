@@ -1,3 +1,5 @@
+from utils.coords import neighbours
+
 from game.block import Block
 
 from mapgen.biome import Biome
@@ -18,8 +20,15 @@ class SurfaceBiome(Biome):
         return (0, 0, world_width, int(world_height/3))
     
     def get_blocks_at(self, x, y, orignoise, blocks):
+        grass = False
+        
+        for nx, ny in neighbours(x, y):
+            if self.mapgen.get_foreground(nx, ny) == 0:
+                grass = True
+                break
+        
         return (
-            blocks[0] if blocks[0] == 0 or orignoise > 0.4 else self.dirt if self.mapgen.get_foreground(x, y-1) else self.dirt_with_grass,
+            blocks[0] if blocks[0] == 0 or orignoise > 0.4 else self.dirt_with_grass if grass else self.dirt,
             blocks[1],
             blocks[2] if blocks[2] == 0 or orignoise > 0.4 else self.dirt_wall,
         )
