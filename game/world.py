@@ -1,5 +1,7 @@
 import pygame as pg
 
+from utils.coords import neighbours
+
 import game.block as block
 from .chunk import Chunk
 from .tick import Ticker
@@ -18,6 +20,7 @@ def ids2blocks(blockids, width, height):
 def blocks2ids(blocks):
     """Make 2d array of block ids from 2d array of Block objects"""
     return [[World.id_from_block(block) for block in line] for line in blocks]
+
 
 
 class World:
@@ -99,13 +102,19 @@ class World:
         
         if blocks[y][x] is not None:
             blocks[y][x].on_place(x, y)
+        
+        updated_chunks = []
+        
+        for cx, cy in neighbours(x, y):
+            chunk_x, chunk_y = self.chunk_pos(cx*block.Block.WIDTH, cy*block.Block.HEIGHT)
 
-        chunk_x, chunk_y = self.chunk_pos(x*block.Block.WIDTH, y*block.Block.HEIGHT)
-
-        if self.chunks[chunk_y][chunk_x] is not None:
-            self.chunks[chunk_y][chunk_x].update()
-        else:
-            self.load_chunk(chunk_x, chunk_y)
+            if (self.chunks[chunk_y][chunk_x] is not None
+               and not self.chunks[chunk_y][chunk_x] in updated_chunks):
+                self.chunks[chunk_y][chunk_x].update()
+                updated_chunks.append(self.chunks[chunk_y][chunk_x])
+            else:
+                if not self.chunks[chunk_y][chunk_x] in updated_chunks:
+                    self.load_chunk(chunk_x, chunk_y)
 
     def _getblock_from(self, blocks, x, y):
         if not self.within_bounds(x, y):
