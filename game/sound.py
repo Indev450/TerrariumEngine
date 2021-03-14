@@ -16,13 +16,13 @@ class Sound:
         except pg.error as e:
             print(f"Error: could not load sound {self.name}: {e}")
             self.sound = pg.mixer.Sound(b'')
-        except FileNotFoundError:
-            print(f'Error: could not load sound {self.name}: no such file')
+        except FileNotFoundError as e:
+            print(f'Error: could not load sound {self.name}: {e}')
             self.sound = pg.mixer.Sound(b'')
 
-    def play(self, *args):
+    def play(self, *args, **kwargs):
         if self.sound is not None:
-            self.sound.play(*args)
+            self.sound.play(*args, **kwargs)
         else:
             traceback.print_stack()
             print(f'Error: sound {self.name} is not loaded')

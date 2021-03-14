@@ -13,6 +13,7 @@ from game.world import World, blocks2ids
 from game.meta_manager import MetaManager
 from game.entity_manager import EntityManager
 from game.item import Item
+from game.sound import getsound
 
 from mods.manager import getmanager
 
@@ -28,6 +29,8 @@ from .activity import Activity
 
 class GameActivity(Activity):
     BG_COLOR = pg.Color('#5555FF')
+    
+    BG_MUSIC = getsound("resources/music/game.ogg")  # TODO - play music based on biome
 
     def __init__(self, path):
         super().__init__()
@@ -283,9 +286,17 @@ class GameActivity(Activity):
         elif not (event.type == pg.MOUSEBUTTONUP and
                   not self.overlay.is_visible()):
             super().on_event(event)
+    
+    def on_begin(self):
+        self.app.music_player.play(self.BG_MUSIC)
 
     def on_end(self):
         print("Saving world...")
+        
+        try:
+            self.app.music_player.stop()
+        except pg.error:
+            pass  # When closing game, pygame.mixer becomes not initialized
 
         blocksize = int(Block.registered_count()/256) + 1
 

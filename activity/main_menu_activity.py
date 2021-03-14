@@ -9,6 +9,8 @@ from .activity import Activity, newactivity, getactivity
 from .game_activity import GameActivity
 from .mapgen_activity import MapgenActivity
 
+from game.sound import getsound
+
 from utils.calls import Call
 from utils.saves import check_save_path
 
@@ -22,6 +24,8 @@ from worldfile.worldfile import decode
 
 class MainMenuActivity(Activity):
     BG_COLOR = pg.Color('#5555FF')
+    
+    BG_MUSIC = getsound('resources/music/mainmenu.ogg')
 
     def __init__(self):
         super().__init__()
@@ -30,6 +34,16 @@ class MainMenuActivity(Activity):
         self.background.fill(self.BG_COLOR)
 
         self.init_ui()
+    
+    def on_begin(self):
+        super().on_begin()
+        self.app.music_player.play(self.BG_MUSIC)
+    
+    def on_end(self):
+        try:
+            self.app.music_player.stop()
+        except pg.error:
+            pass  # When closing game, pygame.mixer becomes not initialized
 
     def init_ui(self):
         root = Label(

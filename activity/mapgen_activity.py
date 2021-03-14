@@ -72,6 +72,7 @@ class MapgenActivity(Activity):
                     
                     self.restore_activity.overlay = newoverlay()
                     self.restore_activity.init_ui()
+                    self.restore_activity.on_begin()
                     
                     self.restore_activity.show_message('Map generated!')
                     return
