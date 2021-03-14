@@ -4,9 +4,14 @@ from .camera import Camera
 
 import game.block as block
 
+from config import getcfg
+
+
+config = getcfg()
+
 
 class Chunk:
-    KEEP_ALIVE_TIME = 5
+    KEEP_ALIVE_TIME = config["chunk.keep_alive_time"]
 
     def __init__(self, world, x, y, width, height):
         self.world = world

@@ -8,6 +8,11 @@ from .tick import Ticker
 
 from .camera import Camera
 
+from config import getcfg
+
+
+config = getcfg()
+
 
 def ids2blocks(blockids, width, height):
     """Make 2d array of Block objects from 2d array of block ids"""
@@ -26,8 +31,8 @@ def blocks2ids(blocks):
 class World:
     instance = None
 
-    CHUNK_WIDTH = 10
-    CHUNK_HEIGHT = 10
+    CHUNK_WIDTH = config["world.chunk_size"][0]
+    CHUNK_HEIGHT = config["world.chunk_size"][1]
 
     def __init__(self, foreground, midground, background):
 

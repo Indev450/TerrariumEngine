@@ -2,15 +2,20 @@ from game.sound import getsound
 
 import traceback
 
+from config import getcfg
+
+
+config = getcfg()
+
 
 class Item:
     image = None
     
     ID = ''
     
-    maxcount = 999
+    maxcount = config["item.default.maxcount"]
     
-    pick_up_sound = getsound('resources/sounds/items/item_pick_up.wav')
+    pick_up_sound = getsound(config["item.default.pick_up_sound"])
     
     registered = {}
 

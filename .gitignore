@@ -12,3 +12,6 @@ world.meta
 
 # World entities
 world.entities
+
+# Config file
+config.json

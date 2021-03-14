@@ -26,11 +26,16 @@ from worldfile.worldfile import decode, encode
 
 from .activity import Activity
 
+from config import getcfg
+
+
+config = getcfg()
+
 
 class GameActivity(Activity):
-    BG_COLOR = pg.Color('#5555FF')
+    BG_COLOR = pg.Color(config["game.background"])
     
-    BG_MUSIC = getsound("resources/music/game.ogg")  # TODO - play music based on biome
+    BG_MUSIC = getsound(config["game.music"])  # TODO - play music based on biome
 
     def __init__(self, path):
         super().__init__()

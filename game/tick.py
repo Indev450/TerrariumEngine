@@ -1,8 +1,13 @@
 import traceback
 
+from config import getcfg
+
+
+config = getcfg()
+
 
 class Ticker:
-    tick_time = 1
+    tick_time = config["tick.time"]
     
     def __init__(self):
         self.events = []

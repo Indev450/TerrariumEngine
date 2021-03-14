@@ -4,14 +4,19 @@ from .texture import gettiled, animtiled
 
 from .inventory import Inventory
 
+from config import getcfg
+
+
+config = getcfg()
+
 
 class Player(Entity):
     ID = 'builtin:player'
     
-    SPEED = 30
-    JUMP = 10
-    WIDTH = 20
-    HEIGHT = 40
+    SPEED = config["player.speed"]
+    JUMP = config["player.jump"]
+    WIDTH = config["player.size"][0]
+    HEIGHT = config["player.size"][1]
 
     TEXTURE = gettiled("resources/textures/player/player.png", 3, 3)
     

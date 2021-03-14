@@ -21,11 +21,16 @@ from runmapgen import get_config
 
 from worldfile.worldfile import decode
 
+from config import getcfg
+
+
+config = getcfg()
+
 
 class MainMenuActivity(Activity):
-    BG_COLOR = pg.Color('#5555FF')
+    BG_COLOR = pg.Color(config["menu.background"])
     
-    BG_MUSIC = getsound('resources/music/mainmenu.ogg')
+    BG_MUSIC = getsound(config["menu.music"])
 
     def __init__(self):
         super().__init__()
@@ -93,11 +98,15 @@ class MainMenuActivity(Activity):
     def run_mapgen(self):
         # TODO - add ability to choose map generator
         # TODO - add ability to choose world save path
+        global config
+        
         path = 'world'
+        
+        gamecfg = config
 
         config = get_config()
         
-        mgconfig = config["mapgens"].get("mapgenv1")
+        mgconfig = config["mapgens"].get(gamecfg["mapgen.selected"])
 
         if mgconfig is None:
             self.show_message('default mapgen not found')
@@ -112,7 +121,7 @@ class MainMenuActivity(Activity):
         try:
             newactivity(MapgenActivity,
                         self, mapgen_t,
-                        path, 1000, 500)
+                        path, *gamecfg["mapgen.world_size"])
         except Exception as e:
             logging.exception("run_mapgen():")
             self.show_message(f"{type(e).__name__}: {str(e)}")

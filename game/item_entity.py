@@ -8,14 +8,19 @@ from .texture import gettransparent
 
 from .item_stack import ItemStack
 
+from config import getcfg
+
+
+config = getcfg()
+
 
 class ItemEntity(Entity):
     ID = 'builtin:item_entity'
     
-    TRY_MERGE_FREQ = 1.0  # How often item will try to merge with neighbours
-    MERGE_DIST = 1.5 * block.Block.WIDTH  # Minimal distance to neighbour to merge
-    MAGNET_DIST = 2 * block.Block.WIDTH  # Minimal distance to player to be magneted
-    MAGNET_ACCELERATION = 50  # Acceleration of magneted item
+    TRY_MERGE_FREQ = config["item.entity.try_merge_freq"]  # How often item will try to merge with neighbours
+    MERGE_DIST = config["item.entity.merge_dist"] * block.Block.WIDTH  # Minimal distance to neighbour to merge
+    MAGNET_DIST = config["item.entity.magnet_dist"] * block.Block.WIDTH  # Minimal distance to player to be magneted
+    MAGNET_ACCELERATION = config["item.entity.magnet_acceleration"]  # Acceleration of magneted item
     
     @classmethod
     def from_save(cls, manager, uuid, save):

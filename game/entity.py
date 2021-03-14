@@ -3,16 +3,21 @@ import traceback
 from .world import World
 from .game_object import GameObject
 
+from config import getcfg
+
+
+config = getcfg()
+
 
 class Entity(GameObject):
     registered = {}
     ID = ''
     
-    GRAVITY = 25  # Fall speed
-    BRAKING = 0.7  # To avoid endless motion of object
-    MIN_SPEED = 0.2  # Minimum horizontal speed
-    MAX_SPEED = 5  # Maximum horizontal speed
-    MAX_FALL = -20  # Maximum of fall speed
+    GRAVITY = config["entity.default.gravity"]  # Fall speed
+    BRAKING = config["entity.default.braking"]  # To avoid endless motion of object
+    MIN_SPEED = config["entity.default.min_speed"]  # Minimum horizontal speed
+    MAX_SPEED = config["entity.default.max_speed"]  # Maximum horizontal speed
+    MAX_FALL = config["entity.default.max_fall"]  # Maximum of fall speed
     
     @classmethod
     def register(cls):
