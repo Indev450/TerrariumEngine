@@ -3,6 +3,8 @@ import pygame as pg
 import game.texture as textures
 import game.sound as sounds
 
+from game.music import MusicPlayer
+
 from activity.activity import Activity, newactivity
 from activity.main_menu_activity import MainMenuActivity
 
@@ -12,6 +14,9 @@ from ui.overlay import Overlay
 if not pg.get_init():
     pg.init()
     pg.fastevent.init()
+
+if not pg.mixer.get_init():
+    pg.mixer.init()
 
 
 class App:
@@ -33,6 +38,8 @@ class App:
 
         textures.load()
         sounds.load()
+        
+        self.music_player = MusicPlayer.new()
 
         newactivity(MainMenuActivity)
 
