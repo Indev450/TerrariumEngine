@@ -71,6 +71,16 @@ def load():
         
         file.close()
     
+    updated = False
+    
+    for key in DEFAULT_CONFIG.keys():
+        if key not in config:
+            config[key] = DEFAULT_CONFIG[key]
+            updated = True
+    
+    if updated:
+        write_config()
+    
     return config
 
 
@@ -79,5 +89,5 @@ def getcfg():
 
 
 def write_config():
-    with open('config.json') as file:
+    with open('config.json', 'w') as file:
         json.dump(config, file)
