@@ -71,6 +71,8 @@ class GameActivity(Activity):
 
         self.world = World(*blocks)
         
+        modmanager.call_handlers('on_world_load', self.world)
+        
         self.meta_manager = MetaManager.load(self.metapath)
         
         self.entity_manager = EntityManager.new()

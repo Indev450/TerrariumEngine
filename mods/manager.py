@@ -43,6 +43,7 @@ class ModManager:
             'init_mapgen': [],
             'on_player_join': [],
             'on_player_leave': [],
+            'on_world_load': [],
         }
         
     def load_mods(self, names=None):
