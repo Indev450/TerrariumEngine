@@ -9,6 +9,17 @@ config = getcfg()
 class Ticker:
     tick_time = config["tick.time"]
     
+    instance = None
+    
+    @classmethod
+    def new(cls):
+        cls.instance = cls()
+        return cls.instance
+    
+    @classmethod
+    def get(cls):
+        return cls.instance
+    
     def __init__(self):
         self.events = []
         self.timer = 0

@@ -69,7 +69,7 @@ class World:
 
         self.camera = Camera.get()
         
-        self.ticker = Ticker()
+        self.ticker = Ticker.new()
     
     def get_ticker(self):
         return self.ticker
