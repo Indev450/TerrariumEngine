@@ -13,12 +13,12 @@ def break_block(radius, layer=0):
         tool_level = getattr(itemstack.item_t, 'level', 1)
         tool_dig_type = getattr(itemstack.item_t, 'dig_type', None)
         
-        try_break_block(*position, tool_level, tool_dig_type, layer)
+        _try_break_block(*position, tool_level, tool_dig_type, layer)
     
     return decor_break_block
 
 
-def try_break_block(x, y, tool_level, tool_dig_type, layer=0):
+def _try_break_block(x, y, tool_level, tool_dig_type, layer=0):
     world = World.get()
     
     block = world.get_block_layer(x, y, layer)
