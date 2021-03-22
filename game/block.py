@@ -63,39 +63,42 @@ class Block(GameObject):
                   # None means it can be digged by every item
 
     def __init__(self, *position):
-        super().__init__(*position, self.WIDTH, self.HEIGHT)
-
-        self.image = self.tile
-
-        self.grid_x = position[0] // self.WIDTH
-        self.grid_y = position[1] // self.HEIGHT
-
-    def getid(self):
-        return self.ID
+        pass
     
-    def on_destroy(self):
+    @classmethod
+    def on_place(cls, x, y):
+        '''Called when placed in world'''
+        pass
+    
+    @classmethod
+    def on_destroy(cls, x, y):
+        pass
+    
+    # You don't usually need to redefine those methods
+    @classmethod
+    def _on_destroy(cls, x, y):
+        '''Called in World when destroyed'''
+        cls.on_destroy(x, y)
+        
         entmanager = entitymanager.EntityManager.get()
         
         if entmanager is None:
             print('Warning: could not drop items without EntityManager')
             return
         
-        for drop in self.get_drops():
+        for drop in cls.get_drops():
             ientity, _ = entmanager.newentity('builtin:item_entity', None,
-                                           position=self.rect.topleft)
+                                           position=(x*cls.WIDTH, y*cls.HEIGHT))
             
             ientity.set_item_stack(drop)
-    
-    def on_place(self, x, y):
-        """Called when placed in world"""
-        pass
-    
-    def get_drops(self):
+
+    @classmethod
+    def get_drops(cls):
         '''Called in default on_destroy function. Should return
         list of ItemStacks'''
         drops = []
         
-        for drop in self.drops:
+        for drop in cls.drops:
             if isinstance(drop, itemstack.ItemStack):
                 drops.append(drop.copy())
             elif isinstance(drop, str):
@@ -103,30 +106,39 @@ class Block(GameObject):
         
         return drops
     
-    def gettile(self):
-        if self.drawtype == 'tiled':
-            self.image.select(*get_tilemap_position(self.grid_x, self.grid_y, self.drawlayer))
-        return self.image.get()
+    @classmethod
+    def gettile(cls, x, y):
+        '''Get block drawable'''
+        if cls.drawtype == 'tiled':
+            cls.tile.select(*get_tilemap_position(x, y, cls.drawlayer))
+        return cls.tile.get()
 
+
+    # Blocks definitions storage methods
+    # TODO - spit this class into Block and BlockDefStorage
     @classmethod
     def by_id(cls, id):
+        '''Get block definition by integer id'''
         try:
             return cls._registered_blocks[id]
         except IndexError:
             pass
 
     @classmethod
-    def id_by_strid(cls, strid):
-        return cls.registered_blocks[strid]["id"]
-
-    @classmethod
-    def by_idstr(cls, idstr):
+    def by_strid(cls, strid):
+        '''Get block definition by string id'''
         block = cls.registered_blocks.get(idstr)
         if block is not None:
             return block["entry"]
 
     @classmethod
+    def id_by_strid(cls, strid):
+        '''Get integer block id by string id'''
+        return cls.registered_blocks[strid]["id"]
+
+    @classmethod
     def register(cls):
+        '''Add block definition into registration table'''
         cls.registered_blocks[cls.id] = {
             "entry": cls,
             "id": -1,
@@ -134,10 +146,12 @@ class Block(GameObject):
 
     @classmethod
     def registered_count(cls):
+        '''Get count of registered blocks'''
         return len(cls._registered_blocks)
 
     @classmethod
     def sort_registered_entries(cls):
+        '''Initialize integer identifiers for registered blocks'''
         cls._registered_blocks = [None]  # None - std:air
 
         keys = list(cls.registered_blocks.keys())

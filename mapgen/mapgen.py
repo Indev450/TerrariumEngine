@@ -1,4 +1,5 @@
 import os
+import array
 
 import multiprocessing as mp
 
@@ -24,9 +25,8 @@ class Mapgen(mp.Process):
         self.width = width
         self.height = height
 
-        self.foreground = [[0 for i in range(self.width)] for i in range(self.height)]
-        self.midground = [[0 for i in range(self.width)] for i in range(self.height)]
-        self.background = [[0 for i in range(self.width)] for i in range(self.height)]
+        self.worldarr = array.array('I')
+        self.worldarr.frombytes(bytes(width*height*3*self.worldarr.itemsize))
         
         self.status = status_v  # String status of a mapgen
         self.done = done_v  # How much work done (in percent)
@@ -35,12 +35,9 @@ class Mapgen(mp.Process):
         return 0 <= x < self.width and 0 <= y < self.height
 
     def save(self):
-        blocksize = int(Block.registered_count()/256) + 1
         data = encode(
-            self.foreground,
-            self.midground,
-            self.background,
-            blocksize)
+                self.worldarr,
+                self.width, self.height)
         self.ofile.write(data)
         self.ofile.close()
         
@@ -60,27 +57,27 @@ class Mapgen(mp.Process):
     
     def put_foreground(self, x, y, blockid):
         if self.is_position_valid(x, y):
-            self.foreground[y][x] = blockid
+            self._set_block_id(x, y, 0, blockid)
 
     def put_midground(self, x, y, blockid):
         if self.is_position_valid(x, y):
-            self.midground[y][x] = blockid
+            self._set_block_id(x, y, 1, blockid)
 
     def put_background(self, x, y, blockid):
         if self.is_position_valid(x, y):
-            self.background[y][x] = blockid
+            self._set_block_id(x, y, 2, blockid)
     
     def get_foreground(self, x, y):
         if self.is_position_valid(x, y):
-            return self.foreground[y][x]
+            return self._get_block_id(x, y, 0)
         
     def get_midground(self, x, y):
         if self.is_position_valid(x, y):
-            return self.midground[y][x]
+            return self._get_block_id(x, y, 1)
     
     def get_background(self, x, y):
         if self.is_position_valid(x, y):
-            return self.background[y][x]
+            return self._get_block_id(x, y, 2)
         
     def set_status(self, string=None, done=None):
         if string is not None:
@@ -97,3 +94,19 @@ class Mapgen(mp.Process):
         manager = getmanager()
         
         manager.call_handlers('init_mapgen', self)
+    
+    def _get_block_index(self, x, y, layer):
+        '''Get index for array('I', <world>)'''
+        return self.width*y*3 + x*3 + layer
+    
+    def _get_block_id(self, x, y, layer):
+        '''Get block identifier at given position and layer'''
+        i = self._get_block_index(x, y, layer)
+        
+        return self.worldarr[i]
+    
+    def _set_block_id(self, x, y, layer, id):
+        '''Set block identifier at given position and layer'''
+        i = self._get_block_index(x, y, layer)
+        
+        self.worldarr[i] = id

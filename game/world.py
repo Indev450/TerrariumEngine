@@ -2,7 +2,7 @@ import pygame as pg
 
 from utils.coords import neighbours
 
-import game.block as block
+import game.block as blockmod
 from .chunk import Chunk
 from .tick import Ticker
 
@@ -14,49 +14,19 @@ from config import getcfg
 config = getcfg()
 
 
-def ids2blocks(blockids, width, height):
-    """Make 2d array of Block objects from 2d array of block ids"""
-    return [[World.block_by_id(
-                blockids[y][x],
-                x*block.Block.WIDTH,
-                y*block.Block.HEIGHT) for x in range(width)] for y in range(height)]
-
-
-def blocks2ids(blocks):
-    """Make 2d array of block ids from 2d array of Block objects"""
-    return [[World.id_from_block(block) for block in line] for line in blocks]
-
-
-
 class World:
     instance = None
 
     CHUNK_WIDTH = config["world.chunk_size"][0]
     CHUNK_HEIGHT = config["world.chunk_size"][1]
 
-    def __init__(self, foreground, midground, background):
-
-        self.set(self)
-
+    def __init__(self, data, width, height):
         print("Initializing blocks...")
 
-        self.WORLD_WIDTH = len(foreground[0])
-        self.WORLD_HEIGHT = len(foreground)
+        self.WORLD_WIDTH = width
+        self.WORLD_HEIGHT = height
 
-        self.foreground = ids2blocks(
-            foreground,
-            self.WORLD_WIDTH,
-            self.WORLD_HEIGHT)
-
-        self.midground = ids2blocks(
-            midground,
-            self.WORLD_WIDTH,
-            self.WORLD_HEIGHT)
-
-        self.background = ids2blocks(
-            background,
-            self.WORLD_WIDTH,
-            self.WORLD_HEIGHT)
+        self.world_data = data
 
         self.chunks_x = self.WORLD_WIDTH//self.CHUNK_WIDTH + 1
         self.chunks_y = self.WORLD_HEIGHT//self.CHUNK_HEIGHT + 1
@@ -78,15 +48,16 @@ class World:
         # block_w = 16, ent.rect.left = 128, ent.rect.right = 138, range = (8, 9)
         for x in self.worldrange_x(entity.rect.left, entity.rect.right):
             for y in self.worldrange_y(entity.rect.top, entity.rect.bottom):
-                if (self.foreground[y][x] is not None and
-                    pg.sprite.collide_rect(self.foreground[y][x], entity)):
-                    on_collide(self.foreground[y][x])
+                rect = pg.Rect(x*blockmod.Block.WIDTH, y*blockmod.Block.HEIGHT, blockmod.Block.WIDTH, blockmod.Block.HEIGHT)
+                block = self.get_block(x, y, 0)
+                if (block is not None and rect.colliderect(entity.rect)):
+                    on_collide(block, rect)
 
     def worldrange_x(self, x1, x2):
-        return range(max(0, x1//block.Block.WIDTH), min(x2//block.Block.WIDTH + 1, self.WORLD_WIDTH))
+        return range(max(0, x1//blockmod.Block.WIDTH), min(x2//blockmod.Block.WIDTH + 1, self.WORLD_WIDTH))
 
     def worldrange_y(self, y1, y2):
-        return range(max(0, y1//block.Block.HEIGHT), min(y2//block.Block.HEIGHT + 1, self.WORLD_HEIGHT))
+        return range(max(0, y1//blockmod.Block.HEIGHT), min(y2//blockmod.Block.HEIGHT + 1, self.WORLD_HEIGHT))
 
     def draw(self, screen):
         list(
@@ -94,24 +65,25 @@ class World:
                 lambda chunk: chunk.draw(screen),
                 self.chunks_loaded))
 
-    def _setblock_into(self, blocks, x, y, id):
-        if not self.within_bounds(x, y):
+    def set_block(self, x, y, layer, id):
+        if not self.within_bounds(x, y) or 0 > layer >= 3:
             return
         
-        if blocks[y][x] is not None:
-            blocks[y][x].on_destroy()
-
-        blocks[y][x] = self.block_by_id(id,
-            x*block.Block.WIDTH,
-            y*block.Block.HEIGHT)
+        block_old = blockmod.Block.by_id(self._get_block_id(x, y, layer))
+        block_new = blockmod.Block.by_id(id)
         
-        if blocks[y][x] is not None:
-            blocks[y][x].on_place(x, y)
+        if block_old is not None:
+            block_old._on_destroy(x, y)
+
+        self._set_block_id(x, y, layer, id)
+        
+        if block_new is not None:
+            block_new.on_place(x, y)
         
         updated_chunks = []
         
-        for cx, cy in neighbours(x, y):
-            chunk_x, chunk_y = self.chunk_pos(cx*block.Block.WIDTH, cy*block.Block.HEIGHT)
+        for nx, ny in neighbours(x, y):
+            chunk_x, chunk_y = self.chunk_pos(nx*blockmod.Block.WIDTH, ny*blockmod.Block.HEIGHT)
 
             if (self.chunks[chunk_y][chunk_x] is not None
                and not self.chunks[chunk_y][chunk_x] in updated_chunks):
@@ -121,45 +93,29 @@ class World:
                 if not self.chunks[chunk_y][chunk_x] in updated_chunks:
                     self.load_chunk(chunk_x, chunk_y)
 
-    def _getblock_from(self, blocks, x, y):
-        if not self.within_bounds(x, y):
+    def get_block(self, x, y, layer):
+        if not self.within_bounds(x, y) or 0 > layer >= 3:
             return
         
-        return blocks[y][x]
-
-    def set_block_layer(self, x, y, layer, id):
-        if not 0 <= layer < 3:
-            print(f'Error: invalid layer: {layer}')
-        
-        self._setblock_into(
-            (self.foreground, self.midground, self.background)[layer],
-            x, y, id)
-
-    def get_block_layer(self, x, y, layer):
-        if not 0 <= layer < 3:
-            print(f'Error: invalid layer: {layer}')
-        
-        return self._setblock_into(
-            (self.foreground, self.midground, self.background)[layer],
-            x, y)
+        return blockmod.Block.by_id(self._get_block_id(x, y, layer))
     
     def set_fg_block(self, x, y, id):
-        self._setblock_into(self.foreground, x, y, id)
+        self.set_block(x, y, 0, id)
 
     def set_mg_block(self, x, y, id):
-        self._setblock_into(self.midground, x, y, id)
+        self.set_block(x, y, 1, id)
 
     def set_bg_block(self, x, y, id):
-        self._setblock_into(self.background, x, y, id)
+        self.set_block(x, y, 2, id)
 
     def get_fg_block(self, x, y):
-        return self._getblock_from(self.foreground, x, y)
+        return self.get_block(x, y, 0)
 
     def get_mg_block(self, x, y):
-        return self._getblock_from(self.midground, x, y)
+        return self.get_block(x, y, 1)
 
     def get_bg_block(self, x, y):
-        return self._getblock_from(self.background, x, y)
+        return self.get_block(x, y, 2)
 
     def within_bounds(self, x, y):
         return 0 <= x < self.WORLD_WIDTH and 0 <= y < self.WORLD_HEIGHT
@@ -170,9 +126,9 @@ class World:
         else:
             result = ()
             
-            bg = self.background[y][x]
-            mg = self.midground[y][x]
-            fg = self.foreground[y][x]
+            bg = self.get_bg_block(x, y)
+            mg = self.get_mg_block(x, y)
+            fg = self.get_fg_block(x, y)
             
             if bg is not None:
                 result += (bg,)
@@ -184,8 +140,8 @@ class World:
             return result
 
     def chunk_pos(self, x, y):
-        x = int(x / block.Block.WIDTH / self.CHUNK_WIDTH)
-        y = int(y / block.Block.HEIGHT / self.CHUNK_HEIGHT)
+        x = int(x / blockmod.Block.WIDTH / self.CHUNK_WIDTH)
+        y = int(y / blockmod.Block.HEIGHT / self.CHUNK_HEIGHT)
 
         return x, y
 
@@ -202,8 +158,8 @@ class World:
 
         left, top = self.bound_chunk_position(left, top)
 
-        right = left + int(info.current_w / block.Block.WIDTH / self.CHUNK_WIDTH) + 4
-        bottom = top + int(info.current_h / block.Block.HEIGHT / self.CHUNK_HEIGHT) + 4
+        right = left + int(info.current_w / blockmod.Block.WIDTH / self.CHUNK_WIDTH) + 4
+        bottom = top + int(info.current_h / blockmod.Block.HEIGHT / self.CHUNK_HEIGHT) + 4
 
         right, bottom = self.bound_chunk_position(right, bottom)
 
@@ -241,6 +197,22 @@ class World:
         self.chunks[y][x] = None
 
         self.chunks_loaded.remove(c)
+    
+    def _get_block_index(self, x, y, layer):
+        '''Get index for array('I', <world>)'''
+        return self.WORLD_WIDTH*y*3 + x*3 + layer
+    
+    def _get_block_id(self, x, y, layer):
+        '''Get block identifier at given position and layer'''
+        i = self._get_block_index(x, y, layer)
+        
+        return self.world_data[i]
+    
+    def _set_block_id(self, x, y, layer, id):
+        '''Set block identifier at given position and layer'''
+        i = self._get_block_index(x, y, layer)
+        
+        self.world_data[i] = id
 
     @classmethod
     def block_by_id(cls, id, x, y):
@@ -258,5 +230,6 @@ class World:
         return cls.instance
 
     @classmethod
-    def set(cls, instance):
-        cls.instance = instance
+    def new(cls, data, width, height):
+        cls.instance = cls(data, width, height)
+        return cls.instance

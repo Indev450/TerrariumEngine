@@ -51,7 +51,7 @@ class Chunk:
                 if not tiles:
                     continue
                 
-                image = compare_tiles(tiles)
+                image = compare_tiles(tiles, x, y)
 
                 local_x = (x-self.x1) * block.Block.WIDTH
                 local_y = (y-self.y1) * block.Block.HEIGHT
@@ -78,10 +78,10 @@ class Chunk:
         return 0
 
 
-def compare_tiles(tiles):
+def compare_tiles(tiles, x, y):
     output = pg.Surface((block.Block.WIDTH, block.Block.HEIGHT)).convert_alpha()
     output.fill(pg.Color(0, 0, 0, 0))
     
-    output.blits([(tile.gettile(), (0, 0)) for tile in tiles])
+    output.blits([(tile.gettile(x, y), (0, 0)) for tile in tiles])
 
     return output

@@ -9,7 +9,7 @@ from game.block import Block
 from game.player import Player
 from game.item_entity import ItemEntity
 from game.camera import Camera
-from game.world import World, blocks2ids
+from game.world import World
 from game.meta_manager import MetaManager
 from game.entity_manager import EntityManager
 from game.item import Item
@@ -65,11 +65,11 @@ class GameActivity(Activity):
         
         file = open(self.worldpath, 'rb')
         
-        blocks = decode(file.read())
+        decoded = decode(file.read())
         
         file.close()
 
-        self.world = World(*blocks)
+        self.world = World.new(*decoded)
         
         modmanager.call_handlers('on_world_load', self.world)
         
@@ -305,13 +305,10 @@ class GameActivity(Activity):
         except pg.error:
             pass  # When closing game, pygame.mixer becomes not initialized
 
-        blocksize = int(Block.registered_count()/256) + 1
-
-        data = encode(
-            blocks2ids(self.world.foreground),
-            blocks2ids(self.world.midground),
-            blocks2ids(self.world.background),
-            blocksize)
+        blocksize = Block.registered_count()//255 + 1
+        
+        data = encode(self.world.world_data,
+                      self.world.WORLD_WIDTH, self.world.WORLD_HEIGHT)
         
         self.meta_manager.save(self.metapath)
         self.entity_manager.save(self.entitiespath)
