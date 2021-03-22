@@ -31,11 +31,11 @@ class Player(Entity):
         },
         "walk_left": {
             "speed": 0.2,
-            "tiles": [(0, 1), (1, 1), (2, 1)]
+            "tiles": [(0, 1), (1, 1), (0, 1), (2, 1)]
         },
         "walk_right": {
             "speed": 0.2,
-            "tiles": [(0, 0), (1, 0), (2, 0)]
+            "tiles": [(0, 0), (1, 0), (0, 0), (2, 0)]
         },
         "jump_left": {
             "speed": 1,
