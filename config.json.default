@@ -32,7 +32,7 @@
     
     "player.speed": 30,
     "player.jump": 10,
-    "player.size": [20, 40],
+    "player.size": [24, 48],
     
     "tick.time": 1.0,
     
