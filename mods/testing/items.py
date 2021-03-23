@@ -1,7 +1,7 @@
 from game.item import Item
 from game.texture import gettexture
 from game.sound import getsound
-from game.block import place_fg_block, place_fg_block_keep
+from utils.items import do_break_block, do_break_block_keep
 
 from mods.manager import modpath
 
@@ -9,9 +9,11 @@ from mods.manager import modpath
 class DebugPick(Item):
     ID = 'testing:debug_pick'
     image = gettexture(modpath('textures/items/tools/debug_pick.png'))
+    
+    level = 999  # UNLIMITED POWER!
 
-    on_press = place_fg_block('std:air', consume=False, force=True)
-    on_keep_press = place_fg_block_keep('std:air', consume=False, force=True)
+    on_press = do_break_block(10)
+    on_keep_press = do_break_block_keep(10, 10)
 
 
 class MusicItem(Item):
