@@ -38,9 +38,9 @@ class Biome:
         
         if self.overnoise is not None:
             overnoise = self.overnoise(
-                x*self.overnoise_scale_x,
-                y*self.overnoise_scale_y)
+                x/self.overnoise_scale_x,
+                y/self.overnoise_scale_y)
         
-        return self.get_block(
+        return self.get_blocks(
                 (orignoise+overnoise) / (2 if self.overnoise else 1),
                 blocks)
