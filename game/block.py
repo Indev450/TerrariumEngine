@@ -12,21 +12,19 @@ from tilemap.maketilemap import tilemap_positions, flags
 def get_tilemap_position(x, y, layer):
     world = worldm.World.get()
     
-    getblock = (world.get_fg_block if layer == 0 else
-                world.get_mg_block if layer == 1 else
-                world.get_bg_block if layer == 2 else lambda: 0)
-    
     block_flags = 0
     
-    up = getblock(x, y-1)
-    down = getblock(x, y+1)
-    left = getblock(x-1, y)
-    right = getblock(x+1, y)
+    self = world.get_block(x, y, layer)
     
-    block_flags |= flags['up'] if up is None or not up.tilecomparable else 0
-    block_flags |= flags['down'] if down is None or not down.tilecomparable else 0
-    block_flags |= flags['left'] if left is None or not left.tilecomparable else 0
-    block_flags |= flags['right'] if right is None or not right.tilecomparable else 0
+    up = world.get_block(x, y-1, layer)
+    down = world.get_block(x, y+1, layer)
+    left = world.get_block(x-1, y, layer)
+    right = world.get_block(x+1, y, layer)
+    
+    block_flags |= flags['up'] if up is None or (not up.tilecomparable and up is not self) else 0
+    block_flags |= flags['down'] if down is None or (not down.tilecomparable and down is not self) else 0
+    block_flags |= flags['left'] if left is None or (not left.tilecomparable and left is not self) else 0
+    block_flags |= flags['right'] if right is None or (not right.tilecomparable and right is not self) else 0
     
     return tilemap_positions[block_flags]
 
