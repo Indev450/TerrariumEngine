@@ -78,6 +78,14 @@ class Mapgen(mp.Process):
     def get_background(self, x, y):
         if self.is_position_valid(x, y):
             return self._get_block_id(x, y, 2)
+    
+    def get_block(self, x, y, layer):
+        if self.is_position_valid(x, y) and 0 <= layer < 3:
+            return self._get_block_id(x, y, layer)
+    
+    def set_block(self, x, y, layer, id):
+        if self.is_position_valid(x, y) and 0 <= layer < 3:
+            return self._set_block_id(x, y, layer, id)
         
     def set_status(self, string=None, done=None):
         if string is not None:
