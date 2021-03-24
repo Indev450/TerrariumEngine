@@ -25,6 +25,7 @@ class MapgenV1(Mapgen):
         self.noise_scale_y = 1/650.0
         
         self.biomes = {}
+        self.ores = {}
 
     def run(self):
         super().run()
@@ -59,6 +60,19 @@ class MapgenV1(Mapgen):
             biomes_processed += 1
             self.set_status(done=(biomes_processed/biomes)*100)
         
+        self.set_status(string="Generating ores...", done=0)
+        
+        self.biomes = self.ores  # Ores are biomes to, but they must be processed after all biomes
+        
+        ores = len(self.ores.keys())
+        ores_processed = 0
+        
+        for ore in self.ores.keys():
+            self.process_biome(ore)
+            
+            ores_processed += 1
+            self.set_status(done=(ores_processed/ores)*100)
+        
         self.set_status(string="Saving the world...", done=0)
 
         self.save()
@@ -74,6 +88,9 @@ class MapgenV1(Mapgen):
     
     def add_biome(self, biome):
         self.biomes[biome.id] = biome
+    
+    def add_ore(self, ore):
+        self.ores[ore.id] = ore
     
     def process_biome(self, id):
         biome = self.biomes.get(id)

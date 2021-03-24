@@ -31,3 +31,10 @@ class DirtWithGrassBlock(Block):
 class DirtWallBlock(Block):
     id = 'std:dirt_wall'
     tile = gettexture(modpath("textures/blocks/dirt_wall.png"))
+
+
+class CopperOreBlock(Block):
+    id = 'std:copper_ore'
+    drawtype = 'tiled'
+    tile = gettiled(modpath("textures/blocks/coppertilemap.png"), 8, 2)
+    tilecomparable = False

@@ -1,9 +1,10 @@
 from utils.checks import hasattrs
 
 from .biomes import SurfaceBiome
+from .ores import CopperOreGen
 from .items import StoneItem
 from .blocks import (StoneBlock, StoneWallBlock, DirtBlock,
-                     DirtWallBlock, DirtWithGrassBlock)
+                     DirtWallBlock, DirtWithGrassBlock, CopperOreBlock)
 
 
 required_mapgen_attributes = ['add_biome']
@@ -21,6 +22,7 @@ def on_load(modmanager):
     DirtBlock.register()
     DirtWithGrassBlock.register()
     DirtWallBlock.register()
+    CopperOreBlock.register()
     
     modmanager.add_handler(init_mapgen=init_mapgen)
 
@@ -30,7 +32,7 @@ def init_mapgen(mg):
     _, missing = hasattrs(mg, required_mapgen_attributes, True)
     
     if 'add_ore' not in missing:
-        pass
+        mg.add_ore(CopperOreGen(mg))
     
     if 'add_biome' not in missing:
         mg.add_biome(SurfaceBiome(mg))
