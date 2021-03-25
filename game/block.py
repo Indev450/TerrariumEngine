@@ -59,6 +59,8 @@ class Block(GameObject):
     level = 1  # If tool has too low level, it wouldn't dig this block
     types = None  # Types of tools that can be used to dig this block
                   # None means it can be digged by every item
+    hits = 4  # How much hits this block requires to break
+    hit_sound = None  # Sound played when hit
 
     def __init__(self, *position):
         pass

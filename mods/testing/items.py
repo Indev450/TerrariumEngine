@@ -10,6 +10,7 @@ class DebugPick(Item):
     ID = 'testing:debug_pick'
     image = gettexture(modpath('textures/items/tools/debug_pick.png'))
     
+    dig_damage = 999
     level = 999  # UNLIMITED POWER!
 
     on_press = do_break_block(10)
