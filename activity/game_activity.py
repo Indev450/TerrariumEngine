@@ -14,6 +14,7 @@ from game.meta_manager import MetaManager
 from game.entity_manager import EntityManager
 from game.item import Item
 from game.sound import getsound
+from game.decorations import DecorationManager
 
 from mods.manager import getmanager
 
@@ -53,6 +54,8 @@ class GameActivity(Activity):
         ItemEntity.register()
 
         Camera.init()  # Create camera object
+        
+        self.decormanager = DecorationManager.new()
 
         self.background = pg.Surface(
             (self.app.WIN_WIDTH, self.app.WIN_HEIGHT))
@@ -218,6 +221,8 @@ class GameActivity(Activity):
             self.entity_manager.update(dtime)
 
             self.world.update(dtime)
+            
+            self.decormanager.update(dtime)
 
             self.camera.update_position()
 
@@ -227,6 +232,8 @@ class GameActivity(Activity):
         self.world.draw(screen)
         
         self.entity_manager.draw(screen)
+        
+        self.decormanager.draw(screen)
 
     def pause(self):
         self.overlay.show('pause')
