@@ -14,7 +14,7 @@ class Sound:
     def load(self, force=False):
         try:
             self.sound = pg.mixer.Sound(self.name)
-            self.sound.set_volume(volume)
+            self.sound.set_volume(self.volume)
         except pg.error as e:
             print(f"Error: could not load sound {self.name}: {e}")
             self.sound = pg.mixer.Sound(b'')
