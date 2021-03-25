@@ -6,13 +6,15 @@ import pygame as pg
 class Sound:
     instances = {}
     
-    def __init__(self, name):
+    def __init__(self, name, volume=1.0):
         self.name = name
         self.sound = None
+        self.volume = volume
     
     def load(self, force=False):
         try:
             self.sound = pg.mixer.Sound(self.name)
+            self.sound.set_volume(volume)
         except pg.error as e:
             print(f"Error: could not load sound {self.name}: {e}")
             self.sound = pg.mixer.Sound(b'')
@@ -28,11 +30,11 @@ class Sound:
             print(f'Error: sound {self.name} is not loaded')
 
 
-def getsound(name):
+def getsound(name, volume=1.0):
     if Sound.instances.get(name):
         return Sound.instances[name]
     
-    Sound.instances[name] = Sound(name)
+    Sound.instances[name] = Sound(name, volume)
     
     return Sound.instances[name]
 
