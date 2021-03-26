@@ -167,11 +167,15 @@ class Block(GameObject):
 # TODO - make this functions better
 
 
+def _block_position(x, y):
+    return int(x // Block.WIDTH), int(y // Block.HEIGHT)
+
+
 def _place_block_into(blockname, into=0, consume=True, force=False):  # 0 - fg, 1 - mg, 2 - bg
     def _place_block(player, itemstack, position):
         world = player.world
         
-        position = int(position[0]), int(position[1])
+        position = _block_position(*position)
 
         if into == 0:
             dstblock = world.get_fg_block(*position)
@@ -200,7 +204,7 @@ def _place_block_into_keep(blockname, into=0, consume=True, force=False):  # 0 -
     def _place_block_keep(player, itemstack, position, use_time):
         world = player.world
 
-        position = int(position[0]), int(position[1])
+        position = _block_position(*position)
         
         if _keep_place_block_users.get(player) is None:
             _keep_place_block_users[player] = 0

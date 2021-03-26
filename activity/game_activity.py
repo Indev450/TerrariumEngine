@@ -201,9 +201,6 @@ class GameActivity(Activity):
                     x += cam_x
                     y += cam_y
                     
-                    x = int(x//Block.WIDTH)
-                    y = int(y//Block.HEIGHT)
-                    
                     if self.controls['mouse']['press_time'] == 0:
                         istack.item_t.on_press(self.player, istack, (x, y))
                         self.controls['mouse']['press_time'] += dtime

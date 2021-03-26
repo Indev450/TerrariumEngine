@@ -80,12 +80,10 @@ class BlockDamager:
 
 def do_break_block(radius, layer=0):
     def inner_break_block(player, itemstack, position):
-        playerpos = player.rect.center[0] // Block.WIDTH, player.rect.center[1] // Block.HEIGHT
-        
-        if Vector2(playerpos).distance_to(Vector2(position)) > radius:
+        if Vector2(player.rect.center).distance_to(Vector2(position)) > radius * Block.WIDTH:
             return
         
-        position = int(position[0]), int(position[1])
+        position = int(position[0]//Block.WIDTH), int(position[1]//Block.HEIGHT)
         
         _try_break_block(*position, itemstack.item_t, layer)
     
@@ -97,14 +95,12 @@ def do_break_block_keep(radius, speed, layer=0):
     cooldown = 1.0 / speed
     
     def inner_break_block_keep(player, itemstack, position, use_time):
-        playerpos = player.rect.center[0] // Block.WIDTH, player.rect.center[1] // Block.HEIGHT
-        
-        if Vector2(playerpos).distance_to(Vector2(position)) > radius:
+        if Vector2(player.rect.center).distance_to(Vector2(position)) > radius * Block.WIDTH:
             return
 
         world = player.world
         
-        position = int(position[0]), int(position[1])
+        position = int(position[0]//Block.WIDTH), int(position[1]//Block.HEIGHT)
         
         if players_use_time.get(player) is None:
             players_use_time[player] = 0
@@ -118,6 +114,48 @@ def do_break_block_keep(radius, speed, layer=0):
             players_use_time[player] = use_time
     
     return inner_break_block_keep
+
+
+def do_break_blocks(radius, break_radius=1, layer=0):
+    def inner_break_blocks(player, itemstack, position):
+        if Vector2(player.rect.center).distance_to(Vector2(position)) > radius * Block.WIDTH:
+            return
+        
+        _x, _y = position[0]/Block.WIDTH + 0.5, position[1]/Block.HEIGHT + 0.5
+        
+        for x in range(int(_x-break_radius), int(_x+break_radius)):
+            for y in range(int(_y-break_radius), int(_y+break_radius)):
+                _try_break_block(x, y, itemstack.item_t, layer)
+    
+    return inner_break_blocks
+
+
+def do_break_blocks_keep(radius, speed, break_radius=1, layer=0):
+    players_use_time = {}
+    cooldown = 1.0 / speed
+    
+    def inner_break_blocks_keep(player, itemstack, position, use_time):
+        if Vector2(player.rect.center).distance_to(Vector2(position)) > radius * Block.WIDTH:
+            return
+
+        world = player.world
+        
+        _x, _y = position[0]/Block.WIDTH + 0.5, position[1]/Block.HEIGHT + 0.5
+        
+        if players_use_time.get(player) is None:
+            players_use_time[player] = 0
+        
+        if players_use_time[player] > use_time:
+            players_use_time[player] = use_time
+        
+        if use_time - players_use_time[player] > cooldown:
+            for x in range(int(_x-break_radius), int(_x+break_radius)):
+                for y in range(int(_y-break_radius), int(_y+break_radius)):
+                    _try_break_block(x, y, itemstack.item_t, layer)
+            
+            players_use_time[player] = use_time
+    
+    return inner_break_blocks_keep
 
 
 def _try_break_block(x, y, tool, layer=0):
