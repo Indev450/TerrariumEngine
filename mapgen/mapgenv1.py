@@ -21,8 +21,8 @@ class MapgenV1(Mapgen):
 
         self.pnf2 = PerlinNoiseFactory(dimension=2)
         
-        self.noise_scale_x = 1/500.0
-        self.noise_scale_y = 1/650.0
+        self.noise_scale_x = 2
+        self.noise_scale_y = 1
         
         self.biomes = {}
         self.ores = {}
@@ -79,11 +79,11 @@ class MapgenV1(Mapgen):
 
     def noise2(self, x, y):
         return math.tan(self.pnf2(
-            x/(self.noise_scale_x*self.width*Block.WIDTH),
-            y/(self.noise_scale_y*self.height*Block.HEIGHT)))
+            x/(self.noise_scale_x*Block.WIDTH),
+            y/(self.noise_scale_y*Block.HEIGHT)))
 
     def noise1(self, x):
-        v = math.tan(self.pnf1(x/(self.noise_scale_x*self.width*Block.WIDTH)))
+        v = math.tan(self.pnf1(x/(self.noise_scale_x*Block.WIDTH)))
         return self.height*0.3 + 10*v
     
     def add_biome(self, biome):

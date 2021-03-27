@@ -13,7 +13,7 @@ class OreGen(Biome):
     name = 'Ore'
     block = None
     layer = 0
-    min_noise = 0.8
+    min_noise = 0.7
     
     min_y = 0
     max_y = 0
@@ -23,7 +23,8 @@ class OreGen(Biome):
         
         self.noise = PerlinNoiseFactory(2)
         
-        self.noise_scale_x = self.noise_scale_y = 1/900.0
+        self.noise_scale_x = 0.8
+        self.noise_scale_y = 0.4
         
         self.blockid = Block.id_by_strid(self.block)
     
@@ -39,7 +40,7 @@ class OreGen(Biome):
     
     def get_blocks_at(self, x, y, orignoise, blocks):
         noise = math.tan(self.noise(
-            x/(self.noise_scale_x*self.mapgen.width*Block.WIDTH),
-            y/(self.noise_scale_y*self.mapgen.height*Block.HEIGHT)))
+            x/(self.noise_scale_x*Block.WIDTH),
+            y/(self.noise_scale_y*Block.HEIGHT)))
         
         return self.get_blocks(noise, blocks)
