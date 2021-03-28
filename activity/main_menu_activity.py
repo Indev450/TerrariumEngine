@@ -8,8 +8,10 @@ import pygame as pg
 from .activity import Activity, newactivity, getactivity
 from .game_activity import GameActivity
 from .mapgen_activity import MapgenActivity
+from .default_parallax import DefaultParallax
 
 from game.sound import getsound
+from game.camera import Camera
 
 from utils.calls import Call
 from utils.saves import check_save_path
@@ -37,6 +39,10 @@ class MainMenuActivity(Activity):
 
         self.background = pg.Surface((self.app.WIN_WIDTH, self.app.WIN_HEIGHT))
         self.background.fill(self.BG_COLOR)
+        
+        Camera.init()
+        
+        self.parallax = DefaultParallax()
 
         self.init_ui()
     
@@ -94,6 +100,7 @@ class MainMenuActivity(Activity):
 
     def draw(self, screen):
         screen.blit(self.background, (0, 0))
+        self.parallax.draw(screen)
 
     def run_mapgen(self):
         # TODO - add ability to choose map generator

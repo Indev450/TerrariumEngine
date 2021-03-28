@@ -26,6 +26,7 @@ from ui.inventory_cell import InventoryCell
 from worldfile.worldfile import decode, encode
 
 from .activity import Activity
+from .default_parallax import DefaultParallax
 
 from config import getcfg
 
@@ -54,6 +55,8 @@ class GameActivity(Activity):
         ItemEntity.register()
 
         Camera.init()  # Create camera object
+        
+        self.parallax = DefaultParallax()
         
         self.decormanager = DecorationManager.new()
 
@@ -225,6 +228,8 @@ class GameActivity(Activity):
 
     def draw(self, screen):
         screen.blit(self.background, (0, 0))
+        
+        self.parallax.draw(screen)
 
         self.world.draw(screen)
         
