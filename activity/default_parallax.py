@@ -27,6 +27,7 @@ class Sun(ParallaxElement):
     texture = gettexture('resources/textures/parallax/sun.png')
     offset = (10, 10)
     size = (256, 256)
+    order = 1
 
     def get_position(self):
         x, y = super().get_position()
@@ -41,6 +42,7 @@ class Cloud(ParallaxElement):
     texture = gettexture('resources/textures/parallax/cloud.png')
     size = (256, 128)
     speed = 50
+    order = 0
     
     def __init__(self, parallax, init=False):
         self.rand_y = random.random()*config['app.resolution'][1]
@@ -56,7 +58,8 @@ class Cloud(ParallaxElement):
         offx = self.speed*(time()-self.starttime) + self.rand_x
         
         if offx > config['app.resolution'][0]:
-            self.parallax.del_object(self)
-            self.parallax.add_object(Cloud(self.parallax))
+            self.starttime = time()
+            self.rand_y = random.random()*config['app.resolution'][1]
+            self.rand_x = random.randint(-600, -self.size[0])
         
         return x + offx, y + self.rand_y

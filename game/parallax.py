@@ -41,6 +41,7 @@ class Parallax:
     def add_object(self, obj, to_child=None):
         if to_child is None:
             self.objects.append(obj)
+            self.objects.sort()
         else:
             if isinstance(to_child, str):
                 child = self.get_child(to_child)
@@ -69,6 +70,7 @@ class Parallax:
 class ParallaxElement(GameObject):
     texture = None
     size = None
+    order = 0
     
     def __init__(self, parallax):
         super().__init__(0, 0, *self.size)
@@ -81,3 +83,9 @@ class ParallaxElement(GameObject):
     
     def update(self):
         self.rect.x, self.rect.y = self.get_position()
+    
+    def __gt__(self, other):
+        return other.order > self.order
+    
+    def __lt__(self, other):
+        return not self > other
