@@ -3,7 +3,7 @@ import array
 
 from lib.perlin import PerlinNoiseFactory
 
-from game.block import Block
+from game.block import BlockDefHolder, Block
 
 from .biome import Biome
 
@@ -26,7 +26,7 @@ class OreGen(Biome):
         self.noise_scale_x = 0.8
         self.noise_scale_y = 0.4
         
-        self.blockid = Block.id_by_strid(self.block)
+        self.blockid = BlockDefHolder.id_by_strid(self.block)
     
     def get_bounds(self, world_width, world_height):
         return (0, self.min_y, world_width, min(self.max_y, world_height))

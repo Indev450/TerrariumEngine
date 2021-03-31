@@ -4,7 +4,7 @@ from .mapgen import Mapgen
 
 from lib.perlin import PerlinNoiseFactory
 
-from game.block import Block
+from game.block import BlockDefHolder, Block
 
 from mods.manager import ModManager
 
@@ -14,8 +14,8 @@ class MapgenV1(Mapgen):
     def __init__(self, mods, output, width, height, status_v, done_v):
         super().__init__(mods, output, width, height, status_v, done_v)
 
-        self.std_stone = Block.id_by_strid("std:stone")
-        self.std_stone_wall = Block.id_by_strid("std:stone_wall")
+        self.std_stone = BlockDefHolder.id_by_strid("std:stone")
+        self.std_stone_wall = BlockDefHolder.id_by_strid("std:stone_wall")
 
         self.pnf1 = PerlinNoiseFactory(dimension=1)
 

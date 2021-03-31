@@ -173,9 +173,9 @@ def _try_break_block(x, y, tool, layer=0):
     if block.level is not None and tool_level < block.level:
         return
     
-    if block.types is not None and tool_dig_type is not None:
-        for btype in block.types:
-            if btype == tool_dig_type:
+    if block.tool_types is not None and tool_dig_type is not None:
+        for tool_type in block.tool_types:
+            if tool_type == tool_dig_type:
                 break
         else:
             return

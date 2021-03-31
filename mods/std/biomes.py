@@ -1,6 +1,6 @@
 from utils.coords import neighbours
 
-from game.block import Block
+from game.block import BlockDefHolder
 
 from mapgen.biome import Biome
 
@@ -12,9 +12,9 @@ class SurfaceBiome(Biome):
     def __init__(self, mapgen):
         super().__init__(mapgen)
         
-        self.dirt = Block.id_by_strid('std:dirt')
-        self.dirt_with_grass = Block.id_by_strid('std:dirt_with_grass')
-        self.dirt_wall = Block.id_by_strid('std:dirt_wall')
+        self.dirt = BlockDefHolder.id_by_strid('std:dirt')
+        self.dirt_with_grass = BlockDefHolder.id_by_strid('std:dirt_with_grass')
+        self.dirt_wall = BlockDefHolder.id_by_strid('std:dirt_wall')
 
     def get_bounds(self, world_width, world_height):
         return (0, 0, world_width, int(world_height/3))

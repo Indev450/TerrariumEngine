@@ -69,8 +69,8 @@ class World:
         if not self.within_bounds(x, y) or 0 > layer >= 3:
             return
         
-        block_old = blockmod.Block.by_id(self._get_block_id(x, y, layer))
-        block_new = blockmod.Block.by_id(id)
+        block_old = blockmod.BlockDefHolder.by_id(self._get_block_id(x, y, layer))
+        block_new = blockmod.BlockDefHolder.by_id(id)
         
         if block_old is not None:
             block_old._on_destroy(x, y)
@@ -97,7 +97,7 @@ class World:
         if not self.within_bounds(x, y) or 0 > layer >= 3:
             return
         
-        return blockmod.Block.by_id(self._get_block_id(x, y, layer))
+        return blockmod.BlockDefHolder.by_id(self._get_block_id(x, y, layer))
     
     def set_fg_block(self, x, y, id):
         self.set_block(x, y, 0, id)
@@ -217,7 +217,7 @@ class World:
     @classmethod
     def block_by_id(cls, id, x, y):
         """Initialize required block by id at given position"""
-        return None if id == 0 else block.Block.by_id(id)(x, y)
+        return None if id == 0 else block.BlockDefHolder.by_id(id)
 
     @classmethod
     def id_from_block(cls, block):

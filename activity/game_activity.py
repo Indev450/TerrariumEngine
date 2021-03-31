@@ -5,7 +5,7 @@ import pygame as pg
 import game.texture as textures
 import game.sound as sounds
 
-from game.block import Block
+from game.block import BlockDefHolder
 from game.player import Player
 from game.item_entity import ItemEntity
 from game.camera import Camera
@@ -49,7 +49,7 @@ class GameActivity(Activity):
         textures.reload()  # Reload all textures from mods
         sounds.reload()  # Same with sounds
 
-        Block.sort_registered_entries()  # Create int identifiers for
+        BlockDefHolder.init_int_ids()             # Create int identifiers for
                                          # block definitions
         Player.register()
         ItemEntity.register()
@@ -314,7 +314,7 @@ class GameActivity(Activity):
         except pg.error:
             pass  # When closing game, pygame.mixer becomes not initialized
 
-        blocksize = Block.registered_count()//255 + 1
+        blocksize = BlockDefHolder.registered_count()//255 + 1
         
         data = encode(self.world.world_data,
                       self.world.WORLD_WIDTH, self.world.WORLD_HEIGHT)

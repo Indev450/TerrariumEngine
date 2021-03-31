@@ -3,7 +3,7 @@ import array
 
 import multiprocessing as mp
 
-from game.block import Block
+from game.block import BlockDefHolder
 
 from worldfile.worldfile import encode
 
@@ -16,7 +16,7 @@ class Mapgen(mp.Process):
     def __init__(self, mods, output, width, height, status_v, done_v):
         super().__init__()
 
-        Block.sort_registered_entries()
+        BlockDefHolder.init_int_ids()
         
         self.mods = mods
 

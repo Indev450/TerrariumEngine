@@ -1,7 +1,5 @@
 import pygame as pg
 
-from .game_object import GameObject
-
 import game.entity_manager as entitymanager
 import game.item_stack as itemstack
 import game.world as worldm
@@ -29,41 +27,116 @@ def get_tilemap_position(x, y, layer):
     return tilemap_positions[block_flags]
 
 
-class Block(GameObject):
+class BlockDefHolder:
+    registered_blocks = {'std:air': None}
+    registered_blocks_list = []
+    
+    @classmethod
+    def by_id(cls, id):
+        '''Get block definition by integer id'''
+        try:
+            return cls.registered_blocks_list[id]
+        except IndexError:
+            return
+
+    @classmethod
+    def by_strid(cls, strid):
+        '''Get block definition by string id'''
+        block = cls.registered_blocks.get(idstr)
+        if block is not None:
+            return block["entry"]
+
+    @classmethod
+    def id_by_strid(cls, strid):
+        '''Get integer block id by string id'''
+        return cls.registered_blocks[strid].ID
+
+    @classmethod
+    def register(cls, block_type):
+        '''Add block definition into registration table'''
+        cls.registered_blocks[block_type.id] = block_type
+
+    @classmethod
+    def registered_count(cls):
+        '''Get count of registered blocks'''
+        return len(cls.registered_blocks_list)
+
+    @classmethod
+    def init_int_ids(cls):
+        '''Initialize integer identifiers for registered blocks'''
+        cls.registered_blocks_list = [None]  # None - std:air
+
+        keys = list(cls.registered_blocks.keys())
+        keys.sort()
+
+        for i in range(1, len(keys)):
+            cls.registered_blocks_list.append(cls.registered_blocks[keys[i]])
+            cls.registered_blocks[keys[i]].ID = i
+
+
+class Block:
+    """
+    # Block definition.
+    
+    `id` (string, required) - identifier for block
+    
+    `drawtype` (string, one of 'image', 'tiled', or None) - describes how
+    to draw block. 'image' - draw single block image, 'tiled' - draw block
+    image based on its neighbours, None - do not draw block
+    
+    `drawlayer` (integer, used only for drawtype='tiled') - which blocks layer
+    use to check blocks neighbours
+    
+    `tilecomparable` (boolean, used only for drawtype='tiled') - describes
+    is this block counts as neighbour for other 'tiled' blocks
+    
+    `tile` (game.texture.Texture derived object) - texture for block
+    
+    `drops` (list of ItemStack objects or strings) - items dropped when block
+    broken
+    
+    `replacable` (boolean) - is this block can be replaced
+    
+    `level` (integer) - minimal tool level required to break this block
+    
+    `tool_types` (iterable or None) - specific tool types/categories required
+    to break this block
+    
+    `hits` (integer) - how much hits this block requires to broke
+    
+    `hit_sound` (game.sound.Sound derived object) - sound player when block hit
+    
+    # Engine variables (don't change them)
+    
+    `WIDTH` and `HEIGHT` (integers) - size of block
+    
+    `ID` (integer) - block id assigned in BlockDefHolder.init_int_ids()
+    """
     id = "builtin:none"
+    
+    drawtype = 'image'
+    drawlayer = 0
+    
+    tilecomparable = True
+
+    tile = None
     
     drops = []
     
-    drawtype = 'image'  # or 'tiled' or None
-    drawlayer = 0  # 0 - foreground, 1 - midground, 2 - background
+    replacable = False
     
-    tilecomparable = True  # TODO - find out how to describe this
+    level = 1
+    
+    tool_types = None
+    
+    hits = 4
+    
+    hit_sound = None
     
     WIDTH = 16
     HEIGHT = 16
 
-    registered_blocks = {"std:air": {
-        "entry": None,
-        "id": 0,
-    }}
-
-    _registered_blocks = [None]  # int ids for registered entries
-                                 # None - air block
-
-    tile = None
-
     ID = 0
-    
-    REPLACABLE = False
-    
-    level = 1  # If tool has too low level, it wouldn't dig this block
-    types = None  # Types of tools that can be used to dig this block
-                  # None means it can be digged by every item
-    hits = 4  # How much hits this block requires to break
-    hit_sound = None  # Sound played when hit
-
-    def __init__(self, *position):
-        pass
     
     @classmethod
     def on_place(cls, x, y):
@@ -72,19 +145,15 @@ class Block(GameObject):
     
     @classmethod
     def on_destroy(cls, x, y):
+        '''Called in Block._on_destroy when block destroyed'''
         pass
     
-    # You don't usually need to redefine those methods
     @classmethod
     def _on_destroy(cls, x, y):
-        '''Called in World when destroyed'''
+        '''Called in World when block destroyed'''
         cls.on_destroy(x, y)
         
         entmanager = entitymanager.EntityManager.get()
-        
-        if entmanager is None:
-            print('Warning: could not drop items without EntityManager')
-            return
         
         for drop in cls.get_drops():
             ientity, _ = entmanager.newentity('builtin:item_entity', None,
@@ -112,55 +181,10 @@ class Block(GameObject):
         if cls.drawtype == 'tiled':
             cls.tile.select(*get_tilemap_position(x, y, cls.drawlayer))
         return cls.tile.get()
-
-
-    # Blocks definitions storage methods
-    # TODO - spit this class into Block and BlockDefStorage
-    @classmethod
-    def by_id(cls, id):
-        '''Get block definition by integer id'''
-        try:
-            return cls._registered_blocks[id]
-        except IndexError:
-            pass
-
-    @classmethod
-    def by_strid(cls, strid):
-        '''Get block definition by string id'''
-        block = cls.registered_blocks.get(idstr)
-        if block is not None:
-            return block["entry"]
-
-    @classmethod
-    def id_by_strid(cls, strid):
-        '''Get integer block id by string id'''
-        return cls.registered_blocks[strid]["id"]
-
+    
     @classmethod
     def register(cls):
-        '''Add block definition into registration table'''
-        cls.registered_blocks[cls.id] = {
-            "entry": cls,
-            "id": -1,
-        }
-
-    @classmethod
-    def registered_count(cls):
-        '''Get count of registered blocks'''
-        return len(cls._registered_blocks)
-
-    @classmethod
-    def sort_registered_entries(cls):
-        '''Initialize integer identifiers for registered blocks'''
-        cls._registered_blocks = [None]  # None - std:air
-
-        keys = list(cls.registered_blocks.keys())
-        keys.sort()
-
-        for i in range(1, len(keys)):
-            cls._registered_blocks.append(cls.registered_blocks[keys[i]]["entry"])
-            cls.registered_blocks[keys[i]]['id'] = i
-            cls._registered_blocks[i].ID = i
+        BlockDefHolder.register(cls)
 
 
 # ---------------------------------------------------------------
@@ -171,26 +195,16 @@ def _block_position(x, y):
     return int(x // Block.WIDTH), int(y // Block.HEIGHT)
 
 
-def _place_block_into(blockname, into=0, consume=True, force=False):  # 0 - fg, 1 - mg, 2 - bg
+def _place_block(blockname, layer=0, consume=True, force=False):  # 0 - fg, 1 - mg, 2 - bg
     def _place_block(player, itemstack, position):
         world = player.world
         
         position = _block_position(*position)
 
-        if into == 0:
-            dstblock = world.get_fg_block(*position)
-        elif into == 1:
-            dstblock = world.get_mg_block(*position)
-        else:
-            dstblock = world.get_bg_block(*position)
+        dstblock = world.get_block(*position, layer)
 
-        if force or dstblock is None or dstblock.REPLACABLE:
-            if into == 0:
-                world.set_fg_block(*position, Block.id_by_strid(blockname))
-            elif into == 1:
-                world.set_mg_block(*position, Block.id_by_strid(blockname))
-            else:
-                world.set_bg_block(*position, Block.id_by_strid(blockname))
+        if force or dstblock is None or dstblock.replacable:
+            world.set_block(*position, layer, BlockDefHolder.id_by_strid(blockname))
             
             if consume:
                 itemstack.consume_items(1)
@@ -198,7 +212,7 @@ def _place_block_into(blockname, into=0, consume=True, force=False):  # 0 - fg, 
     return _place_block
 
 
-def _place_block_into_keep(blockname, into=0, consume=True, force=False):  # 0 - fg, 1 - mg, 2 - bg
+def _place_block_keep(blockname, layer=0, consume=True, force=False):
     _keep_place_block_users = {}
     
     def _place_block_keep(player, itemstack, position, use_time):
@@ -213,20 +227,10 @@ def _place_block_into_keep(blockname, into=0, consume=True, force=False):  # 0 -
             _keep_place_block_users[player] = use_time
         
         if use_time - _keep_place_block_users[player] > 0.1:
-            if into == 0:
-                dstblock = world.get_fg_block(*position)
-            elif into == 1:
-                dstblock = world.get_mg_block(*position)
-            else:
-                dstblock = world.get_bg_block(*position)
+            dstblock = world.get_block(*position, layer)
 
-            if force or dstblock is None or dstblock.REPLACABLE:
-                if into == 0:
-                    world.set_fg_block(*position, Block.id_by_strid(blockname))
-                elif into == 1:
-                    world.set_mg_block(*position, Block.id_by_strid(blockname))
-                else:
-                    world.set_bg_block(*position, Block.id_by_strid(blockname))
+            if force or dstblock is None or dstblock.replacable:
+                world.set_block(*position, layer, BlockDefHolder.id_by_strid(blockname))
                 
                 if consume:
                     itemstack.consume_items(1)
@@ -237,24 +241,24 @@ def _place_block_into_keep(blockname, into=0, consume=True, force=False):  # 0 -
 
 
 def place_fg_block(blockname, consume=True, force=False):
-    return _place_block_into(blockname, 0, consume, force)
+    return _place_block(blockname, 0, consume, force)
 
 
 def place_mg_block(blockname, consume=True, force=False):
-    return _place_block_into(blockname, 1, consume, force)
+    return _place_block(blockname, 1, consume, force)
 
 
 def place_bg_block(blockname, consume=True, force=False):
-    return _place_block_into(blockname, 2, consume, force)
+    return _place_block(blockname, 2, consume, force)
 
 
 def place_fg_block_keep(blockname, consume=True, force=False):
-    return _place_block_into_keep(blockname, 0, consume, force)
+    return _place_block_keep(blockname, 0, consume, force)
 
 
 def place_mg_block_keep(blockname, consume=True, force=False):
-    return _place_block_into_keep(blockname, 1, consume, force)
+    return _place_block_keep(blockname, 1, consume, force)
 
 
 def place_bg_block_keep(blockname, consume=True, force=False):
-    return _place_block_into_keep(blockname, 2, consume, force)
+    return _place_block_keep(blockname, 2, consume, force)
