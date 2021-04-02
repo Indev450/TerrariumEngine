@@ -18,8 +18,10 @@ from utils.saves import create_save_path
 class MapgenActivity(Activity):
     BG_COLOR = pg.Color('#5555FF')
     
-    def __init__(self, mapgen_t, path, width, height):
+    def __init__(self, parallax, mapgen_t, path, width, height):
         super().__init__()
+        
+        self.parallax = parallax  # MainMenuActivity.parallax
         
         create_save_path(path)
         
@@ -82,6 +84,7 @@ class MapgenActivity(Activity):
 
     def draw(self, screen):
         screen.blit(self.background, (0, 0))
+        self.parallax.draw(screen)
     
     def on_event(self, event):
         if event.type == pg.QUIT:

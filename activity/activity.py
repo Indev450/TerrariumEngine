@@ -38,8 +38,22 @@ class Activity:
             print(f"{type(self)}: event {etype} already disabled")
 
     def on_begin(self):
-        """Called when activity created though newactivity()"""
+        """Called when activity created though newactivity() or pushactivity()"""
         pg.event.set_allowed(self.allowed_events)
+    
+    def on_stop(self):
+        """Called when pushactivity() adds new activity, but this activity
+        is still alive"""
+        pass
+    
+    def on_resume(self):
+        """Called when popactivity() sets this activity as main"""
+        pass
+
+    def on_end(self):
+        """Called when activity was replaced or destroyed
+        (in newactivity() or popactivity())"""
+        pass
 
     def update(self, dtime):
         """Called every frame, dtime is a time elapsed since
@@ -72,11 +86,6 @@ class Activity:
             if event.button == 1:
                 self.overlay.on_release(event.pos)
 
-    def on_end(self):
-        """Called when activity was replaced by another one
-        (in newactivity() or setactivity())"""
-        pass
-
 
 def getactivity():
     """Get current activity"""
@@ -91,7 +100,7 @@ def pushactivity(type_, *args, **kwargs):
     current = getactivity()
 
     if current is not None:
-        current.on_end()
+        current.on_stop()
 
     activity = type_(*args, **kwargs)
     
@@ -109,6 +118,13 @@ def popactivity():
     if current is not None:
         current.on_end()
         Activity.current.pop()
+    else:
+        return
+    
+    current = getactivity()
+    
+    if current is not None:
+        current.on_resume()
 
 
 def newactivity(type_, *args, **kwargs):
