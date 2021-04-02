@@ -105,15 +105,9 @@ class MainMenuActivity(Activity):
     def run_mapgen(self):
         # TODO - add ability to choose map generator
         # TODO - add ability to choose world save path
-        global config
+        mgconfig = get_config()["mapgens"].get(config["mapgen.selected"])
         
         path = 'world'
-        
-        gamecfg = config
-
-        config = get_config()
-        
-        mgconfig = config["mapgens"].get(gamecfg["mapgen.selected"])
 
         if mgconfig is None:
             self.show_message('default mapgen not found')
@@ -127,7 +121,7 @@ class MainMenuActivity(Activity):
 
         try:
             pushactivity(MapgenActivity, 
-                         self.parallax, mapgen_t, path, *gamecfg["mapgen.world_size"])
+                         self.parallax, mapgen_t, path, *config["mapgen.world_size"])
         except Exception as e:
             logging.exception("run_mapgen():")
             self.show_message(f"{type(e).__name__}: {str(e)}")
