@@ -11,7 +11,7 @@ class Activity:
     by the App class.
     """
 
-    current = None
+    current = []
 
     def __init__(self):
         self.allowed_events = []
@@ -80,12 +80,14 @@ class Activity:
 
 def getactivity():
     """Get current activity"""
-    return Activity.current
+    if len(Activity.current) > 0:
+        return Activity.current[-1]
 
 
-def newactivity(type_, *args, **kwargs):
-    """Create and set activity of given type,
-    returns new created activity"""
+def pushactivity(type_, *args, **kwargs):
+    """Create new activity of given type and push it in Activity.current.
+    
+    Returns new activity"""
     current = getactivity()
 
     if current is not None:
@@ -93,17 +95,24 @@ def newactivity(type_, *args, **kwargs):
 
     activity = type_(*args, **kwargs)
     
-    Activity.current = activity
-    
     activity.on_begin()
+    
+    Activity.current.append(activity)
+    
+    return activity
 
 
-def setactivity(activity):
-    """Sets already created activity. Remember that you should re-initialize
-    activitys overay and ui (i'll fix that later)"""
+def popactivity():
+    """Pop activity from Activity.current list."""
     current = getactivity()
 
     if current is not None:
         current.on_end()
+        Activity.current.pop()
 
-    Activity.current = activity
+
+def newactivity(type_, *args, **kwargs):
+    """Create new activity of given type and replace current."""
+    popactivity()
+    
+    pushactivity(_type, *args, **kwargs)

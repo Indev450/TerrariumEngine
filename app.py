@@ -5,7 +5,7 @@ import game.sound as sounds
 
 from game.music import MusicPlayer
 
-from activity.activity import Activity, newactivity
+from activity.activity import getactivity, pushactivity
 from activity.main_menu_activity import MainMenuActivity
 
 from ui.overlay import Overlay
@@ -46,7 +46,7 @@ class App:
         
         self.music_player = MusicPlayer.new()
 
-        newactivity(MainMenuActivity)
+        pushactivity(MainMenuActivity)
 
     def run(self):
         timer = pg.time.Clock()
@@ -63,19 +63,22 @@ class App:
 
             last_update_time = t
 
-            for event in pg.fastevent.get():
-                Activity.current.on_event(event)
-
             textures.update_animation(dtime)
+            
+            activity = getactivity()
+            
+            if activity is not None:
+                for event in pg.fastevent.get():
+                    activity.on_event(event)
+                
+                activity.update(dtime)
 
-            Activity.current.update(dtime)
-
-            Activity.current.draw(self.screen)
+                activity.draw(self.screen)
+                
+                if activity.overlay is not None:
+                    activity.overlay.draw(self.screen)
 
             pg.display.set_caption(f"{config['app.caption']} (fps: {int(timer.get_fps())})")
-
-            if Overlay.instance is not None:
-                Overlay.instance.draw(self.screen)
 
             pg.display.flip()
 

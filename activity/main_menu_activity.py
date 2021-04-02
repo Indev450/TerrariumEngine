@@ -5,7 +5,7 @@ import importlib
 
 import pygame as pg
 
-from .activity import Activity, newactivity, getactivity
+from .activity import Activity, pushactivity, getactivity
 from .game_activity import GameActivity
 from .mapgen_activity import MapgenActivity
 from .default_parallax import DefaultParallax
@@ -126,9 +126,8 @@ class MainMenuActivity(Activity):
             return
 
         try:
-            newactivity(MapgenActivity,
-                        self, mapgen_t,
-                        path, *gamecfg["mapgen.world_size"])
+            pushactivity(MapgenActivity,
+                         mapgen_t, path, *gamecfg["mapgen.world_size"])
         except Exception as e:
             logging.exception("run_mapgen():")
             self.show_message(f"{type(e).__name__}: {str(e)}")
@@ -147,11 +146,10 @@ class MainMenuActivity(Activity):
             return self.show_message("Save file not found")
 
         try:
-            newactivity(GameActivity, path)
+            pushactivity(GameActivity, path)
         except Exception as e:
             logging.exception("run_world():")
-            activity = newactivity(MainMenuActivity)
-            getactivity().show_message(f"{type(e).__name__}: {str(e)}")
+            self.show_message(f"{type(e).__name__}: {str(e)}")
 
     def hide_message(self):
         self.overlay.hide("message")

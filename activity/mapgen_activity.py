@@ -6,9 +6,8 @@ import multiprocessing as mp
 
 import pygame as pg
 
-from .activity import Activity, setactivity
+from .activity import Activity, popactivity, getactivity
 
-from ui.overlay import newoverlay
 from ui.label import Label
 
 from mods.manager import getmanager
@@ -19,7 +18,7 @@ from utils.saves import create_save_path
 class MapgenActivity(Activity):
     BG_COLOR = pg.Color('#5555FF')
     
-    def __init__(self, restore_activity, mapgen_t, path, width, height):
+    def __init__(self, mapgen_t, path, width, height):
         super().__init__()
         
         create_save_path(path)
@@ -44,8 +43,6 @@ class MapgenActivity(Activity):
         
         self.mapgen.start()
         
-        self.restore_activity = restore_activity
-        
         self.init_ui()
     
     def init_ui(self):
@@ -68,13 +65,13 @@ class MapgenActivity(Activity):
                 if self.done.value < 0:
                     self.mapgen.join()
                     
-                    setactivity(self.restore_activity)
+                    popactivity()
                     
-                    self.restore_activity.overlay = newoverlay()
-                    self.restore_activity.init_ui()
-                    self.restore_activity.on_begin()
+                    activity = getactivity()
                     
-                    self.restore_activity.show_message('Map generated!')
+                    if activity is not None:
+                        activity.show_message('Map generated!')
+                    
                     return
 
                 self.curdone = self.done.value
