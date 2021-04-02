@@ -131,4 +131,4 @@ def newactivity(type_, *args, **kwargs):
     """Create new activity of given type and replace current."""
     popactivity()
     
-    pushactivity(_type, *args, **kwargs)
+    pushactivity(type_, *args, **kwargs)
