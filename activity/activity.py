@@ -4,6 +4,7 @@ from ui.overlay import newoverlay
 
 import app
 
+
 class Activity:
     """Activity controls game logic, can handle pygame events, etc
     
