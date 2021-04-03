@@ -1,0 +1,6 @@
+{
+    "id": "std:stone",
+    "drawtype": "tiled",
+    "image": "textures/blocks/stone.png",
+    "drops": ["std:stone"]
+}

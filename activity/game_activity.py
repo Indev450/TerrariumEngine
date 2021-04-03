@@ -16,7 +16,7 @@ from game.item import Item
 from game.sound import getsound
 from game.decorations import DecorationManager
 
-from mods.manager import getmanager
+from mods.manager import ModManager
 
 from ui.label import Label
 from ui.inv_hotbar import InventoryHotbar
@@ -42,7 +42,7 @@ class GameActivity(Activity):
     def __init__(self, path):
         super().__init__()
         
-        modmanager = getmanager()
+        modmanager = ModManager.get()
         
         modmanager.load_mods()
         

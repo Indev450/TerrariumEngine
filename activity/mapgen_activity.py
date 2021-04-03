@@ -10,7 +10,7 @@ from .activity import Activity, popactivity, getactivity
 
 from ui.label import Label
 
-from mods.manager import getmanager
+from mods.manager import ModManager
 
 from utils.saves import create_save_path
 
@@ -36,7 +36,7 @@ class MapgenActivity(Activity):
 
         self.done = mp.Value('d', self.curdone)
         
-        self.mapgen = mapgen_t(getmanager().load_mods(),
+        self.mapgen = mapgen_t(ModManager.get().load_mods(),
                                os.path.join('saves', path),
                                width,
                                height,

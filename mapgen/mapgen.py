@@ -7,7 +7,7 @@ from game.block import BlockDefHolder
 
 from worldfile.worldfile import encode
 
-from mods.manager import getmanager
+from mods.manager import ModManager
 
 
 class Mapgen(mp.Process):
@@ -99,7 +99,7 @@ class Mapgen(mp.Process):
     def run(self):
         self.set_status(string="Initializing mods...", done=0)
         
-        manager = getmanager()
+        manager = ModManager.get()
         
         manager.call_handlers('init_mapgen', self)
     

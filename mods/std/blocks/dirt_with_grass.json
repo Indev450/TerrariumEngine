@@ -1,0 +1,5 @@
+{
+    "id": "std:dirt_with_grass",
+    "drawtype": "tiled",
+    "image": "textures/blocks/grassdirt.png"
+}

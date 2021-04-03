@@ -2,6 +2,8 @@ import os
 import importlib
 import traceback
 
+from .jsonblock import register_block
+
 
 class ModManager:
     instance = None
@@ -10,6 +12,7 @@ class ModManager:
     
     @classmethod
     def get(cls):
+        """Get mod manager, create if None"""
         if cls.instance is None:
             cls.instance = cls()
         
@@ -25,19 +28,16 @@ class ModManager:
         self.mods = {}
 
         for file in mods:
-            path = f'mods{os.sep}{file}{os.sep}'
+            path = f'mods/{file}/'
             
             if os.path.isdir(path) and not file == '__pycache__':
                 self._set_modpath(path)
                 
                 mod = importlib.import_module(f'mods.{file}')
                 
-                if not hasattr(mod, 'on_load'):
-                    print(f'Error: mod {file} has no attribute on_load')
-                else:
-                    self.mods[file] = {
-                        'module': mod,
-                        'path': path}
+                self.mods[file] = {
+                    'module': mod,
+                    'path': path}
         
         self.handlers = {
             'init_mapgen': [],
@@ -47,6 +47,9 @@ class ModManager:
         }
         
     def load_mods(self, names=None):
+        """Call on_load() for each mod in `names`
+        
+        If not given, all mods will be initialized"""
         mods = []
         
         if names is None:
@@ -54,9 +57,18 @@ class ModManager:
         
         for name in names:
             if self.mods.get(name):
-                self._set_modpath(self.mods[name]['path'])
+                mod = self.mods[name]
                 
-                self.mods[name]['module'].on_load(self)
+                self._set_modpath(mod['path'])
+                
+                if hasattr(mod['module'], 'on_load'):
+                    mod['module'].on_load(self)
+                
+                blockspath = f'{mod["path"]}/blocks/'
+                
+                if os.path.isdir(blockspath):
+                    for block in os.listdir(blockspath):
+                        register_block(f'{blockspath}/{block}')
 
                 mods.append(self.mods[name]['module'])
             else:
@@ -67,6 +79,7 @@ class ModManager:
         return mods
     
     def add_handler(self, **kwargs):
+        """Add callback"""
         for name in kwargs.keys():
             if self.handlers.get(name) is None:
                 print(f'Warning: no such handler: {name}')
@@ -76,6 +89,7 @@ class ModManager:
             self.handlers[name].append(kwargs[name])
     
     def call_handlers(self, name, *args, **kwargs):
+        """Call all added callbacks"""
         if self.handlers.get(name) is None:
             print(f'Warning: no such handler: {name}')
             traceback.print_stack()
@@ -85,7 +99,14 @@ class ModManager:
 
 
 def modpath(path=''):
-    return f"{ModManager.curmodpath}{path}"
-
-def getmanager():
-    return ModManager.get()
+    """Returns path.
+    modname:some/path will be turned into mods/modname/some/path
+    Regular path will be turned into mods/<current>/<path>"""
+    path = path.split(':')
+    
+    if len(path) == 2:
+        mod, path = path
+        
+        return f'mods/{mod}/{path}'
+    else:
+        return f'{ModManager.curmodpath}{path[0]}'
