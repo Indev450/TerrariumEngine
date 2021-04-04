@@ -71,6 +71,12 @@ class ParallaxElement(GameObject):
     texture = None
     size = None
     order = 0
+    OFFSET_X = 0
+    OFFSET_Y = 0
+    MAX_OFFSET_X = 100
+    MAX_OFFSET_Y = 100
+    BASE_OFFSET_X = 0
+    BASE_OFFSET_Y = 0
     
     def __init__(self, parallax):
         super().__init__(0, 0, *self.size)
@@ -79,7 +85,12 @@ class ParallaxElement(GameObject):
         self.parallax = parallax
     
     def get_position(self):
-        return self.camera.get_position()
+        x, y = self.camera.get_position()
+        
+        x += self.OFFSET_X * (x / self.MAX_OFFSET_X) + self.BASE_OFFSET_X
+        y += self.OFFSET_Y * (y / self.MAX_OFFSET_Y) + self.BASE_OFFSET_Y
+        
+        return x, y
     
     def update(self):
         self.rect.x, self.rect.y = self.get_position()
