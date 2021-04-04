@@ -19,7 +19,6 @@ class Chunk:
         size = (block.Block.WIDTH*width, block.Block.HEIGHT*height)
 
         self.surf = pg.Surface(size).convert_alpha()
-        self.surf.fill(pg.Color(0, 0, 0, 0))
 
         self.x1 = x
         self.x2 = min(x+width, world.WORLD_WIDTH)
@@ -74,13 +73,9 @@ class Chunk:
 
             self.alive_time = self.KEEP_ALIVE_TIME
 
-            return 1
-        return 0
-
 
 def compare_tiles(tiles, x, y):
     output = pg.Surface((block.Block.WIDTH, block.Block.HEIGHT)).convert_alpha()
-    output.fill(pg.Color(0, 0, 0, 0))
     
     output.blits([(tile.gettile(x, y), (0, 0)) for tile in tiles])
 
