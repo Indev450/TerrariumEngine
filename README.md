@@ -1,11 +1,31 @@
-# Terrarium engine
+Terrarium engine
+==
 
-### About
-* What is that? 
-   * This is 2-d terraria-like engine which gives (well, will give in future) great API for modding.
-* Is it playable?
-   * For now is very much things to do to make THIS playable, like API, netcode, refactoring and optimization
+A 2-d sandbox game engine written in pygame
 
-### History
-   * This game/engine (not decided yet) is VERY inspired by Minetest and (of course) Terraria
-   * I have tried to make 2-d sandbox game before, but i failed every time. This is the best try
+### Installing
+You will need to install python 3, pygame and, optionally for maketilemap.py script, PIL
+
+### Features
+- Python modding API
+    - Entities
+    - Blocks
+    - Items
+    - Parallax
+    - Biomes and ores generation
+- JSON modding API
+    - Blocks
+
+### TODO
+- Game
+    - Crafting
+    - Tile based light
+    - 'Multiblocks'
+    - Multiplayer
+    - Better UI
+    - Liquids
+    - Better player texture
+- JSON modding api
+    - Parallax
+    - Items
+    - Biomes and ores generation
