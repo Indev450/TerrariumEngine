@@ -29,9 +29,9 @@ class Camera:
 
     def set_obj(self, obj):
         self.obj = obj
-        self.last_x = self.obj.rect.centerx
-        self.last_y = self.obj.rect.centery
         self.update_position()
+        self.last_x = self.obj.rect.centerx - self.offset_x
+        self.last_y = self.obj.rect.centery - self.offset_y
 
     def move_offset(self, x, y):
         self.offset_x += x
