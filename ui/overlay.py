@@ -27,10 +27,10 @@ class Overlay:
             if self.elements[name]['visible']: 
                self.elements[name]['element'].on_release(position)
 
-    def on_scroll(self, up):
+    def on_scroll(self, position, up):
         for name in self.elements.keys():
             if self.elements[name]['visible']:
-                self.elements[name]['element'].on_scroll(up)
+                self.elements[name]['element'].on_scroll(position, up)
 
     def show(self, name):
         if not self.elements.get(name):

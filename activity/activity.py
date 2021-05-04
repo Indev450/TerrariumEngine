@@ -81,7 +81,7 @@ class Activity:
             if event.button == 1:
                 self.overlay.on_press(event.pos)
             elif event.button in (4, 5):
-                self.overlay.on_scroll(up=(event.button == 4))
+                self.overlay.on_scroll(event.pos, up=(event.button == 4))
 
         elif event.type == pg.MOUSEBUTTONUP and self.overlay.is_enabled():
             if event.button == 1:

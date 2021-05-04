@@ -12,10 +12,8 @@ class UIElement:
                  parent=None,
                  position_f=(0, 0),
                  size_f=(0.5, 0.5)):
-        if children is not None:
-            self.children = children
-        else:
-            self.children = []
+
+        self.children = children or []
         # We can't use [] as default argument, because in each new object it will be
         # same list object, so it can cause problems (it's a python problem)
 
@@ -30,10 +28,13 @@ class UIElement:
         self.overlay = getoverlay()  # Instance of active ui overlay
 
         self.rect = None  # Bound rect of ui element
+        self.draw_pos = (0, 0)  # Position to draw this element
 
         self.set_rect(position_f, size_f)
 
         self.image = None  # drawable
+        
+        self.surface = None  # Surface that actually drawn
 
     def set_rect(self, position_f=(0, 0), size_f=(0.5, 0.5)):
         pwidth = app.App.WIN_WIDTH
@@ -48,6 +49,8 @@ class UIElement:
             px = self.parent.rect.x
             py = self.parent.rect.y
 
+        self.draw_pos = (pwidth*position_f[0], pheight*position_f[1])
+        
         self.rect = pg.Rect(
             pwidth*position_f[0] + px,
             pheight*position_f[1] + py,
@@ -71,17 +74,21 @@ class UIElement:
         for child in self.children:
             child.on_release(position)
 
-    def on_scroll(self, up):
+    def on_scroll(self, position, up):
         for child in self.children:
-            child.on_scroll(up)
+            if child.rect.collidepoint(*position):
+                child.on_scroll(position, up)
 
     def update_image(self):
         self.image = pg.transform.scale(self.image, self.rect.size)
 
     def draw(self, screen):
-        screen.blit(self.image, (self.rect.x, self.rect.y))
+        self.surface = self.image.copy()
+        
         for child in self.children:
-            child.draw(screen)
+            child.draw(self.surface)
+
+        screen.blit(self.surface, self.draw_pos)
 
     def add_child(self, child):
         self.children.append(child)
