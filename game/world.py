@@ -34,8 +34,6 @@ class World:
         self.chunks = [[None for x in range(self.chunks_x)] for y in range(self.chunks_y)]
 
         self.chunks_loaded = []
-        
-        self.load_chunk(0, 0)
 
         self.camera = Camera.get()
         
