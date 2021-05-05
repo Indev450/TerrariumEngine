@@ -21,6 +21,8 @@ class Overlay:
             if (self.elements[name]['visible'] and 
                self.elements[name]['element'].rect.collidepoint(*position)):
                 self.elements[name]['element'].on_click(position)
+            elif self.elements[name]['visible']:
+                self.elements[name]['element'].on_missclick()
 
     def on_release(self, position):
         for name in self.elements.keys():

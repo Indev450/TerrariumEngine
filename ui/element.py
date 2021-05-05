@@ -64,11 +64,17 @@ class UIElement:
         self.set_rect(self.position_f, self.size_f)
 
         self.update_image()
+    
+    def on_missclick(self):
+        for child in self.children:
+            child.on_missclick()
 
     def on_click(self, position):
         for child in self.children:
             if child.rect.collidepoint(*position):
                 child.on_click(position)
+            else:
+                child.on_missclick()
 
     def on_release(self, position):
         for child in self.children:

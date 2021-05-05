@@ -45,6 +45,8 @@ class App:
         sounds.load()
         
         self.music_player = MusicPlayer.new()
+        
+        self.textinput = None
 
         pushactivity(MainMenuActivity)
 
@@ -67,10 +69,14 @@ class App:
             
             activity = getactivity()
             
+            if self.textinput is not None:
+                self.textinput.update(dtime)
+            
             if activity is not None:
                 for event in pg.fastevent.get():
-                    activity.on_event(event)
-                
+                    if self.textinput is None or self.textinput.handle_event(event) is not None:
+                        activity.on_event(event)
+
                 activity.update(dtime)
 
                 activity.draw(self.screen)
