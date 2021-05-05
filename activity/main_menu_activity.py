@@ -62,21 +62,21 @@ class MainMenuActivity(Activity):
             position_f=(0.25, 0.1),
             size_f=(0.5, 0.65))
 
-        exitbutton = Button(
+        Button(
             parent=root,
             on_pressed=Call(exit, 0),
             text="exit",
             position_f=(0.25, 0.65),
             size_f=(0.5, 0.22))
 
-        continue_ = Button(
+        Button(
             parent=root,
             on_pressed=self.run_world,
             text="Continue",
             position_f=(0.25, 0.4),
             size_f=(0.5, 0.22))
 
-        newworld = Button(
+        Button(
             parent=root,
             on_pressed=self.run_mapgen,
             text="New World",
@@ -89,7 +89,7 @@ class MainMenuActivity(Activity):
             position_f=(0.25, 0.1),
             size_f=(0.5, 0.5))
 
-        ok = Button(
+        Button(
             parent=message,
             on_pressed=self.hide_message,
             text="OK",
