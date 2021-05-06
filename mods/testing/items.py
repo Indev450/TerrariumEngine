@@ -21,7 +21,7 @@ class MusicItem(Item):
     ID = 'testing:music_item'
     image = gettexture(modpath('textures/items/tools/music_item.png'))
     
-    sound = getsound(modpath('sounds/items/tools/sound.ogg'))
+    sound = getsound(modpath('sounds/items/tools/sound.wav'))
     
     @classmethod
     def on_press(cls, player, itemstack, position):
