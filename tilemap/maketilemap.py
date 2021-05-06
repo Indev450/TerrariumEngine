@@ -34,7 +34,7 @@ tilemap_positions = {
 }
 
 
-def make_tile_map(block, side, output):
+def make_tile_map(block, side, output, delcolor=None):
     blocktex = pg.image.load(block)
     
     sidetex_up = pg.image.load(side)
@@ -59,6 +59,13 @@ def make_tile_map(block, side, output):
         if key & flags['right']:
             tilemap.blit(sidetex_right, pos)
     
+    if delcolor is not None:
+        delcolor = pg.Color(delcolor)
+        for x in range(128):
+            for y in range(32):
+                if tilemap.get_at((x, y)) == delcolor:
+                    tilemap.set_at((x, y), pg.Color('#00000000'))
+    
     file = open(output, 'wb')
     
     data = pg.image.tostring(tilemap, 'RGBA')
@@ -76,10 +83,11 @@ def main():
     parser.add_argument('--block', metavar='block', help='Block background')
     parser.add_argument('--side', metavar='side', help='Block side')
     parser.add_argument('--output', metavar='output', help='Output file')
+    parser.add_argument('--delcolor', metavar='delcolor', help='That color will be removed from result', default=None)
     
     args = parser.parse_args()
     
-    make_tile_map(args.block, args.side, args.output)
+    make_tile_map(args.block, args.side, args.output, args.delcolor)
 
 
 if __name__ == '__main__':
