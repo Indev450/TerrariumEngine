@@ -19,14 +19,19 @@ from game.decorations import DecorationManager
 from mods.manager import ModManager
 
 from ui.label import Label
+from ui.button import Button
 from ui.inv_hotbar import InventoryHotbar
 from ui.hotbar_selected import HotbarSelected
 from ui.inventory_cell import InventoryCell
 
+from utils.calls import Call
+
 from worldfile.worldfile import decode, encode
 
-from .activity import Activity
+from .activity import Activity, newactivity
 from .default_parallax import DefaultParallax
+
+import activity.main_menu_activity as mainmenu  # Cannot import MainMenuActivity because of cirlular import
 
 from config import getcfg
 
@@ -161,6 +166,27 @@ class GameActivity(Activity):
         # a little bigger than often, so entities can teleport pass
         # blocks. This is temporary solution.
         # TODO - fix that problem by better way
+        
+        pause = Label(
+            text="Paused",
+            position_f=(0.4, 0.3),
+            size_f=(0.2, 0.4))
+        
+        Button(
+            parent=pause,
+            on_pressed=self.play,
+            text="Continue",
+            position_f=(0.1, 0.2),
+            size_f=(0.8, 0.25))
+        
+        Button(
+            parent=pause,
+            on_pressed=Call(newactivity, mainmenu.MainMenuActivity),
+            text="Quit",
+            position_f=(0.1, 0.55),
+            size_f=(0.8, 0.25))
+        
+        self.overlay.add_element('pause', pause)
     
     def update_selected_item(self):
         inv_width = self.player.inventory.get_size('hotbar')
@@ -252,6 +278,8 @@ class GameActivity(Activity):
             self.pause()
 
     def on_event(self, event):
+        if self.paused:
+            super().on_event(event)
         if event.type == pg.KEYDOWN:
             if event.key == pg.K_a:
                 self.controls['left'] = True
