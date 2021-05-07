@@ -31,9 +31,12 @@ class BlockDamager:
     
     @classmethod
     def get(cls):
-        if cls.instance is None:
-            cls.instance = cls()
-        return cls.instance
+        # Probably not the best solution
+        try:
+            return World.get()._blockdamager
+        except AttributeError:
+            damager = World.get()._blockdamager = BlockDamager()
+            return damager
     
     def __init__(self):
         self.blocks = {}

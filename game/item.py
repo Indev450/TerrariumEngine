@@ -18,6 +18,10 @@ class Item:
     pick_up_sound = getsound(config["item.default.pick_up_sound"])
     
     registered = {}
+    
+    @classmethod
+    def clear(cls):
+        cls.registered = {}
 
     @classmethod
     def on_press(cls, player, itemstack, position):

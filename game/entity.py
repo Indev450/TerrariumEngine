@@ -27,6 +27,10 @@ class Entity(GameObject):
         cls.registered[cls.ID] = cls
     
     @classmethod
+    def clear(cls):
+        cls.registered = {}
+    
+    @classmethod
     def get(cls, key):
         return cls.registered.get(key)
 

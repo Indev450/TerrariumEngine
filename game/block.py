@@ -32,6 +32,11 @@ class BlockDefHolder:
     registered_blocks_list = []
     
     @classmethod
+    def clear(cls):
+        cls.registered_blocks = {'std:air': None}
+        cls.registered_blocks_list = []
+    
+    @classmethod
     def by_id(cls, id):
         '''Get block definition by integer id'''
         try:

@@ -2,6 +2,10 @@ import os
 import importlib
 import traceback
 
+from game.entity import Entity
+from game.block import BlockDefHolder
+from game.item import Item
+
 from .jsonblock import register_block
 
 
@@ -50,6 +54,12 @@ class ModManager:
         """Call on_load() for each mod in `names`
         
         If not given, all mods will be initialized"""
+        
+        Entity.clear()
+        BlockDefHolder.clear()
+        Item.clear()
+        # Unregister everything
+        
         mods = []
         
         if names is None:
