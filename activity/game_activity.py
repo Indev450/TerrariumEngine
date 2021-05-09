@@ -117,6 +117,7 @@ class GameActivity(Activity):
         for i in range(inv_width):
             x = (i+1)*space_x + 0.1*i
             InventoryCell(inv.get_item_ref('hotbar', i),
+                          inv,
                           parent=hotbar,
                           position_f=(x+offset, 0.1),
                           size_f=(cell_width, 0.8))
@@ -134,6 +135,7 @@ class GameActivity(Activity):
         for x in range(inv_width):
             for y in range(inv_height):
                 InventoryCell(inv.get_item_ref('main', y*inv_width + x),
+                              inv,
                               parent=main_inventory,
                               position_f=((x+1)*space_x + cell_width*x + offset, 
                                           space_y*y + cell_height*y + offset),
@@ -153,7 +155,7 @@ class GameActivity(Activity):
             'mouse': {
                 'pressed': False,
                 'press_time': 0,
-                },
+            },
         }
 
         self.paused = False

@@ -51,11 +51,11 @@ class Inventory:
     def get_item_ref(self, name, index):
         return InventoryRef(self, name, index)
     
-    def swap(self, name1, index1, name2, index2):
+    def swap(self, name1, index1, other, name2, index2):
         itemstack1 = self.get_item(name1, index1)
         item_t1, count1, data1 = itemstack1.item_t, itemstack1.count, itemstack1.item_data
 
-        itemstack2 = self.get_item(name2, index2)
+        itemstack2 = other.get_item(name2, index2)
         item_t2, count2, data2 = itemstack2.item_t, itemstack2.count, itemstack2.item_data
         
         if itemstack1.can_merge(itemstack2):

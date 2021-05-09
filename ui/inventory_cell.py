@@ -12,6 +12,7 @@ class InventoryCell(UIElement):
     
     def __init__(self,
                  inventoryref,
+                 playerinv,
                  children=None,
                  parent=None,
                  position_f=(0, 0),
@@ -22,6 +23,8 @@ class InventoryCell(UIElement):
                          size_f=size_f)
         self.invref = inventoryref
         self.invref().set_change_callback(self.on_change)
+        
+        self.playerinv = playerinv
 
         self.image = self.get_image()
     
@@ -50,4 +53,4 @@ class InventoryCell(UIElement):
     def on_click(self, position):
         inv = self.invref.inventory
 
-        inv.swap(self.invref.name, self.invref.index, 'buffer', 0)
+        inv.swap(self.invref.name, self.invref.index, self.playerinv, 'buffer', 0)
