@@ -154,6 +154,11 @@ class Block:
         pass
     
     @classmethod
+    def on_load(cls, x, y):
+        '''Called when chunk loads this block'''
+        pass
+    
+    @classmethod
     def _on_destroy(cls, x, y):
         '''Called in World when block destroyed'''
         cls.on_destroy(x, y)

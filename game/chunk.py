@@ -2,7 +2,7 @@ import pygame as pg
 
 from .camera import Camera
 
-import game.block as block
+import game.block as blockm
 
 from config import getcfg
 
@@ -16,7 +16,7 @@ class Chunk:
     def __init__(self, world, x, y, width, height):
         self.world = world
 
-        size = (block.Block.WIDTH*width, block.Block.HEIGHT*height)
+        size = (blockm.Block.WIDTH*width, blockm.Block.HEIGHT*height)
 
         self.surf = pg.Surface(size).convert_alpha()
 
@@ -26,8 +26,8 @@ class Chunk:
         self.y1 = y
         self.y2 = min(y+height, world.WORLD_HEIGHT)
 
-        real_x = x * block.Block.WIDTH
-        real_y = y * block.Block.HEIGHT
+        real_x = x * blockm.Block.WIDTH
+        real_y = y * blockm.Block.HEIGHT
 
         real_width, real_height = size
 
@@ -39,6 +39,14 @@ class Chunk:
         self.alive_time = self.KEEP_ALIVE_TIME
 
         self.update()
+        
+        for y in range(self.y1, self.y2):
+            for x in range(self.x1, self.x2):
+                for layer in range(0, 2):
+                    block = self.world.get_block(x, y, layer)
+                    
+                    if block is not None:
+                        block.on_load(x, y)
 
     def update(self):
         self.surf.fill(pg.Color(0, 0, 0, 0))
@@ -52,8 +60,8 @@ class Chunk:
                 
                 image = compare_tiles(tiles, x, y)
 
-                local_x = (x-self.x1) * block.Block.WIDTH
-                local_y = (y-self.y1) * block.Block.HEIGHT
+                local_x = (x-self.x1) * blockm.Block.WIDTH
+                local_y = (y-self.y1) * blockm.Block.HEIGHT
 
                 self.surf.blit(image, (local_x, local_y))
 
@@ -75,7 +83,7 @@ class Chunk:
 
 
 def compare_tiles(tiles, x, y):
-    output = pg.Surface((block.Block.WIDTH, block.Block.HEIGHT)).convert_alpha()
+    output = pg.Surface((blockm.Block.WIDTH, blockm.Block.HEIGHT)).convert_alpha()
     
     output.blits([(tile.gettile(x, y), (0, 0)) for tile in tiles])
 
