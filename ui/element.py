@@ -37,6 +37,9 @@ class UIElement:
         self.surface = None  # Surface that actually drawn
 
     def set_rect(self, position_f=(0, 0), size_f=(0.5, 0.5)):
+        self.position_f = position_f
+        self.size_f = size_f
+        
         pwidth = app.App.WIN_WIDTH
         pheight = app.App.WIN_HEIGHT
 
@@ -58,10 +61,10 @@ class UIElement:
             pheight*size_f[1])
 
     def on_resize(self):
+        self.set_rect(self.position_f, self.size_f)
+        
         for child in self.children:
             child.on_resize()
-
-        self.set_rect(self.position_f, self.size_f)
 
         self.update_image()
     
