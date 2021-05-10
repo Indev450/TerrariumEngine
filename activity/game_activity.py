@@ -44,6 +44,8 @@ class GameActivity(Activity):
     
     BG_MUSIC = getsound(config["game.music"])  # TODO - play music based on biome
     
+    INTERACT_DIST = config["player.interact_distance"]
+    
     def __init__(self, path):
         super().__init__()
         
@@ -332,6 +334,9 @@ class GameActivity(Activity):
             elif event.key == pg.K_i:
                 self.toggle_inventory_visibility()
             
+            elif event.key == pg.K_e:
+                self.interact()
+            
             elif event.key == pg.K_ESCAPE:
                 if self.overlay.is_visible('inventory'):
                     self.toggle_inventory_visibility()
@@ -369,6 +374,34 @@ class GameActivity(Activity):
         elif not (event.type == pg.MOUSEBUTTONUP and
                   not self.overlay.is_visible()):
             super().on_event(event)
+    
+    def interact(self):
+        can_interact = []
+        
+        # Find all entities we can interact
+        for entity in self.entity_manager.get_tagged_entities('interactive'):
+            v = pg.math.Vector2(self.player.rect.center)
+            
+            if v.distance_to(entity.rect.center) <= self.INTERACT_DIST:
+                can_interact.append(entity)
+        
+        if not can_interact:
+            return  # No entities found
+        
+        # Cursor position in the world
+        cursor = pg.math.Vector2(pg.mouse.get_pos()) + self.camera.get_position()
+        
+        # Nearest entity and distance to it. Initialize it with the first found entity
+        nearest = (can_interact[0], cursor.distance_to(can_interact[0].rect.center))
+        
+        # Now find the nearest entity for the cursor
+        for entity in can_interact[1:]:
+            dist = cursor.distance_to(entity.rect.center)
+            
+            if dist < nearest[1]:
+                nearest = (entity, dist)
+        
+        nearest[0].on_interact(self.player)
     
     def on_begin(self):
         self.app.music_player.play(self.BG_MUSIC)

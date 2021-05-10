@@ -33,6 +33,7 @@
     "player.speed": 30,
     "player.jump": 10,
     "player.size": [24, 48],
+    "player.interact_distance": 48,
     
     "tick.time": 1.0,
     
