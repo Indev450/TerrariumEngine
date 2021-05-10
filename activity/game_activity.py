@@ -43,7 +43,7 @@ class GameActivity(Activity):
     BG_COLOR = pg.Color(config["game.background"])
     
     BG_MUSIC = getsound(config["game.music"])  # TODO - play music based on biome
-
+    
     def __init__(self, path):
         super().__init__()
         
@@ -97,10 +97,12 @@ class GameActivity(Activity):
         inv = self.player.get_inventory()
         
         modmanager.call_handlers('on_player_join', self.player)
-
+        
+        ################################################################
+        # Hotbar
         hotbar = InventoryHotbar(
-            position_f=(0.1, 0.01),
-            size_f=(0.8, 0.14))
+            position_f=(0.01, 0.01),
+            size_f=(0.5, 0.1))
             
         inv_width = inv.get_size('hotbar')
         inv_height = inv.get_size('main') // inv_width
@@ -127,10 +129,14 @@ class GameActivity(Activity):
                           parent=hotbar,
                           position_f=(x+offset, 0.1),
                           size_f=(cell_width, 0.8))
-
+        
+        self.overlay.add_element('hotbar', hotbar, True)
+        
+        ################################################################
+        # Main inventory
         main_inventory = InventoryHotbar(
-            position_f=(0.1, 0.2),
-            size_f=(0.8, 0.6))
+            position_f=(0.01, 0.12),
+            size_f=(0.5, 0.4))
 
         for x in range(inv_width):
             for y in range(inv_height):
@@ -140,8 +146,7 @@ class GameActivity(Activity):
                               position_f=((x+1)*space_x + cell_width*x + offset, 
                                           space_y*y + cell_height*y + offset),
                               size_f=(cell_width, cell_height))
-        
-        self.overlay.add_element('hotbar', hotbar, True)
+
         self.overlay.add_element('inventory', main_inventory)
 
         self.camera = Camera.get()
@@ -190,6 +195,35 @@ class GameActivity(Activity):
         
         self.overlay.add_element('pause', pause)
     
+    def open_inventory(self, inv, name, length):
+        offset = 0.05
+
+        inv_width = length
+        inv_height = inv.get_size(name) // length
+        
+        cell_width = 0.1
+        cell_height = 0.2
+        
+        space_x = (0.9 - cell_width*inv_width) / (inv_width + 1)  # Rockets go brrr
+        space_y = (0.9 - cell_height*inv_height) / inv_height
+        # Free space between slots
+        
+        inventory = InventoryHotbar(
+            position_f=(0.01, 0.53),
+            size_f=(0.5, 0.4))
+
+        for x in range(inv_width):
+            for y in range(inv_height):
+                InventoryCell(inv.get_item_ref(name, y*inv_width + x),
+                              inv,
+                              parent=inventory,
+                              position_f=((x+1)*space_x + cell_width*x + offset, 
+                                          space_y*y + cell_height*y + offset),
+                              size_f=(cell_width, cell_height))
+        
+        self.overlay.add_element('opened_inventory', inventory, True)
+        self.overlay.show('inventory')
+    
     def update_selected_item(self):
         inv_width = self.player.inventory.get_size('hotbar')
         inv_height = self.player.inventory.get_size('main') // inv_width
@@ -212,6 +246,9 @@ class GameActivity(Activity):
     def toggle_inventory_visibility(self):
         if self.overlay.is_visible('inventory'):
             self.overlay.hide('inventory')
+            
+            if self.overlay.get('opened_inventory') is not None:
+                self.overlay.hide('opened_inventory')
         else:
             self.overlay.show('inventory')
 
