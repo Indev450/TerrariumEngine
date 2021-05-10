@@ -90,4 +90,4 @@ def getcfg():
 
 def write_config():
     with open('config.json', 'w') as file:
-        json.dump(config, file)
+        json.dump(config, file, indent=4)
