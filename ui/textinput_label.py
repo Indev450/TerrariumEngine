@@ -16,12 +16,12 @@ class TextInputLabel(UIElement):
                  textinput_offset=(0, 0),
                  parent=None,
                  children=None,
-                 position_f=(0, 0),
-                 size_f=(0.5, 0.5)):
+                 position=(0, 0),
+                 size=(100, 100)):
         super().__init__(children=children,
                          parent=parent,
-                         position_f=position_f,
-                         size_f=size_f)
+                         position=position,
+                         size=size)
         self.textinput = textinput
         self.textinput.draw_cursor = False
         self.textinput.render_text()
@@ -44,8 +44,7 @@ class TextInputLabel(UIElement):
         
         self.image = img  # For self.get_width and get_height
         
-        img.blit(self.textinput.surface, (self.get_width()*self.textinput_offset[0],
-                                          self.get_height()*self.textinput_offset[1]))
+        img.blit(self.textinput.surface, self.textinput_offset)
         
         return img
     

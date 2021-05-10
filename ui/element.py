@@ -10,8 +10,8 @@ class UIElement:
     def __init__(self,
                  children=None,
                  parent=None,
-                 position_f=(0, 0),
-                 size_f=(0.5, 0.5)):
+                 position=(0, 0),
+                 size=(100, 100)):
 
         self.children = children or []
         # We can't use [] as default argument, because in each new object it will be
@@ -22,51 +22,34 @@ class UIElement:
         if parent is not None:
             parent.add_child(self)  # Do it automaticly
 
-        self.position_f = position_f
-        self.size_f = size_f
+        self.position = position
+        self.size = size
 
         self.overlay = getoverlay()  # Instance of active ui overlay
 
         self.rect = None  # Bound rect of ui element
-        self.draw_pos = (0, 0)  # Position to draw this element
 
-        self.set_rect(position_f, size_f)
+        self.set_rect(position, size)
 
         self.image = None  # drawable
         
         self.surface = None  # Surface that actually drawn
 
-    def set_rect(self, position_f=(0, 0), size_f=(0.5, 0.5)):
-        self.position_f = position_f
-        self.size_f = size_f
-        
-        pwidth = app.App.WIN_WIDTH
-        pheight = app.App.WIN_HEIGHT
+    def set_rect(self, position=(0, 0), size=(100, 100)):
+        self.position = position
+        self.size = size
 
         px = 0
         py = 0
 
-        if self.parent is not None and self.parent.image is not None:
-            pwidth = self.parent.get_width()
-            pheight = self.parent.get_height()
+        if self.parent is not None:
             px = self.parent.rect.x
             py = self.parent.rect.y
-
-        self.draw_pos = (pwidth*position_f[0], pheight*position_f[1])
         
         self.rect = pg.Rect(
-            pwidth*position_f[0] + px,
-            pheight*position_f[1] + py,
-            pwidth*size_f[0],
-            pheight*size_f[1])
-
-    def on_resize(self):
-        self.set_rect(self.position_f, self.size_f)
-        
-        for child in self.children:
-            child.on_resize()
-
-        self.update_image()
+            position[0] + px,
+            position[1] + py,
+            *size)
     
     def on_missclick(self):
         for child in self.children:
@@ -97,7 +80,7 @@ class UIElement:
         for child in self.children:
             child.draw(self.surface)
 
-        screen.blit(self.surface, self.draw_pos)
+        screen.blit(self.surface, self.position)
 
     def add_child(self, child):
         self.children.append(child)
@@ -109,9 +92,7 @@ class UIElement:
         self.parent = parent
 
     def get_width(self):
-        if self.image is not None:
-            return self.image.get_width()
+        return self.rect.width
 
     def get_height(self):
-        if self.image is not None:
-            return self.image.get_height()
+        return self.rect.height

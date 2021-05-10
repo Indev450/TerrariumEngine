@@ -14,6 +14,11 @@ from mods.manager import ModManager
 
 from utils.saves import create_save_path
 
+from config import getcfg
+
+
+config = getcfg()
+
 
 class MapgenActivity(Activity):
     BG_COLOR = pg.Color('#5555FF')
@@ -45,12 +50,11 @@ class MapgenActivity(Activity):
         
         self.mapgen.start()
         
-        self.init_ui()
-    
-    def init_ui(self):
+        win_width, win_height = config["app.resolution"]
+
         info = Label(text=f'{self.curstatus} {self.curdone} %',
-                     position_f=(0.25, 0.25),
-                     size_f=(0.5, 0.5))
+                     position=(win_width//2 - 250, win_height//2 - 100),
+                     size=(500, 200))
         
         self.overlay.add_element('info', info, True)
 

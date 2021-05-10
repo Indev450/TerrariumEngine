@@ -100,56 +100,75 @@ class GameActivity(Activity):
         
         modmanager.call_handlers('on_player_join', self.player)
         
+        win_width, win_height = config["app.resolution"]
+        
         ################################################################
         # Hotbar
         hotbar = InventoryHotbar(
-            position_f=(0.01, 0.01),
-            size_f=(0.5, 0.1))
+            position=(20, 20),
+            size=(510, 70))
             
         inv_width = inv.get_size('hotbar')
         inv_height = inv.get_size('main') // inv_width
         
-        cell_width = 0.1
-        cell_height = 0.2
-        
-        space_x = (0.9 - cell_width*inv_width) / (inv_width + 1)  # Rockets go brrr
-        space_y = (0.9 - cell_height*inv_height) / inv_height
-        # Free space between slots
-        
-        offset = 0.05
+        cell_size = 50
+        space = 10
 
         for i in range(inv_width):
-            x = (i+1)*space_x + 0.1*i
+            x = (i+1)*space + cell_size*i + space
             InventoryCell(inv.get_item_ref('hotbar', i),
                           inv,
                           parent=hotbar,
-                          position_f=(x+offset, 0.1),
-                          size_f=(cell_width, 0.8))
+                          position=(x, space),
+                          size=(cell_size, cell_size))
         
-        x = (self.player.selected_item+1)*space_x + 0.1*self.player.selected_item
+        x = (self.player.selected_item+1)*space + cell_size*self.player.selected_item + space
         self.hotbar_selected = HotbarSelected(
                           parent=hotbar,
-                          position_f=(x+offset, 0.1),
-                          size_f=(cell_width, 0.8))
+                          position=(x, space),
+                          size=(cell_size, cell_size))
         
         self.overlay.add_element('hotbar', hotbar, True)
         
         ################################################################
         # Main inventory
         main_inventory = InventoryHotbar(
-            position_f=(0.01, 0.12),
-            size_f=(0.5, 0.4))
+            position=(20, 140),
+            size=(510, 280))
 
         for x in range(inv_width):
             for y in range(inv_height):
                 InventoryCell(inv.get_item_ref('main', y*inv_width + x),
                               inv,
                               parent=main_inventory,
-                              position_f=((x+1)*space_x + cell_width*x + offset, 
-                                          space_y*y + cell_height*y + offset),
-                              size_f=(cell_width, cell_height))
+                              position=((x+1)*space + cell_size*x + space, 
+                                        (y+1)*space + cell_size*y + space),
+                              size=(cell_size, cell_size))
 
         self.overlay.add_element('inventory', main_inventory)
+        
+        ################################################################
+        # Pause
+        pause = Label(
+            text="Paused",
+            position=(win_width//2 - 250, win_height/2 - 220),
+            size=(500, 400))
+        
+        Button(
+            parent=pause,
+            on_pressed=self.play,
+            text="Continue",
+            position=(100, 100),
+            size=(300, 100))
+        
+        Button(
+            parent=pause,
+            on_pressed=Call(newactivity, mainmenu.MainMenuActivity),
+            text="Quit",
+            position=(100, 220),
+            size=(300, 100))
+        
+        self.overlay.add_element('pause', pause)
 
         self.camera = Camera.get()
         self.camera.set_obj(self.player)
@@ -175,53 +194,26 @@ class GameActivity(Activity):
         # a little bigger than often, so entities can teleport pass
         # blocks. This is temporary solution.
         # TODO - fix that problem by better way
-        
-        pause = Label(
-            text="Paused",
-            position_f=(0.4, 0.3),
-            size_f=(0.2, 0.4))
-        
-        Button(
-            parent=pause,
-            on_pressed=self.play,
-            text="Continue",
-            position_f=(0.1, 0.2),
-            size_f=(0.8, 0.25))
-        
-        Button(
-            parent=pause,
-            on_pressed=Call(newactivity, mainmenu.MainMenuActivity),
-            text="Quit",
-            position_f=(0.1, 0.55),
-            size_f=(0.8, 0.25))
-        
-        self.overlay.add_element('pause', pause)
     
     def open_inventory(self, inv, name, length):
-        offset = 0.05
-
         inv_width = length
         inv_height = inv.get_size(name) // length
         
-        cell_width = 0.1
-        cell_height = 0.2
-        
-        space_x = (0.9 - cell_width*inv_width) / (inv_width + 1)  # Rockets go brrr
-        space_y = (0.9 - cell_height*inv_height) / inv_height
-        # Free space between slots
+        cell_size = 50
+        space = 10
         
         inventory = InventoryHotbar(
-            position_f=(0.01, 0.53),
-            size_f=(0.5, 0.4))
+            position=(20, 140),
+            size=(510, 280))
 
         for x in range(inv_width):
             for y in range(inv_height):
-                InventoryCell(inv.get_item_ref(name, y*inv_width + x),
+                InventoryCell(inv.get_item_ref('main', y*inv_width + x),
                               inv,
-                              parent=inventory,
-                              position_f=((x+1)*space_x + cell_width*x + offset, 
-                                          space_y*y + cell_height*y + offset),
-                              size_f=(cell_width, cell_height))
+                              parent=main_inventory,
+                              position=((x+1)*space + cell_size*x + space, 
+                                        (y+1)*space + cell_size*y + space),
+                              size=(cell_size, cell_size))
         
         self.overlay.add_element('opened_inventory', inventory, True)
         self.overlay.show('inventory')
@@ -230,20 +222,14 @@ class GameActivity(Activity):
         inv_width = self.player.inventory.get_size('hotbar')
         inv_height = self.player.inventory.get_size('main') // inv_width
         
-        cell_width = 0.1
-        cell_height = 0.2
+        cell_size = 50
+        space = 10
         
-        space_x = (0.9 - cell_width*inv_width) / (inv_width + 1)  # Rockets go brrr
-        space_y = (0.9 - cell_height*inv_height) / inv_height
-        # Free space between slots
-        
-        offset = 0.05
-        
-        x = (self.player.selected_item+1)*space_x + 0.1*self.player.selected_item
+        x = (self.player.selected_item+1)*space + cell_size*self.player.selected_item
         
         self.hotbar_selected.set_rect(
-            position_f=(x+offset, 0.1),
-            size_f=(cell_width, 0.8))
+            position=(x+space, space),
+            size=(cell_size, cell_size))
     
     def toggle_inventory_visibility(self):
         if self.overlay.is_visible('inventory'):

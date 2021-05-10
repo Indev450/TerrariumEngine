@@ -14,12 +14,12 @@ class Label(UIElement):
                  text="",
                  parent=None,
                  children=None,
-                 position_f=(0, 0),
-                 size_f=(0.5, 0.5)):
+                 position=(0, 0),
+                 size=(100, 100)):
         super().__init__(children=children,
                          parent=parent,
-                         position_f=position_f,
-                         size_f=size_f)
+                         position=position,
+                         size=size)
 
         self.image = self.get_image(text)
 

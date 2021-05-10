@@ -48,70 +48,67 @@ class MainMenuActivity(Activity):
         self.parallax = DefaultParallax()
         
         self.found_worlds_holder = None
+        
+        win_width, win_height = config["app.resolution"]
 
-        self.init_ui()
-    
-    def on_begin(self):
-        super().on_begin()
-        self.app.music_player.play(self.BG_MUSIC)
-    
-    def on_end(self):
-        try:
-            self.app.music_player.stop()
-        except pg.error:
-            pass  # When closing game, pygame.mixer becomes not initialized
-
-    def init_ui(self):
+        ################################################################
         # Main Menu
         root = Label(
             text="Main Menu",
-            position_f=(0.25, 0.1),
-            size_f=(0.5, 0.65))
-
-        Button(
-            parent=root,
-            on_pressed=Call(exit, 0),
-            text="exit",
-            position_f=(0.25, 0.65),
-            size_f=(0.5, 0.22))
-
-        Button(
-            parent=root,
-            on_pressed=self.show_select,
-            text="Continue",
-            position_f=(0.25, 0.4),
-            size_f=(0.5, 0.22))
+            position=(50, config["app.resolution"][1] - 50 - 440),
+            size=(300, 440))
 
         Button(
             parent=root,
             on_pressed=self.show_newworld,
             text="New World",
-            position_f=(0.25, 0.15),
-            size_f=(0.5, 0.22))
+            position=(70, 60),
+            size=(160, 80))
+
+        Button(
+            parent=root,
+            on_pressed=self.show_select,
+            text="Continue",
+            position=(70, 150),
+            size=(160, 80))
+        
+        Button(
+            parent=root,
+            on_pressed=lambda: None,  # Do nothing
+            text="Settings",
+            position=(70, 240),
+            size=(160, 80))
+
+        Button(
+            parent=root,
+            on_pressed=Call(exit, 0),
+            text="Exit",
+            position=(70, 330),
+            size=(160, 80))
 
         self.overlay.add_element("mainmenu", root, True)
         
         ################################################################
         # Message
         message = Label(
-            position_f=(0.25, 0.1),
-            size_f=(0.5, 0.5))
+            position=(win_width//2 - 250, win_height/2 - 100),
+            size=(500, 200))
 
         Button(
             parent=message,
             on_pressed=self.hide_message,
             text="OK",
-            position_f=(0.4, 0.8),
-            size_f=(0.2, 0.1))
+            position=(200, 140),
+            size=(100, 50))
 
         self.overlay.add_element("message", message)
-        
+
         ################################################################
         # New World
         newworld = Label(
             text="New World",
-            position_f=(0.25, 0.1),
-            size_f=(0.5, 0.65))
+            position=(win_width//2 - 250, win_height/2 - 220),
+            size=(500, 440))
         
         textinput = TextInput(
             self.app.FONT,
@@ -122,23 +119,23 @@ class MainMenuActivity(Activity):
         TextInputLabel(
             textinput,
             parent=newworld,
-            textinput_offset=(0.1, 0.3),
-            position_f=(0.25, 0.15),
-            size_f=(0.5, 0.22))
+            textinput_offset=(20, 25),
+            position=(80, 60),
+            size=(340, 80))
         
         Button(
             parent=newworld,
             on_pressed=Call(self.run_mapgen, textinput),
             text="Generate",
-            position_f=(0.25, 0.4),
-            size_f=(0.5, 0.22))
+            position=(150, 165),
+            size=(200, 100))
         
         Button(
             parent=newworld,
             on_pressed=self.hide_newworld,
             text="Cancel",
-            position_f=(0.25, 0.65),
-            size_f=(0.5, 0.22))
+            position=(150, 300),
+            size=(200, 100))
         
         self.overlay.add_element("newworld", newworld)
         
@@ -146,20 +143,20 @@ class MainMenuActivity(Activity):
         # Continue
         select = Label(
             text="Select world",
-            position_f=(0.25, 0.1),
-            size_f=(0.5, 0.65))
+            position=(win_width//2 - 250, win_height/2 - 220),
+            size=(500, 440))
         
         Button(
             parent=select,
             on_pressed=self.hide_select,
             text="Cancel",
-            position_f=(0.25, 0.65),
-            size_f=(0.5, 0.22))
+            position=(150, 300),
+            size=(200, 100))
         
         self.found_worlds_holder = ScrollableLabel(
             parent=select,
-            position_f=(0.1, 0.1),
-            size_f=(0.8, 0.5))
+            position=(50, 60),
+            size=(400, 220))
         
         if not os.path.isdir('saves') or not os.listdir('saves'):
             self.found_worlds_holder.set_text('There is no any world')
@@ -167,6 +164,16 @@ class MainMenuActivity(Activity):
             self.find_worlds()
         
         self.overlay.add_element("selectworld", select)
+    
+    def on_begin(self):
+        super().on_begin()
+        self.app.music_player.play(self.BG_MUSIC)
+    
+    def on_end(self):
+        try:
+            self.app.music_player.stop()
+        except pg.error:
+            pass  # When closing game, pygame.mixer becomes not initialized
 
     def draw(self, screen):
         screen.blit(self.background, (0, 0))
@@ -183,13 +190,11 @@ class MainMenuActivity(Activity):
                     parent=self.found_worlds_holder,
                     on_pressed=Call(self.run_world, file),
                     text=file,
-                    size_f=(0.8, 0.2),
-                    position_f=(0.1, 0.1 + 0.3*count),
+                    size=(300, 60),
+                    position=(50, 20 + 80*count),
                 )
                 count += 1
-        self.found_worlds_holder.max_scroll = (self.found_worlds_holder.get_height()*0.3*count
-                                               + self.found_worlds_holder.get_height()*0.1
-                                               - self.found_worlds_holder.get_height())
+        self.found_worlds_holder.max_scroll = (80*count + 20 - 220)
 
     def run_mapgen(self, frominput):
         # TODO - add ability to choose map generator
