@@ -218,6 +218,8 @@ def gettransparent(*size):
     t = BlankTexture(size, pg.Color(0, 0, 0, 0), True)
     
     _used_textures.append(t)
+    
+    return t
 
 
 def getanimated(*names, speed=1, preload=False):
