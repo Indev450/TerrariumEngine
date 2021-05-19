@@ -2,7 +2,6 @@ from utils.checks import hasattrs
 
 from .biomes import SurfaceBiome
 from .ores import CopperOreGen
-from .items import StoneItem
 
 
 required_mapgen_attributes = ['add_biome', 'add_ore']
@@ -13,8 +12,6 @@ required_mapgen_attributes = ['add_biome', 'add_ore']
 def on_load(modmanager):
     '''Called every time when starting Game- or Mapgen- Activity
     First argument - ModManager object'''
-    StoneItem.register()
-
     modmanager.add_handler(init_mapgen=init_mapgen)
 
 

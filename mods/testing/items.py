@@ -28,11 +28,3 @@ class MusicItem(Item):
     @classmethod
     def on_press(cls, player, itemstack, position):
         cls.sound.play()
-
-
-class TerminalItem(Item):
-    ID = 'testing:terminal'
-    image = gettexture(modpath('textures/blocks/terminal.png'))
-    
-    on_press = place_mg_block('testing:terminal')
-    on_keep_press = place_mg_block_keep('testing:terminal')

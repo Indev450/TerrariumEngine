@@ -1,4 +1,5 @@
 {
     "id": "std:stone_wall",
-    "image": "textures/blocks/stone_wall.png"
+    "image": "textures/blocks/stone_wall.png",
+    "layer": 2
 }

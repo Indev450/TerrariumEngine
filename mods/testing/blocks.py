@@ -13,6 +13,8 @@ class Terminal(Block):
     
     tile = gettexture(modpath('textures/blocks/terminal.png'))
     
+    inventory_image = tile
+    
     @classmethod
     def on_interact(cls, player):
         print('Hello, World!')

@@ -1,4 +1,4 @@
-from .items import DebugPick, MusicItem, TerminalItem
+from .items import DebugPick, MusicItem
 from .blocks import Terminal
 
 
@@ -6,7 +6,6 @@ def on_load(modmanager):
     DebugPick.register()
     MusicItem.register()
     Terminal.register()
-    TerminalItem.register()
     
     modmanager.add_handler(on_player_join=on_player_join)
 

@@ -3,6 +3,7 @@ import pygame as pg
 import game.entity_manager as entitymanager
 import game.item_stack as itemstack
 import game.world as worldm
+import game.block_item as blockitem
 
 from tilemap.maketilemap import tilemap_positions, flags
 
@@ -108,7 +109,11 @@ class Block:
     
     `hits` (integer) - how much hits this block requires to broke
     
-    `hit_sound` (game.sound.Sound derived object) - sound player when block hit
+    `hit_sound` (game.sound.Sound derived object) - sound when player hits block
+    
+    `register_item` (bool) - add item based on the block. Default - True
+    
+    `inventory_image` (game.texture.Texture derived object) - texture for block item
     
     # Engine variables (don't change them)
     
@@ -137,6 +142,10 @@ class Block:
     hits = 4
     
     hit_sound = None
+    
+    register_item = True
+    
+    inventory_image = None
     
     WIDTH = 16
     HEIGHT = 16
@@ -195,6 +204,9 @@ class Block:
     @classmethod
     def register(cls):
         BlockDefHolder.register(cls)
+        
+        if cls.register_item:
+            blockitem.register_block_item(cls)
 
 
 # ---------------------------------------------------------------

@@ -14,6 +14,11 @@ def _tile(drawtype, path):
         return gettiled(mods.modpath(path), 8, 2)
 
 
+def _inventory_image(path):
+    if path is not None:
+        return gettexture(mods.modpath(path))
+
+
 def _hit_sound(path):
     if path is not None:
         return getsound(mods.modpath(path))
@@ -49,6 +54,10 @@ def register_block(path):
         hits = blockdef.get("hits", Block.hits)
         
         hit_sound = _hit_sound(blockdef.get("hit_sound"))
+        
+        register_item = blockdef.get("register_item", Block.register_item)
+        
+        inventory_image = _inventory_image(blockdef.get("inventory_image", Block.inventory_image))
     
     
     JSONBlock.register()
