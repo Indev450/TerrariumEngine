@@ -31,7 +31,9 @@ def register_block(path):
         id = blockdef["id"]
         
         drawtype = blockdef.get("drawtype", Block.drawtype)
-        drawlayer = blockdef.get("drawlayer", Block.drawlayer)
+        
+        layer = blockdef.get("layer", Block.layer)
+        
         tilecomparable = blockdef.get("tilecomparable", Block.tilecomparable)
         
         tile = _tile(blockdef.get("drawtype", Block.drawtype), blockdef.get("image", ''))

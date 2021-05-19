@@ -89,8 +89,7 @@ class Block:
     to draw block. 'image' - draw single block image, 'tiled' - draw block
     image based on its neighbours, None - do not draw block
     
-    `drawlayer` (integer, used only for drawtype='tiled') - which blocks layer
-    use to check blocks neighbours
+    `layer` (integer, 0 - fg, 1 - mg, 2 - bg) - layer number
     
     `tilecomparable` (boolean, used only for drawtype='tiled') - describes
     is this block counts as neighbour for other 'tiled' blocks
@@ -120,7 +119,8 @@ class Block:
     id = "builtin:none"
     
     drawtype = 'image'
-    drawlayer = 0
+    
+    layer = 0
     
     tilecomparable = True
 
@@ -189,7 +189,7 @@ class Block:
     def gettile(cls, x, y):
         '''Get block drawable'''
         if cls.drawtype == 'tiled':
-            cls.tile.select(*get_tilemap_position(x, y, cls.drawlayer))
+            cls.tile.select(*get_tilemap_position(x, y, cls.layer))
         return cls.tile.get()
     
     @classmethod
