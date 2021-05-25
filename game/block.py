@@ -222,6 +222,14 @@ def _place_block(blockname, layer=0, consume=True, force=False):  # 0 - fg, 1 - 
         world = player.world
         
         position = _block_position(*position)
+        
+        if layer == 0:
+            rect = pg.Rect(
+                position[0]*Block.WIDTH, position[1]*Block.HEIGHT,
+                Block.WIDTH, Block.HEIGHT)
+            
+            if player.rect.colliderect(rect):
+                return
 
         dstblock = world.get_block(*position, layer)
 
@@ -241,6 +249,14 @@ def _place_block_keep(blockname, layer=0, consume=True, force=False):
         world = player.world
 
         position = _block_position(*position)
+        
+        if layer == 0:
+            rect = pg.Rect(
+                position[0]*Block.WIDTH, position[1]*Block.HEIGHT,
+                Block.WIDTH, Block.HEIGHT)
+            
+            if player.rect.colliderect(rect):
+                return
         
         if _keep_place_block_users.get(player) is None:
             _keep_place_block_users[player] = 0
