@@ -2,6 +2,7 @@
     "id": "std:copper_ore",
     "drawtype": "tiled",
     "image": "textures/blocks/coppertilemap.png",
+    "inventory_image": "textures/items/blocks/copper.png",
     "drops": ["std:copper_ore"],
     "tilecomparable": false
 }
