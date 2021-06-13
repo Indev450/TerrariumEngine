@@ -109,6 +109,23 @@ class Inventory:
         
         return False
     
+    def consume_items(self, item, count=1):
+        item_t = Item.get(item)
+        
+        if item_t is None:
+            print(f'Warning: no such item: {item}')
+            return False
+        
+        for name in self.data.keys():
+            for istack in self.data[name]:
+                if istack.item_t is item_t:
+                    count = istack.consume_items(count)
+                    
+                    if count <= 0:
+                        return 0
+        
+        return count
+    
     def dump(self):
         result = {}
         
