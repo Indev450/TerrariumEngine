@@ -1,7 +1,5 @@
 import pygame as pg
 
-import app
-
 from .overlay import getoverlay
 
 
