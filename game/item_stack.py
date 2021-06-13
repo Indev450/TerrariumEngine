@@ -85,13 +85,16 @@ class ItemStack:
         if self.on_change is not None:
             self.on_change(self, ItemStackChange.ADD_ITEMS)
         
+        if self.count <= 0:
+            self.item_t = None
+            self.data = {}
+        
         return left if left > 0 else 0
     
     def consume_items(self, count):
         self.add_items(-count)
-        
-        if self.on_change is not None:
-            self.on_change(self, ItemStackChange.CONSUME_ITEMS)
+            
+        return self.count
 
     def set_type(self, item_t, count=0, data=None):
         self.item_t = item_t
