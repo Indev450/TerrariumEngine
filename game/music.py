@@ -2,6 +2,11 @@ import pygame as pg
 
 from .sound import getsound
 
+from config import getcfg
+
+
+config = getcfg()
+
 
 class MusicEntry:
     
@@ -19,6 +24,8 @@ class MusicEntry:
 class MusicPlayer:
     instance = None
     
+    VOLUME = config["volume.music"]
+    
     def __init__(self, fadeout_time=1000):
         self.current = None
         self.playing = []
@@ -35,6 +42,7 @@ class MusicPlayer:
             
             self.current = self.playing[0]
             
+            self.current.music.sound.set_volume(self.VOLUME)
             self.current.music.sound.play(loops=-1)
     
     def stop(self, fadeout=True, replace=False):
@@ -48,13 +56,13 @@ class MusicPlayer:
         else:
             self.playing.music.sound.stop()
         
-        if replace:
-            self.playing = self.playing[1:]
+        self.current = None
+        self.playing = self.playing[1:]
+        
+        if replace and self.playing:
+            self.current = self.playing[0]
             
-            if self.playing:
-                self.current = self.playing[0]
-                
-                self.current.music.sound.play(loops=-1)
+            self.current.music.sound.play(loops=-1)
 
     @classmethod
     def new(cls, fadeout_time=1000):

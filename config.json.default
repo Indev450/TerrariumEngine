@@ -5,6 +5,8 @@
     "app.maxfps": 60,
     "app.caption": "Terrarium",
     
+    "volume.music": 0.5,
+    
     "menu.music": "resources/music/mainmenu.ogg",
     "menu.background": "#5555FF",
     
