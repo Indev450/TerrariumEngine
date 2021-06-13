@@ -15,6 +15,8 @@ class Terminal(Block):
     
     inventory_image = tile
     
+    layer = 1
+    
     @classmethod
     def on_interact(cls, player):
         print('Hello, World!')
