@@ -33,7 +33,8 @@
     "item.entity.magnet_acceleration": 50,
     
     "player.speed": 30,
-    "player.jump": 10,
+    "player.jump": 7,
+    "player.jump_keep": 18,
     "player.size": [24, 48],
     "player.interact_distance": 48,
     

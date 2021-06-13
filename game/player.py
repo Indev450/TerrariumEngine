@@ -15,6 +15,7 @@ class Player(Entity):
     
     SPEED = config["player.speed"]
     JUMP = config["player.jump"]
+    JUMP_KEEP = config["player.jump_keep"]
     WIDTH = config["player.size"][0]
     HEIGHT = config["player.size"][1]
 
@@ -92,9 +93,13 @@ class Player(Entity):
     def update(self, dtime):
         super().update(dtime)
 
-        if self.up and self.on_ground:
-            self.yv -= self.JUMP
-            self.on_ground = False
+        if self.up:
+            if self.on_ground:
+                self.yv -= self.JUMP
+                self.on_ground = False
+            
+            if self.yv < -5:
+                self.yv -= self.JUMP_KEEP * dtime
 
         if self.left:
             self.xv -= self.SPEED * dtime
