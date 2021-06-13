@@ -22,6 +22,18 @@ class ScrollableLabel(Label):
         
     
     def on_scroll(self, position, up):
+        scroll = True
+        
+        for child in self.children:
+            if child.rect.collidepoint(*position):
+                child.on_scroll(position, up)
+            
+            if isinstance(child, ScrollableLabel):
+                scroll = False
+        
+        if not scroll:
+            return
+        
         if 0 <= (self.scroll + self.scroll_step * (-1 if up else 1)) <= self.max_scroll:
             self.scroll += self.scroll_step * (-1 if up else 1)
             for child in self.children:
