@@ -111,4 +111,15 @@ class Player(Entity):
         return {
             'inventory': self.inventory.dump(),
         }
-
+    
+    '''
+    def collide(self, by_x):
+        """Checks collision for one dimension"""
+        if by_x:
+            self.rect.height -= 17
+            self.world.is_collide(self, self._on_collide_x)
+            self.rect.height += 17
+        
+        else:
+            self.world.is_collide(self, self._on_collide_y)
+    ''' # TODO - Do stairs effect normally
