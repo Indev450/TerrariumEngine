@@ -15,6 +15,7 @@ from game.entity_manager import EntityManager
 from game.item import Item
 from game.sound import getsound
 from game.decorations import DecorationManager
+from game.craft import CraftManager
 
 from mods.manager import ModManager
 
@@ -23,6 +24,7 @@ from ui.button import Button
 from ui.inv_hotbar import InventoryHotbar
 from ui.hotbar_selected import HotbarSelected
 from ui.inventory_cell import InventoryCell
+from ui.craftui import CraftUI
 
 from utils.calls import Call
 
@@ -48,6 +50,8 @@ class GameActivity(Activity):
     
     def __init__(self, path):
         super().__init__()
+        
+        self.ui_visible = False
         
         modmanager = ModManager.get()
         
@@ -169,6 +173,13 @@ class GameActivity(Activity):
             size=(300, 100))
         
         self.overlay.add_element('pause', pause)
+        
+        ################################################################
+        # Craft UI
+        self.craftui = CraftUI(position=(540, 140))
+        self.craft_manager = CraftManager.get()
+        
+        self.overlay.add_element('craftui', self.craftui.root)
 
         self.camera = Camera.get()
         self.camera.set_obj(self.player)
@@ -211,7 +222,7 @@ class GameActivity(Activity):
                 InventoryCell(inv.get_item_ref('main', y*inv_width + x),
                               inv,
                               parent=main_inventory,
-                              position=((x+1)*space + cell_size*x + space, 
+                              position=((x+1)*space + cell_size*x + space,
                                         (y+1)*space + cell_size*y + space),
                               size=(cell_size, cell_size))
         
@@ -233,12 +244,26 @@ class GameActivity(Activity):
     
     def toggle_inventory_visibility(self):
         if self.overlay.is_visible('inventory'):
-            self.overlay.hide('inventory')
-            
             if self.overlay.get('opened_inventory') is not None:
                 self.overlay.hide('opened_inventory')
+            
+            if self.overlay.is_visible('craftui'):
+                self.overlay.hide('craftui')
+            
+            self.overlay.hide('inventory')
+            
+            self.ui_visible = False
         else:
             self.overlay.show('inventory')
+            self.ui_visible = True
+    
+    def show_craft_menu(self, type):
+        self.craftui.set_crafts(self.player, type)
+        
+        self.overlay.show('craftui')
+        
+        if not self.overlay.is_visible('inventory'):
+            self.toggle_inventory_visibility()
 
     def update(self, dtime):
         if self._skipupdate:
@@ -323,8 +348,18 @@ class GameActivity(Activity):
             elif event.key == pg.K_e:
                 self.interact()
             
+            elif event.key == pg.K_c:
+                if self.overlay.is_visible('craftui'):
+                    self.overlay.hide('craftui')
+                else:
+                    self.show_craft_menu('builtin:emtyhands')
+            
             elif event.key == pg.K_ESCAPE:
                 if self.overlay.is_visible('inventory'):
+                    if self.overlay.is_visible('craftui'):
+                        self.overlay.hide('craftui')
+                        return
+                    
                     self.toggle_inventory_visibility()
                 else:
                     self.toggle_pause()
@@ -339,7 +374,7 @@ class GameActivity(Activity):
             elif event.key == pg.K_SPACE:
                 self.controls['up'] = False
 
-        elif event.type == pg.MOUSEBUTTONDOWN and not self.overlay.is_visible('inventory'):
+        elif event.type == pg.MOUSEBUTTONDOWN and not self.ui_visible:
             if event.button == 1:
                 self.controls['mouse']['pressed'] = True
             elif event.button in (4, 5):
@@ -352,13 +387,13 @@ class GameActivity(Activity):
                 
                 self.update_selected_item()
         
-        elif event.type == pg.MOUSEBUTTONUP:
+        elif event.type == pg.MOUSEBUTTONUP and not self.ui_visible:
             if event.button == 1:
                 self.controls['mouse']['pressed'] = False
                 self.controls['mouse']['press_time'] = 0
 
         elif not (event.type == pg.MOUSEBUTTONUP and
-                  not self.overlay.is_visible()):
+                  not self.ui_visible):
             super().on_event(event)
     
     def interact(self):
