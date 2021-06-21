@@ -4,7 +4,10 @@ import argparse
 
 import pygame as pg
 
-from PIL import Image
+try:
+    from PIL import Image
+except ImportError:
+    Image = None
 
 
 flags = {
@@ -78,6 +81,9 @@ def make_tile_map(block, side, output, delcolor=None):
 
 
 def main():
+    if Image is None:
+        raise SystemExit("Error: this script requires PIL (try python -m pip install pillow)")
+    
     parser = argparse.ArgumentParser()
     
     parser.add_argument('--block', metavar='block', help='Block background')
