@@ -3,6 +3,11 @@ import time
 
 import pygame as pg
 
+from config import getcfg
+
+
+config = getcfg()
+
 
 class Sound:
     instances = {}
@@ -10,7 +15,7 @@ class Sound:
     def __init__(self, name, volume=1.0, min_wait=0.1):
         self.name = name
         self.sound = None
-        self.volume = volume
+        self.volume = volume * config["volume.sounds"]
         self.min_wait = min_wait
         self.last_played = 0
     

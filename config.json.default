@@ -6,6 +6,7 @@
     "app.caption": "Terrarium",
     
     "volume.music": 0.5,
+    "volume.sounds": 0.6,
     
     "menu.music": "resources/music/mainmenu.ogg",
     "menu.background": "#5555FF",
