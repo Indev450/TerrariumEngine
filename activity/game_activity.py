@@ -25,6 +25,7 @@ from ui.inv_hotbar import InventoryHotbar
 from ui.hotbar_selected import HotbarSelected
 from ui.inventory_cell import InventoryCell
 from ui.craftui import CraftUI
+from ui.healthbar import HealthBar
 
 from utils.calls import Call
 
@@ -184,6 +185,14 @@ class GameActivity(Activity):
         self.camera = Camera.get()
         self.camera.set_obj(self.player)
         self.camera.set_offset(self.app.WIN_WIDTH/2, self.app.WIN_HEIGHT/2)
+        
+        ################################################################
+        # Health Bar
+        self.overlay.add_element('healthbar', HealthBar(
+            self.player,
+            position=(config["app.resolution"][0] - 350 - 10, 10),
+            size=(350, 60)),
+            True)
 
         self.controls = {
             'left': False,
