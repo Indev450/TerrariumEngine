@@ -14,17 +14,6 @@ from mods.manager import modpath
 from utils.entities import Spawner
 
 
-def hit_player(entity, player):
-    KNOCKDOWN = 5
-    
-    if player.rect.x > entity.rect.x:
-        player.xv = KNOCKDOWN
-    else:
-        player.xv = -KNOCKDOWN
-    
-    player.yv = -KNOCKDOWN
-
-
 class WormHead(Entity):
     ID = 'worm:worm_head'
     
@@ -70,8 +59,6 @@ class WormHead(Entity):
         
         self.ignore_collision = True
         
-        self.hittimer = 0
-        
         self.child, _ = manager.newentity(WormBody.ID, None,
                                           position=position,
                                           parent=self,
@@ -88,12 +75,8 @@ class WormHead(Entity):
         
         player = self.manager.get_tagged_entities('player')[0]
         
-        if self.hittimer > 0:
-            self.hittimer -= dtime
-        
-        if self.rect.colliderect(player.rect) and self.hittimer <= 0:
-            hit_player(self, player)
-            self.hittimer = self.HITTIME
+        if self.rect.colliderect(player.rect):
+            player.hurt(5, self)
         
         if self.world.get_fg_block(bx, by) is None:
             if self.in_ground:
@@ -162,8 +145,6 @@ class WormBody(Entity):
         
         self.image = self.TEXTURE
         
-        self.hittimer = 0
-        
         self.parent = parent
         
         self.child = None
@@ -177,12 +158,8 @@ class WormBody(Entity):
     def update(self, dtime):
         player = self.manager.get_tagged_entities('player')[0]
         
-        if self.hittimer > 0:
-            self.hittimer -= dtime
-        
-        if self.rect.colliderect(player.rect) and self.hittimer <= 0:
-            hit_player(self, player)
-            self.hittimer = self.HITTIME
+        if self.rect.colliderect(player.rect):
+            player.hurt(5, self)
     
     def move_to_parent(self):
         distx = self.rect.centerx - self.parent.rect.centerx

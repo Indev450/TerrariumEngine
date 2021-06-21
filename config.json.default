@@ -37,6 +37,9 @@
     "player.jump_keep": 18,
     "player.size": [24, 48],
     "player.interact_distance": 48,
+    "player.max_hp": 100,
+    "player.hurt_sound": "resources/sounds/player/player_hurt.wav",
+    "player.death_sound": "resources/sounds/player/player_death.wav",
     
     "tick.time": 1.0,
     

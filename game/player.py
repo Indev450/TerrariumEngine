@@ -2,6 +2,8 @@ from .entity import Entity
 
 from .texture import gettiled, animtiled
 
+from .sound import getsound
+
 from .inventory import Inventory
 
 from config import getcfg
@@ -20,6 +22,9 @@ class Player(Entity):
     HEIGHT = config["player.size"][1]
 
     TEXTURE = gettiled("resources/textures/player/player.png", 3, 3)
+    
+    SND_HURT = getsound(config["player.hurt_sound"])
+    SND_DEATH = getsound(config["player.death_sound"])
     
     ANIMSPEC = {
         "idle_left": {
@@ -54,6 +59,8 @@ class Player(Entity):
         
         player.inventory = Inventory().load(save['data']['inventory'])
         
+        player.hp = save['data'].get('hp', 100)
+        
         return player
 
     def __init__(self, manager=None, uuid=None, position=(0, 0), velocity=(0, 0)):
@@ -71,6 +78,13 @@ class Player(Entity):
         self.inventory.set_size('buffer', 1)
 
         self.selected_item = 0
+        
+        self.hp = self.max_hp = config["player.max_hp"]
+
+        self.blinking_timer = 0  # How long player have to blink
+        self.blinking_timer2 = 0  # For blinking effect
+        
+        self.respawn_timer = 0
         
         self.add_tag('player')
 
@@ -91,7 +105,22 @@ class Player(Entity):
             self.image.set_animation(name)
 
     def update(self, dtime):
+        if self.hp <= 0:
+            self.respawn_timer -= dtime
+            
+            if self.respawn_timer <= 0:
+                self.respawn()
+            
+            return
+        
         super().update(dtime)
+        
+        if self.blinking_timer > 0:
+            self.blinking_timer -= dtime
+            
+            if self.blinking_timer <= 0:
+                self.blinking = False
+                self.blinking_timer2 = 0
 
         if self.up:
             if self.on_ground:
@@ -115,7 +144,48 @@ class Player(Entity):
     def on_save(self):
         return {
             'inventory': self.inventory.dump(),
+            'hp': self.hp,
         }
+    
+    def hurt(self, damage, entity=None, knockback=5, invulnerable_time=1):
+        if self.blinking_timer > 0 or self.hp <= 0:
+            return
+        
+        self.blinking_timer = invulnerable_time
+        
+        self.hp -= damage
+        
+        if self.hp <= 0:
+            self.SND_DEATH.play(0)
+            self.respawn_timer = 5
+            return
+        
+        self.SND_HURT.play(0)
+        
+        if entity is not None:
+            if self.rect.x > entity.rect.x:
+                self.xv = knockback
+            else:
+                self.xv = -knockback
+        
+        self.yv = -knockback
+    
+    def respawn(self):
+        self.hp = self.max_hp
+        
+        self.rect.topleft = (0, 0)  # TODO - make actual respawn position
+    
+    def draw(self, screen):
+        if self.hp <= 0:
+            return
+        
+        if self.blinking_timer > 0:
+            self.blinking_timer2 += 1
+            
+            if self.blinking_timer2 % 3 == 0:
+                return
+        
+        super().draw(screen)
     
     '''
     def collide(self, by_x):
