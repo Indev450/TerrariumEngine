@@ -112,7 +112,6 @@ class MainMenuActivity(Activity):
         
         textinput = TextInput(
             self.app.FONT,
-            on_return=lambda text: None,  # Do nothing
             max_length=20,
             prompt="Enter world name...")
         

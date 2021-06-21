@@ -5,7 +5,7 @@ class TextInput:
 
     def __init__(self,
                  font,
-                 on_return,
+                 on_return=None,
                  input_wait=0.05,
                  input_start_wait=0.5,
                  init_string="",
@@ -114,9 +114,10 @@ class TextInput:
             self.time_to_wait = self.input_wait
 
             if self.key_pressed == pg.K_RETURN:
-                self.on_return(self.text)
-                self.text = ""
-                self.cursor_pos = 0
+                if self.on_return is not None:
+                    self.on_return(self.text)
+                    self.text = ""
+                    self.cursor_pos = 0
             
             elif self.key_pressed == pg.K_BACKSPACE:
                 if self.cursor_pos == 0:
