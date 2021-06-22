@@ -1,7 +1,3 @@
-from math import sin, cos, radians, degrees
-
-from pygame.math import Vector2 as vec
-
 from game.texture import gettexture, gettiled, animtiled
 from game.sound import getsound
 from game.entity import Entity
