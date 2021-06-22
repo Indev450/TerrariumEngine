@@ -280,7 +280,7 @@ class GameActivity(Activity):
             return
             
         if not self.paused:
-            if self.controls['mouse']['pressed']:
+            if self.controls['mouse']['pressed'] and self.player.hp > 0:
                 istack = self.player.inventory.get_item('hotbar', self.player.selected_item)
                 
                 if not istack.empty():
