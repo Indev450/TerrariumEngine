@@ -10,6 +10,26 @@ from mods.manager import modpath
 from utils.entities import Spawner
 
 
+def do_death_particles(entmgr, position, srcvelocity):
+    for i in range(20):
+        entmgr.newentity('worm:particle_metal', None, position=position,
+                                                      srcvelocity=srcvelocity)
+    
+    entmgr.newentity('worm:particle_smoke', None, position=position)
+
+
+def playsound(snd, player, entity, fade_dist=6, min_volume=0.1):
+    distx = entity.rect.centerx - player.rect.centerx
+    disty = entity.rect.centery - player.rect.centery
+    dist = (distx*distx + disty*disty)**0.5
+    
+    volume = min(Block.WIDTH*fade_dist/dist, 1.0)
+    
+    if volume > min_volume:
+        snd.sound.set_volume(volume)
+        snd.play()
+
+
 class WormHead(Entity):
     ID = 'worm:worm_head'
     
@@ -23,6 +43,8 @@ class WormHead(Entity):
     }
     
     SND_CRUMBLE = getsound(modpath('sounds/crumble.wav'))
+    SND_EXPLOSION = getsound(modpath('sounds/explosion.wav'))
+    SND_HURT = getsound(modpath('sounds/hurt.wav'))
     
     XACC = 15
     YACC = 12
@@ -53,6 +75,8 @@ class WormHead(Entity):
         
         #self.rect.center = player.rect.center
         
+        self.max_hp = self.hp = 100
+        
         self.ignore_collision = True
         
         self.child, _ = manager.newentity(WormBody.ID, None,
@@ -61,6 +85,8 @@ class WormHead(Entity):
                                           segmentno=self.SEGCOUNT)
         
         self.in_ground = True
+        
+        self.add_tag('hittable')
         
     def update(self, dtime):
         self.child.move_to_parent()
@@ -76,30 +102,14 @@ class WormHead(Entity):
         
         if self.world.get_fg_block(bx, by) is None:
             if self.in_ground:
-                distx = self.rect.centerx - player.rect.centerx
-                disty = self.rect.centery - player.rect.centery
-                dist = (distx*distx + disty*disty)**0.5
-                
-                volume = min(Block.WIDTH*6/dist, 1.0)
-                
-                if volume > 0.1:
-                    self.SND_CRUMBLE.sound.set_volume(volume)
-                    self.SND_CRUMBLE.play(0)
+                playsound(self.SND_CRUMBLE, player, self)
                 
                 self.in_ground = False
                 self.friction = 20
         
         else:
             if not self.in_ground:
-                distx = self.rect.centerx - player.rect.centerx
-                disty = self.rect.centery - player.rect.centery
-                dist = (distx*distx + disty*disty)**0.5
-                
-                volume = min(Block.WIDTH*6/dist, 1.0)
-                
-                if volume > 0.1:
-                    self.SND_CRUMBLE.sound.set_volume(volume)
-                    self.SND_CRUMBLE.play(0)
+                playsound(self.SND_CRUMBLE, player, self)
                 
                 self.in_ground = True
             
@@ -116,6 +126,23 @@ class WormHead(Entity):
             else:
                 if self.yv < self.MAX_SPEED:
                     self.yv += self.YACC * dtime
+    
+    def on_death(self):
+        self.child.on_death()
+        
+        playsound(self.SND_EXPLOSION, self.manager.get_tagged_entities('player')[0], self)
+        
+        do_death_particles(self.manager, self.rect.center, (self.xv, self.yv))
+        
+        self.manager.delentity(self.uuid)
+    
+    def hurt(self, damage):
+        playsound(self.SND_HURT, self.manager.get_tagged_entities('player')[0], self)
+        
+        self.hp -= damage
+        
+        if self.hp <= 0:
+            self.on_death()
 
 
 class WormBody(Entity):
@@ -150,6 +177,8 @@ class WormBody(Entity):
                                               position=position,
                                               parent=self,
                                               segmentno=segmentno-1)
+        
+        self.add_tag('hittable')
     
     def update(self, dtime):
         player = self.manager.get_tagged_entities('player')[0]
@@ -166,8 +195,21 @@ class WormBody(Entity):
             if self.child is not None:
                 self.child.move_to_parent()
             
-            self.rect.centerx -= distx * (dist-self.MINDIST)/dist
-            self.rect.centery -= disty * (dist-self.MINDIST)/dist
+            self.xv, self.yv = distx * (dist-self.MINDIST)/dist, disty * (dist-self.MINDIST)/dist
+            
+            self.rect.centerx -= self.xv
+            self.rect.centery -= self.yv
+    
+    def on_death(self):
+        if self.child is not None:
+            self.child.on_death()
+        
+        do_death_particles(self.manager, self.rect.center, (self.xv, self.yv))
+        
+        self.manager.delentity(self.uuid)
+    
+    def hurt(self, damage):
+        self.parent.hurt(damage)
 
 
 class WormSpawner(Spawner):
