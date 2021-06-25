@@ -204,7 +204,8 @@ class WormBody(Entity):
         if self.child is not None:
             self.child.on_death()
         
-        do_death_particles(self.manager, self.rect.center, (self.xv, self.yv))
+        do_death_particles(self.manager, self.rect.center, (-self.xv, -self.yv))
+        # For some reason speed is negative
         
         self.manager.delentity(self.uuid)
     
