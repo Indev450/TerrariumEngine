@@ -83,7 +83,7 @@ class Chunk:
 
 
 def compare_tiles(tiles, x, y):
-    output = pg.Surface((blockm.Block.WIDTH, blockm.Block.HEIGHT)).convert_alpha()
+    output = pg.Surface((blockm.Block.WIDTH, blockm.Block.HEIGHT), pg.SRCALPHA).convert_alpha()
     
     output.blits([(tile.gettile(x, y), (0, 0)) for tile in tiles])
 
