@@ -39,6 +39,8 @@ def interactive(cls):
     class InteractiveBlock(cls):
         loaded = {}
         
+        _entmgr = None
+        
         tile = gettransparent(1, 1)
         
         @classmethod
@@ -57,18 +59,26 @@ def interactive(cls):
         def on_destroy(cls, x, y):
             super().on_destroy(x, y)
             
+            manager = EntityManager.get()
+            
+            if cls._entmgr is not manager:
+                cls._entmgr = manager
+                cls.loaded = {}
+            
             uuid = cls.loaded.get((x, y))
             
             if uuid is not None:
-                manager = EntityManager.get()
-                
                 manager.delentity(uuid)
         
         @classmethod
         def add_block_entity(cls, x, y):
+            manager = EntityManager.get()
+            
+            if cls._entmgr is not manager:
+                cls._entmgr = manager
+                cls.loaded = {}
+            
             if cls.loaded.get((x, y)) is None:
-                manager = EntityManager.get()
-                
                 _, cls.loaded[(x, y)] = manager.newentity(
                     f'{cls.id}_entity', None,
                     position=(Block.WIDTH*x, Block.HEIGHT*y))
