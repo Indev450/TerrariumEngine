@@ -43,6 +43,9 @@ class ModManager:
                     'module': mod,
                     'path': path}
         
+        self.handlers = {}
+    
+    def reset_handlers(self):
         self.handlers = {
             'init_mapgen': [],
             'on_player_join': [],

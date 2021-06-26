@@ -41,7 +41,10 @@ class MapgenActivity(Activity):
 
         self.done = mp.Value('d', self.curdone)
         
-        self.mapgen = mapgen_t(ModManager.get().load_mods(),
+        modmanager = ModManager.get()
+        modmanager.reset_handlers()
+        
+        self.mapgen = mapgen_t(modmanager.load_mods(),
                                os.path.join('saves', path),
                                width,
                                height,

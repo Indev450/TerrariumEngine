@@ -56,6 +56,7 @@ class GameActivity(Activity):
         
         modmanager = ModManager.get()
         
+        modmanager.reset_handlers()
         modmanager.load_mods()
         
         textures.reload()  # Reload all textures from mods
