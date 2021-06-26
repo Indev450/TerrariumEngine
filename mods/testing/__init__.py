@@ -1,10 +1,11 @@
-from .items import DebugPick, MusicItem, Pistol
+from .items import DebugPick, DebugAxe, MusicItem, Pistol
 from .blocks import Terminal
 from .entities import Bullet
 
 
 def on_load(modmanager):
     DebugPick.register()
+    DebugAxe.register()
     MusicItem.register()
     Pistol.register()
     
@@ -20,6 +21,9 @@ def on_player_join(player):
     
     if not inv.has_item('testing:debug_pick'):
         inv.add_item('main', 'testing:debug_pick')
+    
+    if not inv.has_item('testing:debug_axe'):
+        inv.add_item('main', 'testing:debug_axe')
 
     if not inv.has_item('testing:music_item'):
         inv.add_item('main', 'testing:music_item')

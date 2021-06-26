@@ -7,6 +7,7 @@ from game.texture import gettexture
 from game.sound import getsound
 from game.block import place_mg_block, place_mg_block_keep
 from game.entity_manager import EntityManager
+from game.tree import do_chop_tree, do_chop_tree_keep
 
 from utils.items import do_break_blocks, do_break_blocks_keep
 
@@ -22,6 +23,15 @@ class DebugPick(Item):
 
     on_press = do_break_blocks(10, break_radius=1.5)
     on_keep_press = do_break_blocks_keep(10, 10, break_radius=1.5)
+
+
+class DebugAxe(Item):
+    ID = 'testing:debug_axe'
+    image = gettexture(modpath('textures/items/tools/axe.png'))
+
+    on_press = do_chop_tree(10)
+    on_keep_press = do_chop_tree_keep(10, 10)
+    # (ALMOST) UNLIMITED POWER!
 
 
 class MusicItem(Item):
