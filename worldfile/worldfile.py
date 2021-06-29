@@ -2,6 +2,7 @@
 
 import itertools
 import array
+import gzip
 
 
 CURRENT_VERSION = 2
@@ -23,13 +24,18 @@ def encode(worldarr, width, height):
     
     result[9:] = worldarr.tobytes()
 
-    return result.tobytes()
+    return gzip.compress(result.tobytes())
 
 
 def decode(data):
     """Decode world data from bytes
 
     Returns world data and size of world"""
+    try:
+        data = gzip.decompress(data)
+    except gzip.BadGzipFile:
+        pass  # That world has not been compressed
+    
     mv = memoryview(bytearray(data))
     
     version = mv[0]
