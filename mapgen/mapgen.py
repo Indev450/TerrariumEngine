@@ -4,6 +4,8 @@ import array
 import multiprocessing as mp
 
 from game.block import BlockDefHolder
+from game.entity_manager import EntityManager
+from game.meta_manager import MetaManager
 
 from worldfile.worldfile import encode
 
@@ -21,6 +23,8 @@ class Mapgen(mp.Process):
         self.mods = mods
 
         self.ofile = open(os.path.join(output, 'world.tworld'), 'wb')
+        self.metapath = os.path.join(output, 'world.meta')
+        self.entitiespath = os.path.join(output, 'world.entities')
 
         self.width = width
         self.height = height
@@ -30,6 +34,9 @@ class Mapgen(mp.Process):
         
         self.status = status_v  # String status of a mapgen
         self.done = done_v  # How much work done (in percent)
+        
+        self.entity_manager = EntityManager.new()
+        self.meta_manager = MetaManager()
     
     def is_position_valid(self, x, y):
         return 0 <= x < self.width and 0 <= y < self.height
@@ -40,6 +47,9 @@ class Mapgen(mp.Process):
                 self.width, self.height)
         self.ofile.write(data)
         self.ofile.close()
+        
+        self.meta_manager.save(self.metapath)
+        self.entity_manager.save(self.entitiespath)
         
         self.set_status(done=-1)
     
