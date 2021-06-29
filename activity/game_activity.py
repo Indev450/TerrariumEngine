@@ -224,20 +224,20 @@ class GameActivity(Activity):
         space = 10
         
         inventory = InventoryHotbar(
-            position=(20, 140),
+            position=(20, 440),
             size=(510, 280))
 
         for x in range(inv_width):
             for y in range(inv_height):
-                InventoryCell(inv.get_item_ref('main', y*inv_width + x),
-                              inv,
-                              parent=main_inventory,
+                InventoryCell(inv.get_item_ref(name, y*inv_width + x),
+                              self.player.inventory,
+                              parent=inventory,
                               position=((x+1)*space + cell_size*x + space,
                                         (y+1)*space + cell_size*y + space),
                               size=(cell_size, cell_size))
         
         self.overlay.add_element('opened_inventory', inventory, True)
-        self.overlay.show('inventory')
+        self.toggle_inventory_visibility()
     
     def update_selected_item(self):
         inv_width = self.player.inventory.get_size('hotbar')
@@ -303,9 +303,9 @@ class GameActivity(Activity):
                             self.controls['mouse']['press_time'])
                         self.controls['mouse']['press_time'] += dtime
 
-            self.player.update_presses(left=self.controls['left'],
-                                       right=self.controls['right'],
-                                       up=self.controls['up'])
+            self.player.update_presses(left=False if self.ui_visible else self.controls['left'],
+                                       right=False if self.ui_visible else self.controls['right'],
+                                       up=False if self.ui_visible else self.controls['up'])
             self.entity_manager.update(dtime)
 
             self.world.update(dtime)
