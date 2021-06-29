@@ -101,6 +101,7 @@ class GameActivity(Activity):
 
         if self.player is None:
             self.player, _ = self.entity_manager.newentity('builtin:player', 'player')
+            self.player.respawn()  # Go to spawnpoint
         
         inv = self.player.get_inventory()
         

@@ -6,6 +6,8 @@ from .sound import getsound
 
 from .inventory import Inventory
 
+from .meta_manager import MetaManager
+
 from config import getcfg
 
 
@@ -85,6 +87,13 @@ class Player(Entity):
         self.blinking_timer2 = 0  # For blinking effect
         
         self.respawn_timer = 0
+        
+        self.respawn_pos = (0, 0)
+        
+        spawn = MetaManager.get().getmeta('spawnpoint')
+        
+        if spawn is not None:
+            self.respawn_pos = spawn['position']
         
         self.add_tag('player')
 
@@ -173,7 +182,7 @@ class Player(Entity):
     def respawn(self):
         self.hp = self.max_hp
         
-        self.rect.topleft = (0, 0)  # TODO - make actual respawn position
+        self.rect.topleft = self.respawn_pos
     
     def draw(self, screen):
         if self.hp <= 0:

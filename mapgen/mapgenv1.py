@@ -85,6 +85,22 @@ class MapgenV1(Mapgen):
             dungeons_processed += 1
             self.set_status(done=(dungeons_processed/dungeons)*100)
         
+        self.set_status(string="Adding spawn point...", done=0)
+        
+        x = self.width // 2
+        y = 0
+        
+        while self.get_foreground(x, y) == 0 and y < self.height:
+            y += 1
+        
+        self.put_foreground(x+1, y-1, 0)
+        # Do it because players width is ~2 blocks
+        
+        y -= 3  # Do it because players height is ~3 blocks
+        
+        _, spawnpoint = self.meta_manager.newmeta("spawnpoint")
+        spawnpoint["position"] = (x*Block.WIDTH, y*Block.HEIGHT)
+        
         self.set_status(string="Saving the world...", done=0)
 
         self.save()
