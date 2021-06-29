@@ -30,8 +30,10 @@ class MetaManager:
     def __init__(self, data=None):
         self.data = data or {}
 
-    def newmeta(self):
-        key = uuid.uuid1()
+    def newmeta(self, key=None):
+        if key is None:
+            key = str(uuid.uuid1())
+
         self.data[key] = {}
         
         return key, self.data
