@@ -57,7 +57,7 @@ class Player(Entity):
     def from_save(cls, manager, uuid, save):
         player = super().from_save(manager, uuid, save)
         
-        player.inventory = Inventory().load(save['data']['inventory'])
+        player.inventory.load(save['data']['inventory'])
         
         player.hp = save['data'].get('hp', 100)
         
