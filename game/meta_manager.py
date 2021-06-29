@@ -36,7 +36,7 @@ class MetaManager:
 
         self.data[key] = {}
         
-        return key, self.data
+        return key, self.data[key]
 
     def delmeta(self, key):
         if self.data.get(key):
