@@ -20,7 +20,9 @@ class ItemStack:
         item, *count = string.split()
         
         if not count:
-            count = (1,)
+            count = 1
+        else:
+            count = int(count[0])
         
         item_t = Item.get(item)
         
@@ -28,10 +30,10 @@ class ItemStack:
             print(f'Error: invalid item id: {item}')
             return cls()
         
-        if count[0] < 1:
+        if count < 1:
             return cls()
         
-        return cls(item_t, count[0])
+        return cls(item_t, count)
         
 
     def __init__(self, item_t=None, count=0, data=None):
