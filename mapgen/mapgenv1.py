@@ -26,6 +26,7 @@ class MapgenV1(Mapgen):
         
         self.biomes = {}
         self.ores = {}
+        self.dungeons = []
 
     def run(self):
         super().run()
@@ -73,6 +74,17 @@ class MapgenV1(Mapgen):
             ores_processed += 1
             self.set_status(done=(ores_processed/ores)*100)
         
+        self.set_status(string="Adding dungeons...", done=0)
+        
+        dungeons = len(self.dungeons)
+        dungeons_processed = 0
+        
+        for dungeon in self.dungeons:
+            dungeon(self)
+            
+            dungeons_processed += 1
+            self.set_status(done=(dungeons_processed/dungeons)*100)
+        
         self.set_status(string="Saving the world...", done=0)
 
         self.save()
@@ -91,6 +103,9 @@ class MapgenV1(Mapgen):
     
     def add_ore(self, ore):
         self.ores[ore.id] = ore
+    
+    def add_dungeon(self, cb):
+        self.dungeons.append(cb)
     
     def process_biome(self, id):
         biome = self.biomes.get(id)
