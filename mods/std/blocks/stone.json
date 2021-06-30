@@ -3,5 +3,5 @@
     "drawtype": "tiled",
     "image": "textures/blocks/stone.png",
     "drops": ["std:stone"],
-    "inventory_image": "textures/items/blocks/stone.png"
+    "inventory_image": "textures/items/stone.png"
 }

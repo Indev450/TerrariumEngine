@@ -44,7 +44,7 @@ class Chest(Entity):
         self.checkblock = (position[0]//Block.WIDTH, position[1]//Block.HEIGHT + 1)
         
         self.add_tag('interactive')
-        self.add_tag('furniture')  # To be destructable
+        self.add_tag('destructable')
         
         self.image = self.TEXTURE
 

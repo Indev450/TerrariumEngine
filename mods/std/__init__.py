@@ -2,7 +2,7 @@ from utils.checks import hasattrs
 
 from .biomes import SurfaceBiome
 from .ores import CopperOreGen
-from .trees import Tree
+from .trees import Tree, Sapling
 from .chest import Chest
 from .dungeons import box_dungeon
 
@@ -16,6 +16,7 @@ def on_load(modmanager):
     '''Called every time when starting Game- or Mapgen- Activity
     First argument - ModManager object'''
     Tree.register()
+    Sapling.register()
     Chest.register()
     
     modmanager.add_handler(init_mapgen=init_mapgen)
