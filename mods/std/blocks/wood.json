@@ -4,6 +4,4 @@
     "image": "textures/blocks/woodtilemap.png",
     "inventory_image": "textures/items/wood.png",
     "drops": ["std:wood"],
-    "collide_down": false,
-    "custom_rect": [[0, 0], [16, 1]]
 }
