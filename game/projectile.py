@@ -54,7 +54,7 @@ class Projectile(Entity):
                     self.on_hit_entity(entity)
     
     def collide(self, by_x):
-        self.world.is_collide(self, self._on_collide)
+        self.world.is_collide(self, self._on_collide_x if by_x else self._on_collide_y)
         
     def on_hit_block(self, block):
         self.manager.delentity(self.uuid)
@@ -62,5 +62,17 @@ class Projectile(Entity):
     def on_hit_entity(self, entity):
         pass
     
-    def _on_collide(self, block, rect):
-        self.on_hit_block(block)
+    def _on_collide_x(self, block, rect):
+        """Collide callback for x"""
+        if ((self.yv > 0 or block.collide_down)
+            and (self.yv < 0 or block.collide_up)):
+            
+            if (self.xv > 0 and block.collide_right
+                or (self.xv < 0 and block.collide_left)):
+                self.on_hit_block(block)
+
+    def _on_collide_y(self, block, rect):
+        """Collide callback for y"""
+        if ((self.yv > 0 and block.collide_up)
+            or (self.yv < 0 and block.collide_down)):
+            self.on_hit_block(block)

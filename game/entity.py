@@ -140,23 +140,26 @@ class Entity(GameObject):
 
     def _on_collide_x(self, block, rect):
         """Collide callback for x"""
-        if self.xv > 0:
-            self.rect.right = rect.left
-            self.xv = 0
+        if ((self.yv > 0 or block.collide_down)
+            and (self.yv < 0 or block.collide_up)):
+            
+            if self.xv > 0 and block.collide_right:
+                self.rect.right = rect.left
+                self.xv = 0
 
-        if self.xv < 0:
-            self.rect.left = rect.right
-            self.xv = 0
+            if self.xv < 0 and block.collide_left:
+                self.rect.left = rect.right
+                self.xv = 0
 
     def _on_collide_y(self, block, rect):
         """Collide callback for y"""
-        if self.yv > 0:
+        if self.yv > 0 and block.collide_up:
             self.rect.bottom = rect.top
             self.on_ground = True
             self.yv = 0
             self.friction = getattr(block, 'friction', 20)
             # Block based friction
 
-        if self.yv < 0:
+        if self.yv < 0 and block.collide_down:
             self.rect.top = rect.bottom
             self.yv = 0

@@ -46,10 +46,18 @@ class World:
         # block_w = 16, ent.rect.left = 128, ent.rect.right = 138, range = (8, 9)
         for x in self.worldrange_x(entity.rect.left, entity.rect.right):
             for y in self.worldrange_y(entity.rect.top, entity.rect.bottom):
-                rect = pg.Rect(x*blockmod.Block.WIDTH, y*blockmod.Block.HEIGHT, blockmod.Block.WIDTH, blockmod.Block.HEIGHT)
                 block = self.get_block(x, y, 0)
-                if (block is not None and rect.colliderect(entity.rect)):
-                    on_collide(block, rect)
+                if block is not None:
+                    rect = pg.Rect(x*blockmod.Block.WIDTH, y*blockmod.Block.HEIGHT, blockmod.Block.WIDTH, blockmod.Block.HEIGHT)
+                    
+                    if block.custom_rect is not None:
+                        rect.x += block.custom_rect.x
+                        rect.y += block.custom_rect.y
+                        rect.width = block.custom_rect.width
+                        rect.height = block.custom_rect.height
+
+                    if rect.colliderect(entity.rect):
+                        on_collide(block, rect)
 
     def worldrange_x(self, x1, x2):
         return range(max(0, x1//blockmod.Block.WIDTH), min(x2//blockmod.Block.WIDTH + 1, self.WORLD_WIDTH))

@@ -48,9 +48,7 @@ class BlockDefHolder:
     @classmethod
     def by_strid(cls, strid):
         '''Get block definition by string id'''
-        block = cls.registered_blocks.get(idstr)
-        if block is not None:
-            return block["entry"]
+        return cls.registered_blocks.get(strid)
 
     @classmethod
     def id_by_strid(cls, strid):
@@ -146,6 +144,10 @@ class Block:
     register_item = True
     
     inventory_image = None
+    
+    collide_up = collide_down = collide_left = collide_right = True
+    
+    custom_rect = None
     
     WIDTH = 16
     HEIGHT = 16

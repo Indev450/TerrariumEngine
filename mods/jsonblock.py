@@ -1,5 +1,7 @@
 import json
 
+import pygame as pg
+
 from game.texture import gettexture, gettiled
 from game.sound import getsound
 from game.block import Block
@@ -22,6 +24,11 @@ def _inventory_image(path):
 def _hit_sound(path):
     if path is not None:
         return getsound(mods.modpath(path))
+
+
+def _custom_rect(shape):
+    if shape is not None:
+        return pg.Rect(*shape)
 
 
 def register_block(path):
@@ -58,6 +65,13 @@ def register_block(path):
         register_item = blockdef.get("register_item", Block.register_item)
         
         inventory_image = _inventory_image(blockdef.get("inventory_image", Block.inventory_image))
+        
+        collide_up = blockdef.get("collide_up", Block.collide_up)
+        collide_down = blockdef.get("collide_down", Block.collide_down)
+        collide_left = blockdef.get("collide_left", Block.collide_left)
+        collide_right = blockdef.get("collide_right", Block.collide_right)
+        
+        custom_rect = _custom_rect(blockdef.get("custom_rect"))
     
     
     JSONBlock.register()
