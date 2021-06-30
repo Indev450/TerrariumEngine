@@ -173,6 +173,12 @@ def register_tree(cls):
             check_no_blocks = [mapgen.get_foreground(_x, y) == 0 for _x in range(x-cls.SIZE[0]//Block.WIDTH//2, x+cls.SIZE[0]//Block.WIDTH//2)]
             
             return all(check_blocks) and all(check_no_blocks) and mapgen.get_foreground(x, y) == 0
+        
+        def can_place(world, x, y):
+            check_blocks = [world.get_fg_block(_x, y+1) is not None for _x in range(x-cls.SIZE[0]//Block.WIDTH//2, x+cls.SIZE[0]//Block.WIDTH//2)]
+            check_no_blocks = [world.get_fg_block(_x, y) is None for _x in range(x-cls.SIZE[0]//Block.WIDTH//2, x+cls.SIZE[0]//Block.WIDTH//2)]
+            
+            return all(check_blocks) and all(check_no_blocks) and world.get_fg_block(x, y) is None
     
     TreeEntity.register()
     TreeBlock.register()
