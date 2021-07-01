@@ -220,7 +220,13 @@ def _block_position(x, y):
 
 
 def _place_block(blockname, layer=0, consume=True, force=False):  # 0 - fg, 1 - mg, 2 - bg
+    from utils.items import do_cooldown  # Circular imports!
+    cooldown = do_cooldown(0.1)
+    
     def _place_block(player, itemstack, position):
+        if not cooldown(player):
+            return
+
         world = player.world
         
         position = _block_position(*position)
@@ -245,9 +251,13 @@ def _place_block(blockname, layer=0, consume=True, force=False):  # 0 - fg, 1 - 
 
 
 def _place_block_keep(blockname, layer=0, consume=True, force=False):
-    _keep_place_block_users = {}
+    from utils.items import do_cooldown  # Circular imports!
+    cooldown = do_cooldown(0.1)
     
     def _place_block_keep(player, itemstack, position, use_time):
+        if not cooldown(player):
+            return
+
         world = player.world
 
         position = _block_position(*position)
@@ -259,23 +269,14 @@ def _place_block_keep(blockname, layer=0, consume=True, force=False):
             
             if player.rect.colliderect(rect):
                 return
-        
-        if _keep_place_block_users.get(player) is None:
-            _keep_place_block_users[player] = 0
-        
-        if _keep_place_block_users[player] > use_time:
-            _keep_place_block_users[player] = use_time
-        
-        if use_time - _keep_place_block_users[player] > 0.1:
-            dstblock = world.get_block(*position, layer)
 
-            if force or dstblock is None or dstblock.replacable:
-                world.set_block(*position, layer, BlockDefHolder.id_by_strid(blockname))
-                
-                if consume:
-                    itemstack.consume_items(1)
-                
-                _keep_place_block_users[player] = use_time
+        dstblock = world.get_block(*position, layer)
+
+        if force or dstblock is None or dstblock.replacable:
+            world.set_block(*position, layer, BlockDefHolder.id_by_strid(blockname))
+            
+            if consume:
+                itemstack.consume_items(1)
     
     return _place_block_keep
 

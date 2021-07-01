@@ -1,4 +1,5 @@
 import weakref
+import time
 
 from game.decorations import Decor, DecorationManager
 from game.texture import gettiled
@@ -81,9 +82,12 @@ class BlockDamager:
                 del self.blocks[(x, y, layer)]
 
 
-def do_break_block(radius, layer=0):
+def do_break_block(radius, speed, layer=0):
+    cooldown = do_cooldown(1.0 / speed)
+    
     def inner_break_block(player, itemstack, position):
-        if Vector2(player.rect.center).distance_to(Vector2(position)) > radius * Block.WIDTH:
+        if (Vector2(player.rect.center).distance_to(Vector2(position)) > radius * Block.WIDTH
+            or not cooldown(player)):
             return
         
         position = int(position[0]//Block.WIDTH), int(position[1]//Block.HEIGHT)
@@ -94,34 +98,26 @@ def do_break_block(radius, layer=0):
 
 
 def do_break_block_keep(radius, speed, layer=0):
-    players_use_time = {}
-    cooldown = 1.0 / speed
+    cooldown = do_cooldown(1.0 / speed)
     
     def inner_break_block_keep(player, itemstack, position, use_time):
-        if Vector2(player.rect.center).distance_to(Vector2(position)) > radius * Block.WIDTH:
+        if (Vector2(player.rect.center).distance_to(Vector2(position)) > radius * Block.WIDTH
+            or not cooldown(player)):
             return
-
-        world = player.world
         
         position = int(position[0]//Block.WIDTH), int(position[1]//Block.HEIGHT)
         
-        if players_use_time.get(player) is None:
-            players_use_time[player] = 0
-        
-        if players_use_time[player] > use_time:
-            players_use_time[player] = use_time
-        
-        if use_time - players_use_time[player] > cooldown:
-            _try_break_block(*position, itemstack.item_t, layer)
-            
-            players_use_time[player] = use_time
+        _try_break_block(*position, itemstack.item_t, layer)
     
     return inner_break_block_keep
 
 
-def do_break_blocks(radius, break_radius=1, layer=0):
+def do_break_blocks(radius, speed, break_radius=1, layer=0):
+    cooldown = do_cooldown(1.0 / speed)
+    
     def inner_break_blocks(player, itemstack, position):
-        if Vector2(player.rect.center).distance_to(Vector2(position)) > radius * Block.WIDTH:
+        if (Vector2(player.rect.center).distance_to(Vector2(position)) > radius * Block.WIDTH
+            or not cooldown(player)):
             return
         
         _x, _y = position[0]/Block.WIDTH + 0.5, position[1]/Block.HEIGHT + 0.5
@@ -134,29 +130,18 @@ def do_break_blocks(radius, break_radius=1, layer=0):
 
 
 def do_break_blocks_keep(radius, speed, break_radius=1, layer=0):
-    players_use_time = {}
-    cooldown = 1.0 / speed
+    cooldown = do_cooldown(1.0 / speed)
     
     def inner_break_blocks_keep(player, itemstack, position, use_time):
-        if Vector2(player.rect.center).distance_to(Vector2(position)) > radius * Block.WIDTH:
+        if (Vector2(player.rect.center).distance_to(Vector2(position)) > radius * Block.WIDTH
+            or not cooldown(player)):
             return
-
-        world = player.world
         
         _x, _y = position[0]/Block.WIDTH + 0.5, position[1]/Block.HEIGHT + 0.5
         
-        if players_use_time.get(player) is None:
-            players_use_time[player] = 0
-        
-        if players_use_time[player] > use_time:
-            players_use_time[player] = use_time
-        
-        if use_time - players_use_time[player] > cooldown:
-            for x in range(int(_x-break_radius), int(_x+break_radius)):
-                for y in range(int(_y-break_radius), int(_y+break_radius)):
-                    _try_break_block(x, y, itemstack.item_t, layer)
-            
-            players_use_time[player] = use_time
+        for x in range(int(_x-break_radius), int(_x+break_radius)):
+            for y in range(int(_y-break_radius), int(_y+break_radius)):
+                _try_break_block(x, y, itemstack.item_t, layer)
     
     return inner_break_blocks_keep
 
@@ -189,3 +174,37 @@ def _try_break_block(x, y, tool, layer=0):
     block_damager = BlockDamager.get()
     
     block_damager.damage(x, y, layer, tool_damage)
+
+
+def do_cooldown(cooldown):
+    """Returns function, that takes one argument - actor (player for example)
+    Every call function checks if there was enough time since last _action_.
+    If time since last _action_ is greatter than _cooldown_, it returns True and
+    sets new _action_ time. Otherwise, returns False
+    
+    Example:
+    
+    def do_stuff(args):
+        cooldown = do_cooldown(<cooldown>)
+        
+        def inner_do_stuff(player, itemstack, position):
+            if <some exit conditions> or not cooldown(player):
+                return
+            ...
+        
+        return inner_do_stuff
+    """
+    last_use = {}
+    
+    def inner_do_cooldown(actor):
+        if last_use.get(actor) is None:
+            last_use[actor] = 0
+        
+        if time.time() - last_use[actor] > cooldown:
+            last_use[actor] = time.time()
+            
+            return True
+        
+        return False
+    
+    return inner_do_cooldown

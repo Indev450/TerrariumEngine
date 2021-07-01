@@ -4,6 +4,8 @@ import pygame as pg
 
 from pygame.math import Vector2
 
+from utils.items import do_cooldown
+
 from game.entity import Entity
 from game.entity_manager import EntityManager
 from game.block import Block
@@ -185,9 +187,12 @@ def make_tree(cls):
     return TreeEntity, TreeBlock
 
 
-def do_chop_tree(radius, damage=1):
+def do_chop_tree(radius, speed, damage=1):
+    cooldown = do_cooldown(1.0 / speed)
+    
     def inner_chop_tree(player, itemstack, position):
-        if Vector2(player.rect.center).distance_to(Vector2(position)) > radius * Block.WIDTH:
+        if (Vector2(player.rect.center).distance_to(Vector2(position)) > radius * Block.WIDTH
+            or not cooldown(player)):
             return
         
         manager = EntityManager.get()
@@ -200,26 +205,17 @@ def do_chop_tree(radius, damage=1):
 
 
 def do_chop_tree_keep(radius, speed, damage=1):
-    players_use_time = {}
-    cooldown = 1.0 / speed
+    cooldown = do_cooldown(1.0 / speed)
     
     def inner_chop_tree_keep(player, itemstack, position, use_time):
-        if Vector2(player.rect.center).distance_to(Vector2(position)) > radius * Block.WIDTH:
+        if (Vector2(player.rect.center).distance_to(Vector2(position)) > radius * Block.WIDTH
+            or not cooldown(player)):
             return
-        
-        if players_use_time.get(player) is None:
-            players_use_time[player] = 0
-        
-        if players_use_time[player] > use_time:
-            players_use_time[player] = use_time
-        
-        if use_time - players_use_time[player] > cooldown:
-            manager = EntityManager.get()
-            
-            for entity in manager.get_tagged_entities('choppy'):
-                if entity.chop_rect.collidepoint(position):
-                    entity.chop(damage)
-            
-            players_use_time[player] = use_time
+
+        manager = EntityManager.get()
+
+        for entity in manager.get_tagged_entities('choppy'):
+            if entity.chop_rect.collidepoint(position):
+                entity.chop(damage)
     
     return inner_chop_tree_keep

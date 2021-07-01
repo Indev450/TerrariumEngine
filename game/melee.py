@@ -2,6 +2,8 @@ import time
 
 from pygame.math import Vector2
 
+from utils.items import do_cooldown
+
 from .entity import Entity
 from .entity_manager import EntityManager
 
@@ -57,16 +59,10 @@ class Swing(Entity):
 
 
 def do_swing(swing_id, speed):
-    last_swing_time = {}
-    cooldown = 1/speed
+    cooldown = do_cooldown(1.0 / speed)
     
     def inner_do_swing(player, itemstack, position):
-        if last_swing_time.get(player) is None:
-            last_swing_time[player] = 0
-        
-        if time.time() - last_swing_time[player] > cooldown:
-            last_swing_time[player] = time.time()
-            
+        if cooldown(player):
             manager = EntityManager.get()
             
             manager.newentity(swing_id, None, parent=player, facing_left=player.turned_left)
@@ -75,19 +71,10 @@ def do_swing(swing_id, speed):
 
 
 def do_swing_keep(swing_id, speed):
-    last_swing_time = {}
-    cooldown = 1/speed
+    cooldown = do_cooldown(1.0 / speed)
     
     def inner_do_swing_keep(player, itemstack, position, use_time):
-        if last_swing_time.get(player) is None:
-            last_swing_time[player] = 0
-        
-        if last_swing_time[player] > use_time:
-            last_swing_time[player] = use_time
-        
-        if use_time - last_swing_time[player] > cooldown:
-            last_swing_time[player] = use_time
-            
+        if cooldown(player):
             manager = EntityManager.get()
             
             manager.newentity(swing_id, None, parent=player, facing_left=player.turned_left)

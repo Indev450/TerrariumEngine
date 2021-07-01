@@ -1,5 +1,3 @@
-import time
-
 from pygame.math import Vector2
 
 from game.item import Item
@@ -13,7 +11,7 @@ from .entities import SwordSwing
 
 from mods.std.tree_api import do_chop_tree, do_chop_tree_keep
 
-from utils.items import do_break_blocks, do_break_blocks_keep
+from utils.items import do_break_blocks_keep, do_cooldown
 
 from mods.manager import modpath
 
@@ -22,18 +20,17 @@ class DebugPick(Item):
     ID = 'testing:debug_pick'
     image = gettexture(modpath('textures/items/tools/debug_pick.png'))
     
-    dig_damage = 999
-    level = 999  # UNLIMITED POWER!
+    dig_damage = 1
+    level = 999
 
-    on_press = do_break_blocks(10, break_radius=1.5)
-    on_keep_press = do_break_blocks_keep(10, 10, break_radius=1.5)
+    on_keep_press = do_break_blocks_keep(10, 100, break_radius=1.5)
+    # UNLIMITED POWER!
 
 
 class DebugAxe(Item):
     ID = 'testing:debug_axe'
     image = gettexture(modpath('textures/items/tools/axe.png'))
 
-    on_press = do_chop_tree(10)
     on_keep_press = do_chop_tree_keep(10, 10)
     # (ALMOST) UNLIMITED POWER!
 
@@ -42,7 +39,6 @@ class DebugSword(Item):
     ID = 'testing:debug_sword'
     image = gettexture(modpath('textures/items/tools/sword.png'))
     
-    on_press = do_swing(SwordSwing.ID, 1/SwordSwing.TTL)
     on_keep_press = do_swing_keep(SwordSwing.ID, 1/SwordSwing.TTL)
     # (Not so) UNLIMITED POWER!
 
@@ -64,21 +60,11 @@ class Pistol(Item):
     
     #sound = getsound(modpath('sounds/items/pistol_shoot.wav'))
     
-    _last_use_time = {}
-    
-    USE_TIME = 0.7
+    cooldown = do_cooldown(0.7)
     
     @classmethod
     def on_press(cls, player, itemstack, position):
-        if cls._last_use_time.get(player) is None:
-            cls._last_use_time[player] = 0
-            
-        t = time.time()
-        
-        if t - cls._last_use_time[player] > cls.USE_TIME:
-            cls._last_use_time[player] = t
-        
-        else:
+        if not cls.cooldown(player):
             return
         
         #cls.sound.play()
