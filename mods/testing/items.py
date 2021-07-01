@@ -7,6 +7,10 @@ from game.texture import gettexture
 from game.sound import getsound
 from game.block import place_mg_block, place_mg_block_keep
 from game.entity_manager import EntityManager
+from game.melee import do_swing, do_swing_keep
+
+from .entities import SwordSwing
+
 from mods.std.tree_api import do_chop_tree, do_chop_tree_keep
 
 from utils.items import do_break_blocks, do_break_blocks_keep
@@ -32,6 +36,15 @@ class DebugAxe(Item):
     on_press = do_chop_tree(10)
     on_keep_press = do_chop_tree_keep(10, 10)
     # (ALMOST) UNLIMITED POWER!
+
+
+class DebugSword(Item):
+    ID = 'testing:debug_sword'
+    image = gettexture(modpath('textures/items/tools/sword.png'))
+    
+    on_press = do_swing(SwordSwing.ID, 1/SwordSwing.TTL)
+    on_keep_press = do_swing_keep(SwordSwing.ID, 1/SwordSwing.TTL)
+    # (Not so) UNLIMITED POWER!
 
 
 class MusicItem(Item):
