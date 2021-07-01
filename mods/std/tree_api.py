@@ -4,11 +4,11 @@ import pygame as pg
 
 from pygame.math import Vector2
 
-from .entity import Entity
-from .entity_manager import EntityManager
-from .block import Block
+from game.entity import Entity
+from game.entity_manager import EntityManager
+from game.block import Block
 
-from .texture import gettransparent
+from game.texture import gettransparent
 
 
 class TreeDef:
@@ -33,10 +33,12 @@ class TreeDef:
     
     @classmethod
     def register(cls):
-        register_tree(cls)
+        TreeEntity, TreeBlock = make_tree(cls)
+        TreeEntity.register()
+        TreeBlock.register()
 
 
-def register_tree(cls):
+def make_tree(cls):
     class TreeEntity(Entity):
         ID = f'{cls.ID}_entity'
         
@@ -180,8 +182,7 @@ def register_tree(cls):
             
             return all(check_blocks) and all(check_no_blocks) and world.get_fg_block(x, y) is None
     
-    TreeEntity.register()
-    TreeBlock.register()
+    return TreeEntity, TreeBlock
 
 
 def do_chop_tree(radius, damage=1):

@@ -7,7 +7,7 @@ from game.texture import gettexture
 from game.sound import getsound
 from game.block import place_mg_block, place_mg_block_keep
 from game.entity_manager import EntityManager
-from game.tree import do_chop_tree, do_chop_tree_keep
+from mods.std.tree_api import do_chop_tree, do_chop_tree_keep
 
 from utils.items import do_break_blocks, do_break_blocks_keep
 

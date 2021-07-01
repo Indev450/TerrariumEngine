@@ -1,7 +1,7 @@
 from game.texture import gettexture
 from game.sound import getsound
 
-from game.tree import TreeDef
+from .tree_api import TreeDef
 from .sapling_api import SaplingDef
 
 from mods.manager import modpath
