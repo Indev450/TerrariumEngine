@@ -1,0 +1,5 @@
+{
+    "name": "Testing Mod",
+    "description": "Contains items for debugging and devolopment",
+    "reqs": ["std"]
+}

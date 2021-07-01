@@ -1,10 +1,13 @@
 import os
 import importlib
 import traceback
+import json
 
 from game.entity import Entity
 from game.block import BlockDefHolder
 from game.item import Item
+
+from utils.checks import hasitems
 
 from .jsonblock import register_block
 
@@ -31,17 +34,28 @@ class ModManager:
         
         self.mods = {}
 
-        for file in mods:
-            path = f'mods/{file}/'
+        for name in mods:
+            path = os.path.join('mods', name)
+            confpath = os.path.join(path, 'modconf.json')
             
-            if os.path.isdir(path) and not file == '__pycache__':
+            if os.path.isdir(path) and os.path.isfile(confpath):
+                with open(confpath) as file:
+                    modconf = json.load(file)
+                    
+                    reqs_found, missing_reqs = hasitems(mods, modconf.get('reqs', []), True)
+                    
+                    if not reqs_found:
+                        print(f'Error: missing requirements for mod {name}: {", ".join(missing_reqs)}')
+                        continue
+                
                 self._set_modpath(path)
                 
-                mod = importlib.import_module(f'mods.{file}')
+                mod = importlib.import_module(f'mods.{name}')
                 
-                self.mods[file] = {
+                self.mods[name] = {
                     'module': mod,
-                    'path': path}
+                    'path': path,
+                    'modconf': modconf}
         
         self.handlers = {}
     
@@ -120,6 +134,6 @@ def modpath(path=''):
     if len(path) == 2:
         mod, path = path
         
-        return f'mods/{mod}/{path}'
+        return os.path.join('mods', mod, path)
     else:
-        return f'{ModManager.curmodpath}{path[0]}'
+        return os.path.join(ModManager.curmodpath, path[0])
