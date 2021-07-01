@@ -3,5 +3,5 @@
     "drawtype": "tiled",
     "image": "textures/blocks/woodtilemap.png",
     "inventory_image": "textures/items/wood.png",
-    "drops": ["std:wood"],
+    "drops": ["std:wood"]
 }
