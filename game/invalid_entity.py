@@ -4,7 +4,7 @@ from .entity import Entity
 class InvalidEntity(Entity):
     
     @classmethod
-    def from_save(cls, save):
+    def from_save(cls, manager, uuid, save):
         return cls(save)
     
     def update(self, dtime):
