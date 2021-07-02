@@ -7,6 +7,7 @@ from game.texture import gettexture
 from game.entity import Entity
 from game.block import Block
 from game.inventory import Inventory
+from game.item import Item
 
 from mods.manager import modpath
 
@@ -41,12 +42,15 @@ class Chest(Entity):
         self.inventory = Inventory(self)
         self.inventory.set_size('main', 8*4)
         
-        self.checkblock = (position[0]//Block.WIDTH, position[1]//Block.HEIGHT + 1)
+        self.block = (position[0]//Block.WIDTH, position[1]//Block.HEIGHT)
+        self.checkblock = (self.block[0], self.block[1] + 1)
         
         self.add_tag('interactive')
         self.add_tag('destructable')
         
         self.image = self.TEXTURE
+        
+        self.world.set_mg_block(*self.block, 1)
 
     def update(self, dtime):
         if self.world.get_fg_block(*self.checkblock) is None:
@@ -61,9 +65,35 @@ class Chest(Entity):
             ientity.set_item_stack(drop)
         
         self.manager.delentity(self.uuid)
+        
+        self.world.set_mg_block(*self.block, 0)
     
     def on_interact(self, player):
         getactivity().open_inventory(self.inventory, 'main', 8)
     
     def on_save(self):
         return {'inventory': self.inventory.dump()}
+
+
+class ChestItem(Item):
+    ID = Chest.ID
+    
+    image = Chest.TEXTURE
+    
+    @classmethod
+    def on_press(cls, player, itemstack, position):
+        x, y = position
+        
+        x = int(x//Block.WIDTH)
+        y = int(y//Block.HEIGHT)
+        
+        if (player.world.get_fg_block(x, y) is not None or player.world.get_fg_block(x, y+1) is None
+            or player.world.get_mg_block(x, y) is not None):
+            return
+        
+        x *= Block.WIDTH
+        y *= Block.HEIGHT
+        
+        EntityManager.get().newentity(cls.ID, None, position=(x, y))
+        
+        itemstack.consume_items(1)

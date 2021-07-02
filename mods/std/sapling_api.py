@@ -3,7 +3,7 @@ from random import randint
 from game.entity import Entity
 from game.entity_manager import EntityManager
 from game.item_stack import ItemStack
-from game.block import Block, BlockDefHolder
+from game.block import Block, BlockDefHolder, BlockObstructed
 from game.item import Item
 
 
@@ -70,6 +70,8 @@ def make_sapling(sapdef):
             self.add_tag('destructable')
             
             self.tree = BlockDefHolder.by_strid(self.TREE)
+            
+            self.world.set_mg_block(*self.block, 1)
         
         def update(self, dtime):
             self.time_to_grow -= dtime
@@ -92,6 +94,8 @@ def make_sapling(sapdef):
                                                 position=self.rect.center)
             
             ientity.set_item_stack(ItemStack.from_str(self.ID))
+            
+            self.world.set_mg_block(*self.block, 0)
             
             self.manager.delentity(self.uuid)
         
@@ -118,7 +122,8 @@ def make_sapling(sapdef):
             x = int(x//Block.WIDTH)
             y = int(y//Block.HEIGHT)
             
-            if player.world.get_fg_block(x, y) is not None:
+            if (player.world.get_fg_block(x, y) is not None or player.world.get_fg_block(x, y+1) is None
+                or player.world.get_mg_block(x, y) is not None):
                 return
             
             x *= Block.WIDTH

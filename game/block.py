@@ -29,12 +29,12 @@ def get_tilemap_position(x, y, layer):
 
 
 class BlockDefHolder:
-    registered_blocks = {'std:air': None}
+    registered_blocks = {}
     registered_blocks_list = []
     
     @classmethod
     def clear(cls):
-        cls.registered_blocks = {'std:air': None}
+        cls.registered_blocks = {'builtin:air': None, 'builtin:obstructed': BlockObstructed}
         cls.registered_blocks_list = []
     
     @classmethod
@@ -68,12 +68,12 @@ class BlockDefHolder:
     @classmethod
     def init_int_ids(cls):
         '''Initialize integer identifiers for registered blocks'''
-        cls.registered_blocks_list = [None]  # None - std:air
+        cls.registered_blocks_list = [None, BlockObstructed]  # None - std:air
 
         keys = list(cls.registered_blocks.keys())
         keys.sort()
 
-        for i in range(1, len(keys)):
+        for i in range(2, len(keys)):
             cls.registered_blocks_list.append(cls.registered_blocks[keys[i]])
             cls.registered_blocks[keys[i]].ID = i
 
@@ -210,6 +210,10 @@ class Block:
         if cls.register_item:
             blockitem.register_block_item(cls)
 
+
+class BlockObstructed(Block):
+    id = 'builtin:obstructed'
+    ID = 1
 
 # ---------------------------------------------------------------
 # TODO - make this functions better

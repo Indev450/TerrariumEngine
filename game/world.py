@@ -136,11 +136,11 @@ class World:
             mg = self.get_mg_block(x, y)
             fg = self.get_fg_block(x, y)
             
-            if bg is not None:
+            if bg is not None and bg is not blockmod.BlockObstructed:
                 result += (bg,)
-            if mg is not None:
+            if mg is not None and mg is not blockmod.BlockObstructed:
                 result += (mg,)
-            if fg is not None:
+            if fg is not None and fg is not blockmod.BlockObstructed:
                 result += (fg,)
                 
             return result

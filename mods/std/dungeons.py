@@ -27,6 +27,9 @@ def generate_dungeon(mapgen, startx, starty):
     x = startx + 4
     y = starty + 8
     
+    if mapgen.get_foreground(x, y) != 0 or mapgen.get_midground(x, y) != 0 or mapgen.get_foreground(x, y+1) in (0, 1):
+        return
+
     chest, _ = mapgen.entity_manager.newentity("std:chest", None, position=(x*Block.WIDTH, y*Block.HEIGHT))
     
     for i in range(randint(2, 5)):
