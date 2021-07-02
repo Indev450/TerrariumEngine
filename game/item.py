@@ -37,6 +37,21 @@ class Item:
     def on_release(cls, player, itemstack, position):
         '''Caled when player stops using item'''
         pass
+        
+    @classmethod
+    def alt_on_press(cls, player, itemstack, position):
+        '''Called when player starts using item (rmb)'''
+        pass
+    
+    @classmethod
+    def alt_on_keep_press(cls, player, itemstack, position, use_time):
+        '''Called when player keeps using item (rmb)'''
+        pass
+
+    @classmethod
+    def alt_on_release(cls, player, itemstack, position):
+        '''Caled when player stops using item (rmb)'''
+        pass
 
     @classmethod
     def register(cls):
@@ -58,7 +73,7 @@ class Item:
     
     @classmethod
     def on_wield_stop(cls, player, itemstack):
-        '''Called when item unselected item'''
+        '''Called when item unselected'''
         pass
     
     @classmethod

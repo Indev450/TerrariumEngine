@@ -201,8 +201,14 @@ class GameActivity(Activity):
             'right': False,
             'up': False,
             'mouse': {
-                'pressed': False,
-                'press_time': 0,
+                'lmb': {
+                    'pressed': False,
+                    'press_time': 0,
+                },
+                'rmb': {
+                    'pressed': False,
+                    'press_time': 0,
+                }
             },
         }
 
@@ -282,7 +288,8 @@ class GameActivity(Activity):
             return
             
         if not self.paused:
-            if self.controls['mouse']['pressed'] and self.player.hp > 0:
+            if ((self.controls['mouse']['lmb']['pressed'] or self.controls['mouse']['rmb']['pressed'])
+                and self.player.hp > 0):
                 istack = self.player.inventory.get_item('hotbar', self.player.selected_item)
                 
                 if not istack.empty():
@@ -293,16 +300,29 @@ class GameActivity(Activity):
                     x += cam_x
                     y += cam_y
                     
-                    if self.controls['mouse']['press_time'] == 0:
-                        istack.item_t.on_press(self.player, istack, (x, y))
-                        self.controls['mouse']['press_time'] += dtime
-                    else:
-                        istack.item_t.on_keep_press(
-                            self.player,
-                            istack,
-                            (x, y), 
-                            self.controls['mouse']['press_time'])
-                        self.controls['mouse']['press_time'] += dtime
+                    if self.controls['mouse']['lmb']['pressed']:
+                        if self.controls['mouse']['lmb']['press_time'] == 0:
+                            istack.item_t.on_press(self.player, istack, (x, y))
+                            self.controls['mouse']['lmb']['press_time'] += dtime
+                        else:
+                            istack.item_t.on_keep_press(
+                                self.player,
+                                istack,
+                                (x, y), 
+                                self.controls['mouse']['lmb']['press_time'])
+                            self.controls['mouse']['lmb']['press_time'] += dtime
+                    
+                    elif self.controls['mouse']['rmb']['pressed']:
+                        if self.controls['mouse']['rmb']['press_time'] == 0:
+                            istack.item_t.alt_on_press(self.player, istack, (x, y))
+                            self.controls['mouse']['rmb']['press_time'] += dtime
+                        else:
+                            istack.item_t.alt_on_keep_press(
+                                self.player,
+                                istack,
+                                (x, y), 
+                                self.controls['mouse']['rmb']['press_time'])
+                            self.controls['mouse']['rmb']['press_time'] += dtime
 
             self.player.update_presses(left=False if self.ui_visible else self.controls['left'],
                                        right=False if self.ui_visible else self.controls['right'],
@@ -387,7 +407,9 @@ class GameActivity(Activity):
 
         elif event.type == pg.MOUSEBUTTONDOWN and not self.ui_visible:
             if event.button == 1:
-                self.controls['mouse']['pressed'] = True
+                self.controls['mouse']['lmb']['pressed'] = True
+            elif event.button == 3:
+                self.controls['mouse']['rmb']['pressed'] = True
             elif event.button in (4, 5):
                 self.player.selected_item += 1 if event.button == 5 else -1
                 
@@ -399,9 +421,30 @@ class GameActivity(Activity):
                 self.update_selected_item()
         
         elif event.type == pg.MOUSEBUTTONUP and not self.ui_visible:
-            if event.button == 1:
-                self.controls['mouse']['pressed'] = False
-                self.controls['mouse']['press_time'] = 0
+            if event.button in (1, 3):
+                istack = self.player.inventory.get_item('hotbar', self.player.selected_item)
+                
+                if not istack.empty():
+                    x, y = pg.mouse.get_pos()
+                    
+                    cam_x, cam_y = self.camera.get_position()
+                    
+                    x += cam_x
+                    y += cam_y
+                    
+                    if event.button == 1:
+                        istack.item_t.on_release(self.player, istack, (x, y))
+                    
+                    else:
+                        istack.item_t.alt_on_release(self.player, istack, (x, y))
+                
+                if event.button == 1:
+                    self.controls['mouse']['lmb']['pressed'] = False
+                    self.controls['mouse']['lmb']['press_time'] = 0
+                
+                else:
+                    self.controls['mouse']['rmb']['pressed'] = False
+                    self.controls['mouse']['rmb']['press_time'] = 0
 
         elif not (event.type == pg.MOUSEBUTTONUP and
                   not self.ui_visible):

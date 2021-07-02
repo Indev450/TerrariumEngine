@@ -24,6 +24,7 @@ class DebugPick(Item):
     level = 999
 
     on_keep_press = do_break_blocks_keep(10, 100, break_radius=1.5)
+    alt_on_keep_press = do_break_blocks_keep(10, 100, break_radius=1.5, layer=2)
     # UNLIMITED POWER!
 
 
