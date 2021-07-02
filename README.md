@@ -13,12 +13,12 @@ You will need to install python 3, pygame and, optionally for maketilemap.py scr
     - Items
     - Parallax
     - Biomes and ores generation
+    - Crafting
 - JSON modding API
     - Blocks
 
 ### TODO
 - Game
-    - Crafting
     - Tile based light
     - 'Multiblocks'
     - Multiplayer
