@@ -3,7 +3,7 @@ from utils.checks import hasattrs
 from .biomes import SurfaceBiome
 from .ores import CopperOreGen
 from .trees import Tree, Sapling
-from .chest import Chest
+from .chest import Chest, ChestItem
 from .dungeons import box_dungeon
 
 
@@ -18,6 +18,7 @@ def on_load(modmanager):
     Tree.register()
     Sapling.register()
     Chest.register()
+    ChestItem.register()
     
     modmanager.add_handler(init_mapgen=init_mapgen)
 

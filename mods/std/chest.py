@@ -5,8 +5,10 @@ from activity.activity import getactivity
 from game.texture import gettexture
 
 from game.entity import Entity
+from game.entity_manager import EntityManager
 from game.block import Block
 from game.inventory import Inventory
+from game.item_stack import ItemStack
 from game.item import Item
 
 from mods.manager import modpath
@@ -57,6 +59,11 @@ class Chest(Entity):
             self.on_destructed()
     
     def on_destructed(self):
+        ientity, _ = self.manager.newentity('builtin:item_entity', None,
+                                            position=self.rect.center)
+            
+        ientity.set_item_stack(ItemStack.from_str(self.ID))
+        
         for drop in self.inventory.data['main']:
             ientity, _ = self.manager.newentity('builtin:item_entity', None,
                                                 position=self.rect.center,
