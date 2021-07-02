@@ -51,8 +51,6 @@ class Chest(Entity):
         self.add_tag('destructable')
         
         self.image = self.TEXTURE
-        
-        self.world.set_mg_block(*self.block, 1)
 
     def update(self, dtime):
         if self.world.get_fg_block(*self.checkblock) is None:
@@ -97,6 +95,8 @@ class ChestItem(Item):
         if (player.world.get_fg_block(x, y) is not None or player.world.get_fg_block(x, y+1) is None
             or player.world.get_mg_block(x, y) is not None):
             return
+        
+        self.world.set_mg_block(x, y, 1)
         
         x *= Block.WIDTH
         y *= Block.HEIGHT
