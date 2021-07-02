@@ -96,7 +96,7 @@ class ChestItem(Item):
             or player.world.get_mg_block(x, y) is not None):
             return
         
-        self.world.set_mg_block(x, y, 1)
+        player.world.set_mg_block(x, y, 1)
         
         x *= Block.WIDTH
         y *= Block.HEIGHT
