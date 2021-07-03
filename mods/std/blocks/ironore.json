@@ -1,0 +1,10 @@
+{
+    "id": "std:iron_ore",
+    "drawtype": "tiled",
+    "image": "textures/blocks/irontilemap.png",
+    "inventory_image": "textures/items/iron.png",
+    "drops": ["std:iron_ore"],
+    "tilecomparable": false,
+    "hits": 8,
+    "hit_sound": "sounds/dig_metal.wav"
+}

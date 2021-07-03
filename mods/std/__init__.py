@@ -1,10 +1,13 @@
+from game.meta_manager import MetaManager
+
 from utils.checks import hasattrs
 
 from .biomes import SurfaceBiome
-from .ores import CopperOreGen
+from .ores import CopperOreGen, IronOreGen
 from .trees import Tree, Sapling
 from .chest import Chest, ChestItem
 from .dungeons import box_dungeon
+from .items import register_items
 
 
 required_mapgen_attributes = ['add_biome', 'add_ore', 'add_dungeon']
@@ -20,7 +23,10 @@ def on_load(modmanager):
     Chest.register()
     ChestItem.register()
     
+    register_items()
+    
     modmanager.add_handler(init_mapgen=init_mapgen)
+    modmanager.add_handler(on_player_join=on_player_join)
 
 
 def init_mapgen(mg):
@@ -29,9 +35,28 @@ def init_mapgen(mg):
     
     if 'add_ore' not in missing:
         mg.add_ore(CopperOreGen(mg))
+        mg.add_ore(IronOreGen(mg))
     
     if 'add_biome' not in missing:
         mg.add_biome(SurfaceBiome(mg))
     
     if 'add_dungeon' not in missing:
         mg.add_dungeon(box_dungeon)
+
+
+def on_player_join(player):
+    meta = MetaManager.get()
+    
+    initstuff = meta.getmeta('gave_initstuff')
+    
+    if initstuff is None:
+        _, initstuff = meta.newmeta('gave_initstuff')
+    
+    if initstuff.get(player.uuid) is None:
+        player.inventory.add_item('main', 'std:copper_pick')
+        player.inventory.add_item('main', 'std:copper_axe')
+        player.inventory.add_item('main', 'std:hammer')
+        
+        initstuff[player.uuid] = 1
+    
+    

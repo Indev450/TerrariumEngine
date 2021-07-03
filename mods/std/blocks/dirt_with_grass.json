@@ -2,5 +2,6 @@
     "id": "std:dirt_with_grass",
     "drawtype": "tiled",
     "image": "textures/blocks/grassdirt.png",
-    "drops": ["std:dirt"]
+    "drops": ["std:dirt"],
+    "hit_sound": "sounds/dig_soil.wav"
 }

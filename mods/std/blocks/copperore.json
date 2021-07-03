@@ -4,5 +4,7 @@
     "image": "textures/blocks/coppertilemap.png",
     "inventory_image": "textures/items/copper.png",
     "drops": ["std:copper_ore"],
-    "tilecomparable": false
+    "tilecomparable": false,
+    "hits": 6,
+    "hit_sound": "sounds/dig_metal.wav"
 }

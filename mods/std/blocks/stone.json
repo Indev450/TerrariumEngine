@@ -3,5 +3,7 @@
     "drawtype": "tiled",
     "image": "textures/blocks/stone.png",
     "drops": ["std:stone"],
-    "inventory_image": "textures/items/stone.png"
+    "inventory_image": "textures/items/stone.png",
+    "hits": 6,
+    "hit_sound": "sounds/dig_stone.wav"
 }
