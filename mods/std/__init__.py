@@ -6,6 +6,7 @@ from .biomes import SurfaceBiome
 from .ores import CopperOreGen, IronOreGen
 from .trees import Tree, Sapling
 from .chest import Chest, ChestItem
+from .furnace import Furnace
 from .dungeons import box_dungeon
 from .items import register_items
 
@@ -22,6 +23,7 @@ def on_load(modmanager):
     Sapling.register()
     Chest.register()
     ChestItem.register()
+    Furnace.register()
     
     register_items()
     
@@ -56,6 +58,7 @@ def on_player_join(player):
         player.inventory.add_item('main', 'std:copper_pick')
         player.inventory.add_item('main', 'std:copper_axe')
         player.inventory.add_item('main', 'std:hammer')
+        player.inventory.add_item('main', 'std:furnace')
         
         initstuff[player.uuid] = 1
     
