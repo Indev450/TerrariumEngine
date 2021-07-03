@@ -17,8 +17,6 @@ class Mapgen(mp.Process):
 
     def __init__(self, mods, output, width, height, status_v, done_v):
         super().__init__()
-
-        BlockDefHolder.init_int_ids()
         
         self.mods = mods
 
@@ -37,6 +35,10 @@ class Mapgen(mp.Process):
         
         self.entity_manager = EntityManager.new()
         self.meta_manager = MetaManager()
+        
+        _, preserved = self.meta_manager.newmeta('preserved_block_ids')
+
+        BlockDefHolder.init_int_ids(preserved)
     
     def is_position_valid(self, x, y):
         return 0 <= x < self.width and 0 <= y < self.height

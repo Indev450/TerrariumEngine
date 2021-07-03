@@ -61,9 +61,22 @@ class GameActivity(Activity):
         
         textures.reload()  # Reload all textures from mods
         sounds.reload()  # Same with sounds
-
-        BlockDefHolder.init_int_ids()             # Create int identifiers for
-                                         # block definitions
+        
+        savepath = os.path.join('saves', path)
+        self.worldpath = os.path.join(savepath, 'world.tworld')
+        self.metapath = os.path.join(savepath, 'world.meta')
+        self.entitiespath = os.path.join(savepath, 'world.entities')
+        
+        self.meta_manager = MetaManager.load(self.metapath)
+        
+        preserved_block_ids = self.meta_manager.getmeta('preserved_block_ids')
+        
+        if preserved_block_ids is None:
+            _, preserved_block_ids = self.meta_manager.newmeta('preserved_block_ids')
+        
+        BlockDefHolder.init_int_ids(preserved_block_ids)  # Create int identifiers for
+                                                          # block definitions
+        
         Player.register()
         ItemEntity.register()
 
@@ -77,11 +90,6 @@ class GameActivity(Activity):
             (self.app.WIN_WIDTH, self.app.WIN_HEIGHT))
         self.background.fill(self.BG_COLOR)
         
-        savepath = os.path.join('saves', path)
-        self.worldpath = os.path.join(savepath, 'world.tworld')
-        self.metapath = os.path.join(savepath, 'world.meta')
-        self.entitiespath = os.path.join(savepath, 'world.entities')
-        
         file = open(self.worldpath, 'rb')
         
         decoded = decode(file.read())
@@ -90,15 +98,13 @@ class GameActivity(Activity):
 
         self.world = World.new(*decoded)
         
-        modmanager.call_handlers('on_world_load', self.world)
-        
-        self.meta_manager = MetaManager.load(self.metapath)
-        
         self.entity_manager = EntityManager.new()
         self.entity_manager.load(self.entitiespath)
-
+        
+        modmanager.call_handlers('on_world_load', self.world)
+        
         self.player = self.entity_manager.getentity('player')
-
+        
         if self.player is None:
             self.player, _ = self.entity_manager.newentity('builtin:player', 'player')
             self.player.respawn()  # Go to spawnpoint

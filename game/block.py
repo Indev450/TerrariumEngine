@@ -5,6 +5,8 @@ import game.item_stack as itemstack
 import game.world as worldm
 import game.block_item as blockitem
 
+from game.texture import gettexture
+
 from tilemap.maketilemap import tilemap_positions, flags
 
 
@@ -66,16 +68,81 @@ class BlockDefHolder:
         return len(cls.registered_blocks_list)
 
     @classmethod
-    def init_int_ids(cls):
+    def init_int_ids(cls, preserved=None):
         '''Initialize integer identifiers for registered blocks'''
         cls.registered_blocks_list = [None, BlockObstructed]  # None - std:air
+        
+        if preserved is not None and preserved:  # If has any values in
+            maxid = max(preserved.values())
+            
+            # Allocate space for preserved blocks
+            for i in range(maxid):
+                cls.registered_blocks_list.append(None)
+        
+        elif preserved is None:
+            preserved = {}
+        
+        # Replace all needed slots with block types, even they don't exists.
+        # That will help keep map (more or less) not corrupted
+        for key in preserved.keys():
+            block_type = cls.registered_blocks.get(key)
+            
+            if block_type is None:
+                block_type = make_unknown_block(key)
+            
+            cls.registered_blocks_list[preserved[key]] = block_type
+            block_type.ID = preserved[key]
+        
+        i = 2  # Skip first 2 entries
+        preserved_size = len(cls.registered_blocks_list)  # To avoid IndexError
+        registered_keys = iter(cls.registered_blocks.keys())
+        
+        # Skip:
+        next(registered_keys)  # bultin:air
+        next(registered_keys)  # bultin:obstructed
+        
+        while True:
+            try:
+                if i < preserved_size:
+                    if cls.registered_blocks_list[i] is None:
+                        # Take a next key. If there is no any, raise StopIteration.
+                        # (Actually i though 'while' will handle it, but
+                        # looks like i should do it myself)
+                        nextkey = next(registered_keys)
+                        
+                        if preserved.get(nextkey) is not None:
+                            # Thats block is already preserved and added to list,
+                            # so we can skip it
+                            continue
 
-        keys = list(cls.registered_blocks.keys())
-        keys.sort()
+                        cls.registered_blocks_list[i] = cls.registered_blocks[nextkey]
+                        cls.registered_blocks_list[i].ID = i
+                        
+                        preserved[nextkey] = i
+                        # Add new block to 'preserved' so next time we
+                        # load it block will have same int ID
+                    
+                    i += 1
+                
+                else:
+                    # Same as above. Used when there is no free slots left
+                    nextkey = next(registered_keys)
 
-        for i in range(2, len(keys)):
-            cls.registered_blocks_list.append(cls.registered_blocks[keys[i]])
-            cls.registered_blocks[keys[i]].ID = i
+                    if preserved.get(nextkey) is not None:
+                        continue
+                    
+                    cls.registered_blocks_list.append(cls.registered_blocks[nextkey])
+                    
+                    cls.registered_blocks_list[i].ID = i
+                    
+                    preserved[nextkey] = i
+                    
+                    i += 1
+            
+            except StopIteration:
+                break
+
+        return preserved
 
 
 class Block:
@@ -214,6 +281,18 @@ class Block:
 class BlockObstructed(Block):
     id = 'builtin:obstructed'
     ID = 1
+
+
+def make_unknown_block(id):
+    """Creates new UnknownBlock type to not mix other unknown blocks"""
+    class UnknownBlock(Block):
+        id = id
+        
+        drops = [id]
+        
+        tile = gettexture('resources/textures/blocks/unknown_block.png')
+    
+    return UnknownBlock
 
 # ---------------------------------------------------------------
 # TODO - make this functions better
