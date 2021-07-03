@@ -1,5 +1,5 @@
 {
-    "app.resolution": [800, 640],
+    "app.resolution": [1400, 1000],
     "app.font": "resources/fonts/dpcomic.ttf",
     "app.font.size": 30,
     "app.maxfps": 60,
