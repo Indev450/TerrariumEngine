@@ -8,13 +8,20 @@ You will need to install python 3, pygame and, optionally for maketilemap.py scr
 
 ### Controls
 A, D - moving left and right
+
 SPACE - jump
+
 E - use (in world)
+
 I - inventory
+
 C - craft
+
 LMB - use item
+
 RMB - alt use item
-Mouse weel - select item from hotbar
+
+Mouse wheel - select item from hotbar
 
 
 ### Features
