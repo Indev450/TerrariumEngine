@@ -186,7 +186,7 @@ class GameActivity(Activity):
         ################################################################
         # Craft UI
         self.craftui = CraftUI(position=(540, 140))
-        self.craft_manager = CraftManager.get()
+        self.craftui.set_crafts(self.player, 'builtin:emptyhands')
         
         self.overlay.add_element('craftui', self.craftui.root)
 
@@ -389,7 +389,7 @@ class GameActivity(Activity):
                 if self.overlay.is_visible('craftui'):
                     self.overlay.hide('craftui')
                 else:
-                    self.show_craft_menu('builtin:emtyhands')
+                    self.show_craft_menu('builtin:emptyhands')
             
             elif event.key == pg.K_ESCAPE:
                 if self.overlay.is_visible('inventory'):

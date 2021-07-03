@@ -28,8 +28,8 @@ class ScrollableLabel(Label):
             if child.rect.collidepoint(*position):
                 child.on_scroll(position, up)
             
-            if isinstance(child, ScrollableLabel):
-                scroll = False
+                if isinstance(child, ScrollableLabel):
+                    scroll = False
         
         if not scroll:
             return

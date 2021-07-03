@@ -25,9 +25,11 @@ class CraftUI:
         self.crafts = 'builtin:emptyhands'
     
     def set_crafts(self, player, crafts):
+        import traceback
+        
         self.crafts = crafts
         
-        crafts = CraftManager.get().crafts.get(crafts, [])
+        crafts = CraftManager.get().crafts.get(crafts, {})
         
         self.root.children = []
         
@@ -35,9 +37,10 @@ class CraftUI:
         
         y = space
         
-        self.root.max_scroll = ((len(crafts) - 3)*self.CRAFT_SIZE[1] + space)
+        self.root.max_scroll = ((len(crafts) - 3)*(self.CRAFT_SIZE[1] + space))
+        self.root.scroll = 0
         
-        for craft in crafts:
+        for craft in crafts.values():
             self.create_craft_ui((space, y), player, craft)
             
             Button(
@@ -69,17 +72,15 @@ class CraftUI:
         
         l = ScrollableLabel(size=self.CRAFT_SIZE, position=position, parent=self.root)
         
-        l.max_scroll = ((len(craft.inputs) - 1)*50 + space)
+        l.max_scroll = ((len(craft.inputs) - 1)//xcount_max)*(50 + space)
         
         # Craft input
-        for item, count in craft.inputs:
+        for item, count in craft.get_inputs():
             el = UIElement(parent=l,
                            position=(x, y),
                            size=(50, 50))
             
             el.image = draw_item(item, count, (50, 50), (item, count) in missing)
-            
-            l.add_child(el)
             
             xcount += 1
             
@@ -96,19 +97,13 @@ class CraftUI:
                        size=(50, 50))
         
         el.image = self.ARROW.get()
-        
-        l.add_child(el)
 
         # Craft output
         el = UIElement(parent=l,
                        position=(50*4 + space*5, 10),
                        size=(50, 50))
         
-        el.image = draw_item(*craft.output, (50, 50))
-        
-        l.add_child(el)
-        
-        self.root.add_child(l)
+        el.image = draw_item(*craft.get_output(), (50, 50))
 
 
 def draw_item(item, count, size, miss=False):

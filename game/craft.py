@@ -14,7 +14,7 @@ class Craft:
     def missing_inputs(cls, player):
         missing = []
         
-        for item, count in cls.inputs:
+        for item, count in cls.get_inputs():
             if not player.inventory.has_item(item.ID, count):
                 missing.append((item, count))
         
@@ -27,14 +27,23 @@ class Craft:
     @classmethod
     def do_craft(cls, player):
         if cls.can_craft(player):
-            for item, count in cls.inputs:
+            for item, count in cls.get_inputs():
                 player.inventory.consume_items(item.ID, count)
             
-            player.inventory.add_item('main', cls.output[0].ID, cls.output[1])
+            output = cls.get_output()
+            player.inventory.add_item('main', output[0].ID, output[1])
     
     @classmethod
     def register(cls):
         CraftManager.get().register_craft(cls)
+    
+    @classmethod
+    def get_inputs(cls):
+        return parse_items(cls.inputs)
+    
+    @classmethod
+    def get_output(cls):
+        return parse_item(cls.output)
 
 
 class CraftManager:
@@ -74,6 +83,7 @@ def parse_item(item):
     parse_item((Item, int)) -> (Item, int)
     parse_item(Item) -> (Item, 1)
     """
+    
     if isinstance(item, str):
         id, *count = item.split()
         
