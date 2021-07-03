@@ -7,8 +7,10 @@ from .ores import CopperOreGen, IronOreGen
 from .trees import Tree, Sapling
 from .chest import Chest, ChestItem
 from .furnace import Furnace
+from .anvil import Anvil
 from .dungeons import box_dungeon
 from .items import register_items
+from .crafting import register_craftitems, register_crafts
 
 
 required_mapgen_attributes = ['add_biome', 'add_ore', 'add_dungeon']
@@ -24,8 +26,11 @@ def on_load(modmanager):
     Chest.register()
     ChestItem.register()
     Furnace.register()
+    Anvil.register()
     
     register_items()
+    register_craftitems()
+    register_crafts()
     
     modmanager.add_handler(init_mapgen=init_mapgen)
     modmanager.add_handler(on_player_join=on_player_join)
@@ -58,7 +63,6 @@ def on_player_join(player):
         player.inventory.add_item('main', 'std:copper_pick')
         player.inventory.add_item('main', 'std:copper_axe')
         player.inventory.add_item('main', 'std:hammer')
-        player.inventory.add_item('main', 'std:furnace')
         
         initstuff[player.uuid] = 1
     
