@@ -43,6 +43,8 @@ def interactive(cls):
         
         tile = gettransparent(1, 1)
         
+        entity = InteractiveEntity
+        
         @classmethod
         def on_load(cls, x, y):
             super().on_load(x, y)
@@ -86,6 +88,6 @@ def interactive(cls):
         @classmethod
         def register(cls):
             super().register()
-            InteractiveEntity.register()
+            cls.entity.register()
     
     return InteractiveBlock
