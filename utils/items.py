@@ -53,13 +53,16 @@ class BlockDamager:
         return weakref.ref(decor)
         
     def damage(self, x, y, layer, damage=1):
-        if self.blocks.get((x, y, layer)) is None or self.blocks[(x, y, layer)]['decor']() is None:
+        if self.blocks.get((x, y, layer)) is None:
             self.blocks[(x, y, layer)] = {
                 'damage': 1,
                 'required_damage': self.world.get_block(x, y, layer).hits,
                 'decor': self.decor_damage(x, y)
             }
         else:
+            if self.blocks[(x, y, layer)]['decor']() is None:
+                self.blocks[(x, y, layer)]['decor'] = self.decor_damage(x, y)
+
             block = self.blocks[(x, y, layer)]
             
             block['damage'] += damage
