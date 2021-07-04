@@ -73,6 +73,9 @@ def register_block(path):
         
         custom_rect = _custom_rect(blockdef.get("custom_rect"))
     
+    if blockdef.get('wall_id') is not None:
+        JSONBlock.wall_id = blockdef["wall_id"]
+    
     
     JSONBlock.register()
     
