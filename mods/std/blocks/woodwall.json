@@ -1,0 +1,7 @@
+{
+    "id": "std:wood_wall",
+    "image": "textures/blocks/wood_wall.png",
+    "layer": 2,
+    "hit_sound": "sounds/dig_wood.wav",
+    "drops": ["std:wood"]
+}

@@ -4,5 +4,6 @@
     "image": "textures/blocks/woodtilemap.png",
     "inventory_image": "textures/items/wood.png",
     "drops": ["std:wood"],
-    "hit_sound": "sounds/dig_wood.wav"
+    "hit_sound": "sounds/dig_wood.wav",
+    "wall_id": "std:wood_wall"
 }

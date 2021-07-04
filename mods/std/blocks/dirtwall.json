@@ -2,5 +2,6 @@
     "id": "std:dirt_wall",
     "image": "textures/blocks/dirt_wall.png",
     "layer": 2,
-    "hit_sound": "sounds/dig_soil.wav"
+    "hit_sound": "sounds/dig_soil.wav",
+    "drops": ["std:dirt"]
 }

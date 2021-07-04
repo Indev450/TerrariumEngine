@@ -2,5 +2,7 @@
     "id": "std:stone_wall",
     "image": "textures/blocks/stone_wall.png",
     "layer": 2,
-    "hit_sound": "sounds/dig_stone.wav"
+    "hits": 6,
+    "hit_sound": "sounds/dig_stone.wav",
+    "drops": ["std:stone"]
 }

@@ -4,5 +4,6 @@
     "image": "textures/blocks/dirt.png",
     "inventory_image": "textures/items/dirt.png",
     "drops": ["std:dirt"],
-    "hit_sound": "sounds/dig_soil.wav"
+    "hit_sound": "sounds/dig_soil.wav",
+    "wall_id": "std:dirt_wall"
 }
