@@ -106,7 +106,7 @@ def place_scheme_mg(mapgen, x, y, blocks, scheme):
                 block = blocks[layer][c]
                 
                 if block != -1:
-                    put(x + xoff, y + yoff, )
+                    put(x + xoff, y + yoff, block)
                 
                 xoff += 1
             
