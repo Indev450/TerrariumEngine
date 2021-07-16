@@ -91,7 +91,7 @@ class Entity(GameObject):
         if not self.ignore_collision:
             self.collide(False)
 
-        self.rect.x += self.xv
+        self.rect.x += int(self.xv)
         
         if not self.ignore_collision:
             self.collide(True)
