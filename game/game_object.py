@@ -14,7 +14,7 @@ class GameObject(pg.sprite.Sprite):
         self.rect = pg.Rect(x, y, width, height)
         # All game objects should have a rect
 
-        self.image = getblank(width, height)
+        self.image = None
 
         self.camera = Camera.get()
         
