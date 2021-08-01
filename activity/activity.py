@@ -11,9 +11,8 @@ class Activity:
     This class contains reference to curent activity which will be rendered
     by the App class.
     """
-
     current = []
-
+    
     def __init__(self):
         self.allowed_events = []
         

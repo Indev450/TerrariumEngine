@@ -1,6 +1,8 @@
 import uuid
 import json
 
+from utils.weakobj import WeakObject
+
 
 class MetaManager:
     instance = None
@@ -21,11 +23,11 @@ class MetaManager:
             pass
         
         cls.instance = cls(data)
-        return cls.instance
+        return WeakObject(cls.instance)
 
     @classmethod
     def get(cls):
-        return cls.instance
+        return WeakObject(cls.instance)
 
     def __init__(self, data=None):
         self.data = data or {}

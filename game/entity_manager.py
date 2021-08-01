@@ -4,6 +4,8 @@ import json
 from .entity import Entity
 from .invalid_entity import InvalidEntity
 
+from utils.weakobj import WeakObject
+
 
 class EntityManager:
     instance = None
@@ -35,18 +37,18 @@ class EntityManager:
                 entcls = InvalidEntity
                 # If mod that adds this entity was deleted we will keep entity
 
-            data[key] = entcls.from_save(self, key, entsave)
+            data[key] = entcls.from_save(WeakObject(self), key, entsave)
         
         self.data = data
 
     @classmethod
     def get(cls):
-        return cls.instance
+        return WeakObject(cls.instance)
     
     @classmethod
     def new(cls):
         cls.instance = cls()
-        return cls.instance
+        return WeakObject(cls.instance)
     
     def __init__(self, data=None):
         self.data = data or {}
@@ -56,41 +58,40 @@ class EntityManager:
         if self.tags.get(tag) is None:
             self.tags[tag] = []
         
-        self.tags[tag].append(entity)
+        if entity.uuid in self.tags[tag]:
+            return
+        
+        self.tags[tag].append(entity.uuid)
     
     def untag_entity(self, entity, tag):
         if not self.tags.get(tag):
             return
         
         try:
-            self.tags[tag].remove(entity)
+            self.tags[tag].remove(entity.uuid)
         except ValueError:
             print(f'Warning: cannot untag entity: entity has no tag {tag}')
     
     def get_tagged_entities(self, tag):
-        return self.tags.get(tag, [])
-    
-    def addentity(self, ent, key=None):
-        ent.assign_to_manager(self)
+        entities = []
         
-        if key is None:
-            key = str(uuid.uuid1())
+        for id in self.tags.get(tag, []):
+            entity = self.data.get(id)
+            
+            if entity is not None:
+                entities.append(entity)
         
-        self.data[key] = ent
-        
-        ent.uuid = key
-        
-        return key
+        return entities
     
     def newentity(self, id, key, *args, **kwargs):
         if key is None:
             key = str(uuid.uuid1())
         
-        ent = Entity.get(id)(manager=self, uuid=key, *args, **kwargs)
+        ent = Entity.get(id)(manager=WeakObject(self), uuid=key, *args, **kwargs)
         
         self.data[key] = ent
         
-        return (ent, key)
+        return (WeakObject(ent), key)
 
     def delentity(self, key):
         if self.data.get(key):
@@ -98,7 +99,7 @@ class EntityManager:
             del self.data[key]
 
     def getentity(self, key):
-        return self.data.get(key)
+        return WeakObject(self.data.get(key))
     
     def update(self, dtime):
         for ent in list(self.data.values()):

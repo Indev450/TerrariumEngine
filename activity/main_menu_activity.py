@@ -13,7 +13,7 @@ from .default_parallax import DefaultParallax
 from game.sound import getsound
 from game.camera import Camera
 
-from utils.calls import Call
+from utils.calls import Call, WeakCall
 from utils.saves import check_save_path
 
 from ui.button import Button
@@ -60,14 +60,14 @@ class MainMenuActivity(Activity):
 
         Button(
             parent=root,
-            on_pressed=self.show_newworld,
+            on_pressed=WeakCall(self.show_newworld),
             text="New World",
             position=(70, 60),
             size=(160, 80))
 
         Button(
             parent=root,
-            on_pressed=self.show_select,
+            on_pressed=WeakCall(self.show_select),
             text="Continue",
             position=(70, 150),
             size=(160, 80))
@@ -96,7 +96,7 @@ class MainMenuActivity(Activity):
 
         Button(
             parent=message,
-            on_pressed=self.hide_message,
+            on_pressed=WeakCall(self.hide_message),
             text="OK",
             position=(200, 140),
             size=(100, 50))
@@ -124,14 +124,14 @@ class MainMenuActivity(Activity):
         
         Button(
             parent=newworld,
-            on_pressed=Call(self.run_mapgen, textinput),
+            on_pressed=WeakCall(self.run_mapgen, textinput),
             text="Generate",
             position=(150, 165),
             size=(200, 100))
         
         Button(
             parent=newworld,
-            on_pressed=self.hide_newworld,
+            on_pressed=WeakCall(self.hide_newworld),
             text="Cancel",
             position=(150, 300),
             size=(200, 100))
@@ -147,7 +147,7 @@ class MainMenuActivity(Activity):
         
         Button(
             parent=select,
-            on_pressed=self.hide_select,
+            on_pressed=WeakCall(self.hide_select),
             text="Cancel",
             position=(150, 300),
             size=(200, 100))
@@ -187,7 +187,7 @@ class MainMenuActivity(Activity):
             if os.path.isdir(f'saves/{file}'):
                 world = Button(
                     parent=self.found_worlds_holder,
-                    on_pressed=Call(self.run_world, file),
+                    on_pressed=WeakCall(self.run_world, file),
                     text=file,
                     size=(300, 60),
                     position=(50, 20 + 80*count),

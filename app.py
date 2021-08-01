@@ -5,7 +5,7 @@ import game.sound as sounds
 
 from game.music import MusicPlayer
 
-from activity.activity import getactivity, pushactivity
+from activity.activity import Activity, pushactivity
 from activity.main_menu_activity import MainMenuActivity
 
 from ui.overlay import Overlay
@@ -67,22 +67,19 @@ class App:
 
             textures.update_animation(dtime)
             
-            activity = getactivity()
-            
             if self.textinput is not None:
                 self.textinput.update(dtime)
             
-            if activity is not None:
-                for event in pg.fastevent.get():
-                    if self.textinput is None or self.textinput.handle_event(event) is not None:
-                        activity.on_event(event)
+            for event in pg.fastevent.get():
+                if self.textinput is None or self.textinput.handle_event(event) is not None:
+                    Activity.current[-1].on_event(event)
 
-                activity.update(dtime)
+            Activity.current[-1].update(dtime)
 
-                activity.draw(self.screen)
-                
-                if activity.overlay is not None:
-                    activity.overlay.draw(self.screen)
+            Activity.current[-1].draw(self.screen)
+            
+            if Activity.current[-1].overlay is not None:
+                Activity.current[-1].overlay.draw(self.screen)
 
             pg.display.set_caption(f"{config['app.caption']} (fps: {int(timer.get_fps())})")
 

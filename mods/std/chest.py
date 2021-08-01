@@ -11,6 +11,8 @@ from game.inventory import Inventory
 from game.item_stack import ItemStack
 from game.item import Item
 
+from utils.weakobj import WeakObject
+
 from mods.manager import modpath
 
 
@@ -41,7 +43,7 @@ class Chest(Entity):
             velocity=(0, 0),
             size=self.SIZE)
         
-        self.inventory = Inventory(self)
+        self.inventory = Inventory(WeakObject(self))
         self.inventory.set_size('main', 8*4)
         
         self.block = (position[0]//Block.WIDTH, position[1]//Block.HEIGHT)

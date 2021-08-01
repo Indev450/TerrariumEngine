@@ -8,6 +8,8 @@ from .inventory import Inventory
 
 from .meta_manager import MetaManager
 
+from utils.weakobj import WeakObject
+
 from config import getcfg
 
 
@@ -73,7 +75,7 @@ class Player(Entity):
 
         self.image = animtiled(self.TEXTURE, self.ANIMSPEC, "idle_left")
         
-        self.inventory = Inventory(self)
+        self.inventory = Inventory(WeakObject(self))
         
         self.inventory.set_size('hotbar', 8)
         self.inventory.set_size('main', 8*4)

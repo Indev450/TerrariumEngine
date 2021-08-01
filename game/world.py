@@ -8,6 +8,8 @@ from .tick import Ticker
 
 from .camera import Camera
 
+from utils.weakobj import WeakObject
+
 from config import getcfg
 
 
@@ -187,7 +189,7 @@ class World:
         if self.chunks[y][x] is not None:
             return
 
-        c = Chunk(self, 
+        c = Chunk(WeakObject(self), 
                   x*self.CHUNK_WIDTH, y*self.CHUNK_HEIGHT,
                   self.CHUNK_WIDTH, self.CHUNK_HEIGHT)
         self.chunks[y][x] = c
@@ -233,9 +235,9 @@ class World:
 
     @classmethod
     def get(cls):
-        return cls.instance
+        return WeakObject(cls.instance)
 
     @classmethod
     def new(cls, data, width, height):
         cls.instance = cls(data, width, height)
-        return cls.instance
+        return WeakObject(cls.instance)

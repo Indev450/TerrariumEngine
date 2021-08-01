@@ -27,7 +27,7 @@ from ui.inventory_cell import InventoryCell
 from ui.craftui import CraftUI
 from ui.healthbar import HealthBar
 
-from utils.calls import Call
+from utils.calls import Call, WeakCall
 
 from worldfile.worldfile import decode, encode
 
@@ -109,6 +109,13 @@ class GameActivity(Activity):
             self.player, _ = self.entity_manager.newentity('builtin:player', 'player')
             self.player.respawn()  # Go to spawnpoint
         
+        # Currently i have no idea how to fix issue with player entity use-after-free,
+        # so i'm keeping it as a strong reference. That should not become problem
+        # because even being alive after GameActivity closed, player deleted
+        # when starting new GameActivity. But this is still bad, so i'll need
+        # to fix that later.
+        self.player = self.player.obj()
+        
         inv = self.player.get_inventory()
         
         modmanager.call_handlers('on_player_join', self.player)
@@ -169,7 +176,7 @@ class GameActivity(Activity):
         
         Button(
             parent=pause,
-            on_pressed=self.play,
+            on_pressed=WeakCall(self.play),
             text="Continue",
             position=(100, 100),
             size=(300, 100))
@@ -292,7 +299,7 @@ class GameActivity(Activity):
         if self._skipupdate:
             self._skipupdate = False
             return
-            
+
         if not self.paused:
             if ((self.controls['mouse']['lmb']['pressed'] or self.controls['mouse']['rmb']['pressed'])
                 and self.player.hp > 0):
@@ -502,6 +509,10 @@ class GameActivity(Activity):
         
         self.meta_manager.save(self.metapath)
         self.entity_manager.save(self.entitiespath)
+        
+        MetaManager.instance = None
+        EntityManager.instance = None
+        World.instance = None
 
         file = open(self.worldpath, 'wb')
 
