@@ -11,6 +11,11 @@ from utils.checks import hasitems
 
 from .jsonblock import register_block
 
+from config import getcfg
+
+
+config = getcfg()
+
 
 class ModManager:
     instance = None
@@ -31,6 +36,8 @@ class ModManager:
     
     def __init__(self):
         mods = os.listdir('mods')
+        
+        self.modprofiles = config.get("mods.profiles", {})
         
         self.mods = {}
 
@@ -57,6 +64,8 @@ class ModManager:
                     'path': path,
                     'modconf': modconf}
         
+        self.modprofiles['_all'] = list(self.mods.keys())
+        
         self.handlers = {}
     
     def reset_handlers(self):
@@ -67,10 +76,10 @@ class ModManager:
             'on_world_load': [],
         }
         
-    def load_mods(self, names=None):
-        """Call on_load() for each mod in `names`
+    def load_mods(self, profile='_all'):
+        """Call on_load() for each mod in modprofiles[profile]
         
-        If not given, all mods will be initialized"""
+        If not given, all mods will be initialized (profile '_all')"""
         
         Entity.clear()
         BlockDefHolder.clear()
@@ -79,8 +88,7 @@ class ModManager:
         
         mods = []
         
-        if names is None:
-            names = self.mods.keys()  # Load all by default
+        names = self.modprofiles[profile]
         
         for name in names:
             if self.mods.get(name):

@@ -49,6 +49,13 @@ class MainMenuActivity(Activity):
         
         self.found_worlds_holder = None
         
+        self.modprofiles = list(config.get("mods.profiles", {'_all': []}).keys())
+        self.modprofileno = config.get("mods.lastprofile", 0)
+        
+        # If some profile was deleted
+        if self.modprofileno >= len(self.modprofiles):
+            self.modprofileno = 0
+        
         win_width, win_height = config["app.resolution"]
 
         ################################################################
@@ -108,7 +115,7 @@ class MainMenuActivity(Activity):
         newworld = Label(
             text="New World",
             position=(win_width//2 - 250, win_height/2 - 220),
-            size=(500, 440))
+            size=(500, 640))
         
         textinput = TextInput(
             self.app.FONT,
@@ -135,6 +142,36 @@ class MainMenuActivity(Activity):
             text="Cancel",
             position=(150, 300),
             size=(200, 100))
+        
+        modprofile = Label(
+            parent=newworld,
+            text="Mod Profile",
+            position=(50, 435),
+            size=(400, 150),
+        )
+        
+        self._selected_modprofile = Label(
+            parent=modprofile,
+            text=self.modprofiles[self.modprofileno],
+            position=(100, 70),
+            size=(200, 60),
+        )
+        
+        Button(
+            parent=modprofile,
+            text=">",
+            position=(325, 80),
+            size=(50, 50),
+            on_pressed=WeakCall(self.next_modprofile),
+        )
+        
+        Button(
+            parent=modprofile,
+            text="<",
+            position=(25, 80),
+            size=(50, 50),
+            on_pressed=WeakCall(self.prev_modprofile),
+        )
         
         self.overlay.add_element("newworld", newworld)
         
@@ -198,6 +235,8 @@ class MainMenuActivity(Activity):
     def run_mapgen(self, frominput):
         # TODO - add ability to choose map generator
         
+        config['mods.lastprofile'] = self.modprofileno
+        
         mgconfig = get_config()["mapgens"].get(config["mapgen.selected"])
         
         path = frominput.text
@@ -219,7 +258,8 @@ class MainMenuActivity(Activity):
 
         try:
             pushactivity(MapgenActivity, 
-                         self.parallax, mapgen_t, path, *config["mapgen.world_size"])
+                         self.parallax, mapgen_t, path, *config["mapgen.world_size"],
+                         self.modprofiles[self.modprofileno])
             self.find_worlds()  # Add new world
         except Exception as e:
             logging.exception("run_mapgen():")
@@ -262,3 +302,17 @@ class MainMenuActivity(Activity):
     def hide_select(self):
         self.overlay.hide("selectworld")
         self.overlay.show("mainmenu")
+    
+    def next_modprofile(self):
+        self.modprofileno += 1
+        if self.modprofileno >= len(self.modprofiles):
+            self.modprofileno = 0
+        
+        self._selected_modprofile.set_text(self.modprofiles[self.modprofileno])
+    
+    def prev_modprofile(self):
+        self.modprofileno -= 1
+        if self.modprofileno < 0:
+            self.modprofileno = len(self.modprofiles)-1
+        
+        self._selected_modprofile.set_text(self.modprofiles[self.modprofileno])

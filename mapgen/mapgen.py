@@ -15,10 +15,10 @@ from mods.manager import ModManager
 class Mapgen(mp.Process):
     """Base mapgen class"""
 
-    def __init__(self, mods, output, width, height, status_v, done_v):
+    def __init__(self, modprofile, output, width, height, status_v, done_v):
         super().__init__()
         
-        self.mods = mods
+        self.mods = ModManager.get().load_mods(modprofile)
 
         self.ofile = open(os.path.join(output, 'world.tworld'), 'wb')
         self.metapath = os.path.join(output, 'world.meta')
@@ -35,6 +35,8 @@ class Mapgen(mp.Process):
         
         self.entity_manager = EntityManager.new()
         self.meta_manager = MetaManager()
+        _, modprofile_meta = self.meta_manager.newmeta('modprofile')
+        modprofile_meta["name"] = modprofile
         
         _, preserved = self.meta_manager.newmeta('preserved_block_ids')
 

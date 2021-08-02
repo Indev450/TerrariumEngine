@@ -23,10 +23,12 @@ config = getcfg()
 class MapgenActivity(Activity):
     BG_COLOR = pg.Color('#5555FF')
     
-    def __init__(self, parallax, mapgen_t, path, width, height):
+    def __init__(self, parallax, mapgen_t, path, width, height, modprofile):
         super().__init__()
         
         self.parallax = parallax  # MainMenuActivity.parallax
+        
+        self.modprofile = modprofile
         
         create_save_path(path)
         
@@ -44,7 +46,7 @@ class MapgenActivity(Activity):
         modmanager = ModManager.get()
         modmanager.reset_handlers()
         
-        self.mapgen = mapgen_t(modmanager.load_mods(),
+        self.mapgen = mapgen_t(modprofile,
                                os.path.join('saves', path),
                                width,
                                height,

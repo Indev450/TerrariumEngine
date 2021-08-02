@@ -54,20 +54,20 @@ class GameActivity(Activity):
         
         self.ui_visible = False
         
-        modmanager = ModManager.get()
-        
-        modmanager.reset_handlers()
-        modmanager.load_mods()
-        
-        textures.reload()  # Reload all textures from mods
-        sounds.reload()  # Same with sounds
-        
         savepath = os.path.join('saves', path)
         self.worldpath = os.path.join(savepath, 'world.tworld')
         self.metapath = os.path.join(savepath, 'world.meta')
         self.entitiespath = os.path.join(savepath, 'world.entities')
         
         self.meta_manager = MetaManager.load(self.metapath)
+        
+        modmanager = ModManager.get()
+        
+        modmanager.reset_handlers()
+        modmanager.load_mods((self.meta_manager.getmeta('modprofile') or {'name': '_all'})['name'])
+        
+        textures.reload()  # Reload all textures from mods
+        sounds.reload()  # Same with sounds
         
         preserved_block_ids = self.meta_manager.getmeta('preserved_block_ids')
         
@@ -105,7 +105,7 @@ class GameActivity(Activity):
         
         self.player = self.entity_manager.getentity('player')
         
-        if self.player is None:
+        if not self.player:
             self.player, _ = self.entity_manager.newentity('builtin:player', 'player')
             self.player.respawn()  # Go to spawnpoint
         

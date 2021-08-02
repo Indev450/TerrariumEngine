@@ -44,5 +44,10 @@
     
     "tick.time": 1.0,
     
-    "world.chunk_size": [10, 10]
+    "world.chunk_size": [10, 10],
+    
+    "mods.profiles": {
+        "default": ["std"],
+        "debug": ["std", "testing"]
+    }
 }
