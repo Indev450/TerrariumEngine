@@ -75,7 +75,7 @@ def make_tree(cls):
             y = position[1] // Block.HEIGHT
             
             self.block = (position[0] // Block.WIDTH, position[1] // Block.HEIGHT)
-            self.check_blocks = [(x//Block.WIDTH, y+1) for x in range(self.chop_rect.x, self.chop_rect.x+self.chop_rect.width, Block.WIDTH)]
+            self.check_blocks = [(x, y+1) for x in range(self.chop_rect.x//Block.WIDTH, (self.chop_rect.x+self.chop_rect.width)//Block.WIDTH+1)]
         
         def update(self, dtime):
             for block in self.check_blocks:
@@ -150,10 +150,6 @@ def make_tree(cls):
             
             manager = EntityManager.get()
             
-            if cls._entmgr is not manager:
-                cls._entmgr = manager
-                cls.loaded = {}
-            
             uuid = cls.loaded.get((x, y))
             
             if uuid is not None:
@@ -162,10 +158,6 @@ def make_tree(cls):
         @classmethod
         def add_block_entity(cls, x, y):
             manager = EntityManager.get()
-            
-            if cls._entmgr is not manager:
-                cls._entmgr = manager
-                cls.loaded = {}
             
             if cls.loaded.get((x, y)) is None:
                 _, cls.loaded[(x, y)] = manager.newentity(

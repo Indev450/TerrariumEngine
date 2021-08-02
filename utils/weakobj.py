@@ -5,8 +5,11 @@ class WeakObject:
     """Same as weakref object, but you don't need to call it"""
     
     def __init__(self, obj):
-        self.obj = weakref.ref(obj)
-    
+        try:
+            self.obj = weakref.ref(obj)
+        except TypeError:
+            self.obj = lambda: None
+        
     def __getattribute__(self, name):
         if name == 'obj':
             return super().__getattribute__(name)
@@ -23,6 +26,9 @@ class WeakObject:
     
     def __eq__(self, other):
         return self.obj() is other.obj()
+    
+    def __ne__(self, other):
+        return not (self == other)
     
     def __bool__(self):
         return self.obj() is not None
