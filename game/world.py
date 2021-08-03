@@ -88,18 +88,13 @@ class World:
         if block_new is not None:
             block_new.on_place(x, y)
         
-        updated_chunks = []
-        
         for nx, ny in neighbours(x, y):
             chunk_x, chunk_y = self.chunk_pos(nx*blockmod.Block.WIDTH, ny*blockmod.Block.HEIGHT)
+            
+            chunk = self.chunks[chunk_y][chunk_x]
 
-            if (self.chunks[chunk_y][chunk_x] is not None
-               and not self.chunks[chunk_y][chunk_x] in updated_chunks):
-                self.chunks[chunk_y][chunk_x].update()
-                updated_chunks.append(self.chunks[chunk_y][chunk_x])
-            else:
-                if not self.chunks[chunk_y][chunk_x] in updated_chunks:
-                    self.load_chunk(chunk_x, chunk_y)
+            if chunk is not None:
+                chunk.need_to_redraw = True
 
     def get_block(self, x, y, layer):
         if not self.within_bounds(x, y) or 0 > layer >= 3:

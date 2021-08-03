@@ -37,8 +37,8 @@ class Chunk:
                             real_height)
 
         self.alive_time = self.KEEP_ALIVE_TIME
-
-        self.update()
+        
+        self.need_to_redraw = True
         
         for y in range(self.y1, self.y2):
             for x in range(self.x1, self.x2):
@@ -48,7 +48,7 @@ class Chunk:
                     if block is not None:
                         block.on_load(x, y)
 
-    def update(self):
+    def redraw(self):
         self.surf.fill(pg.Color(0, 0, 0, 0))
 
         for y in range(self.y1, self.y2):
@@ -64,6 +64,8 @@ class Chunk:
                 local_y = (y-self.y1) * blockm.Block.HEIGHT
 
                 self.surf.blit(image, (local_x, local_y))
+        
+        self.need_to_redraw = False
 
     def deltimer(self, dtime):
         self.alive_time -= dtime
@@ -71,6 +73,9 @@ class Chunk:
         return self.alive_time <= 0
 
     def draw(self, screen):
+        if self.need_to_redraw:
+            self.redraw()
+        
         info = pg.display.Info()
         offset_x, offset_y = Camera.get().get_position()
         draw_x = self.rect.x - offset_x
