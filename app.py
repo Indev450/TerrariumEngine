@@ -10,7 +10,7 @@ from activity.main_menu_activity import MainMenuActivity
 
 from ui.overlay import Overlay
 
-from config import getcfg
+from config import getcfg, write_config
 
 
 if not pg.get_init():
@@ -21,7 +21,7 @@ if not pg.mixer.get_init():
     pg.mixer.init()
 
 
-config = getcfg()
+config = getcfg().copy()
 
 
 class App:
@@ -96,3 +96,8 @@ class App:
     @classmethod
     def set(cls, instance):
         cls.instance = instance
+    
+    def __del__(self):
+        if config != getcfg():
+            print('Config changed, rewriting...')
+            write_config()
