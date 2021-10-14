@@ -1,4 +1,5 @@
 import os
+import platform
 import array
 
 import multiprocessing as mp
@@ -10,6 +11,10 @@ from game.meta_manager import MetaManager
 from worldfile.worldfile import encode
 
 from mods.manager import ModManager
+
+
+if platform.system() == 'Windows':
+    mp.set_start_method('spawn')  # Windows sucks
 
 
 class Mapgen(mp.Process):
