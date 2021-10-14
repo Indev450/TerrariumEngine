@@ -112,7 +112,7 @@ class Entity(GameObject):
         return self.xv, self.yv
     
     def add_tag(self, tag):
-        if self.manager is None:
+        if not self.manager:
             print('Error: cannot tag entity without manager')
             return
         
@@ -120,7 +120,7 @@ class Entity(GameObject):
         self.tags.append(tag)
     
     def del_tag(self, tag):
-        if self.manager is None:
+        if not self.manager:
             print('Error: cannot untag entity without manager')
             return
             
@@ -131,7 +131,7 @@ class Entity(GameObject):
         self.tags.remove(tag)
     
     def on_deleted(self):
-        if self.manager is None:
+        if not self.manager:
             print('Error: cannot do default cleanup without manager')
             return
 
