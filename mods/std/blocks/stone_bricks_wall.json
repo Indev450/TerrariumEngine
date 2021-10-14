@@ -1,0 +1,8 @@
+{
+    "id": "std:stone_bricks_wall",
+    "image": "textures/blocks/stone_bricks_wall.png",
+    "layer": 2,
+    "hits": 6,
+    "hit_sound": "sounds/dig_stone.wav",
+    "drops": ["std:stone_bricks"]
+}

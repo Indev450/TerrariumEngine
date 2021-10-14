@@ -17,9 +17,15 @@ class IronIngot(Item):
     image = gettexture(modpath('textures/items/iron_ingot.png'))
 
 
+class GoldIngot(Item):
+    ID = 'std:gold_ingot'
+    image = gettexture(modpath('textures/items/gold_ingot.png'))
+
+
 def register_craftitems():
     CopperIngot.register()
     IronIngot.register()
+    GoldIngot.register()
 
 
 ########################################################################
@@ -52,6 +58,22 @@ class CraftIronIngot(Craft):
     
     inputs = ['std:iron_ore 2']
     output = 'std:iron_ingot'
+
+
+class CraftGoldIngot(Craft):
+    ID = 'std:craft_gold_ingot'
+    TYPE = 'std:furnace'
+    
+    inputs = ['std:gold_ore 3']
+    output = 'std:gold_ingot'
+
+
+class CraftStoneBricks(Craft):
+    ID = 'std:craft_stone_bricks'
+    TYPE = 'std:furnace'
+    
+    inputs = ['std:stone 4']
+    output = 'std:stone_bricks 4'
 
 
 class CraftCopperPick(Craft):
@@ -98,6 +120,8 @@ def register_crafts():
     CraftAnvil.register()
     CraftCopperIngot.register()
     CraftIronIngot.register()
+    CraftGoldIngot.register()
+    CraftStoneBricks.register()
     CraftCopperPick.register()
     CraftCopperAxe.register()
     CraftIronPick.register()

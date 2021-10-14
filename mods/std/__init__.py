@@ -3,7 +3,7 @@ from game.meta_manager import MetaManager
 from utils.checks import hasattrs
 
 from .biomes import SurfaceBiome
-from .ores import CopperOreGen, IronOreGen
+from .ores import CopperOreGen, IronOreGen, GoldOreGen
 from .trees import Tree, Sapling
 from .chest import Chest, ChestItem
 from .furnace import Furnace
@@ -43,6 +43,7 @@ def init_mapgen(mg):
     if 'add_ore' not in missing:
         mg.add_ore(CopperOreGen(mg))
         mg.add_ore(IronOreGen(mg))
+        mg.add_ore(GoldOreGen(mg))
     
     if 'add_biome' not in missing:
         mg.add_biome(SurfaceBiome(mg))

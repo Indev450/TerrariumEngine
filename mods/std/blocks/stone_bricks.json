@@ -1,0 +1,10 @@
+{
+    "id": "std:stone_bricks",
+    "drawtype": "tiled",
+    "image": "textures/blocks/stone_bricks_tilemap.png",
+    "drops": ["std:stone_bricks"],
+    "inventory_image": "textures/items/stone_bricks.png",
+    "hits": 6,
+    "hit_sound": "sounds/dig_stone.wav",
+    "wall_id": "std:stone_bricks_wall"
+}

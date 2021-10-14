@@ -1,0 +1,10 @@
+{
+    "id": "std:gold_ore",
+    "drawtype": "tiled",
+    "image": "textures/blocks/goldtilemap.png",
+    "inventory_image": "textures/items/gold.png",
+    "drops": ["std:gold_ore"],
+    "tilecomparable": false,
+    "hits": 10,
+    "hit_sound": "sounds/dig_metal.wav"
+}

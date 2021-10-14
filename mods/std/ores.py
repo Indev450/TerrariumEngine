@@ -22,3 +22,12 @@ class IronOreGen(OreGen):
     max_y = int(config['mapgen.world_size'][1]*0.8)
     
     min_noise = 0.9
+
+
+class GoldOreGen(OreGen):
+    id = 'std:gold_ore'
+    block = 'std:gold_ore'
+    min_y = int(config['mapgen.world_size'][1]*0.55)
+    max_y = int(config['mapgen.world_size'][1]*0.9)
+    
+    min_noise = 0.93
