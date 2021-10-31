@@ -53,7 +53,9 @@ class CraftUI:
             y += space + self.CRAFT_SIZE[1]
     
     def update(self, player):
+        scroll = self.root.scroll
         self.set_crafts(player, self.crafts)
+        self.root.set_scroll(scroll)
     
     def do_craft(self, craft, player):
         craft.do_craft(player)

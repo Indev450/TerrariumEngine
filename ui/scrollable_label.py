@@ -41,3 +41,12 @@ class ScrollableLabel(Label):
                                   child.position[1] + self.scroll_step * (1 if up else -1))
                 child.rect.topleft = (child.rect.left,
                                       child.rect.top + self.scroll_step * (1 if up else -1))
+    
+    def set_scroll(self, scroll):
+        self.scroll = scroll
+        
+        for child in self.children:
+            child.position = (child.position[0],
+                              child.position[1] - scroll)
+            child.rect.topleft = (child.rect.left,
+                                  child.rect.top - scroll)
