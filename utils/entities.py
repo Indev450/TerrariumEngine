@@ -23,7 +23,7 @@ class Spawner:
         
         entmanager = EntityManager.get()
         
-        if entmanager is None:
+        if not entmanager:
             return
         
         for player in entmanager.get_tagged_entities('player'):
