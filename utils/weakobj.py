@@ -25,7 +25,10 @@ class WeakObject:
         return hash(self.obj())
     
     def __eq__(self, other):
-        return self.obj() is other.obj()
+        if isinstance(other, WeakObject):
+            return self.obj() is other.obj()
+        else:
+            return self.obj() is other
     
     def __ne__(self, other):
         return not (self == other)
