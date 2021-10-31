@@ -29,7 +29,6 @@ def interactive(cls):
         def on_interact(self, player):
             cls.on_interact(player)
         
-        
         def update(self, dtime):
             if (self.world.get_fg_block(*self.checkblock) is None
                 and self.world.get_mg_block(*self.checkblock) is None):
@@ -63,7 +62,7 @@ def interactive(cls):
             
             manager = EntityManager.get()
             
-            if cls._entmgr is not manager:
+            if cls._entmgr != manager:
                 cls._entmgr = manager
                 cls.loaded = {}
             
@@ -76,7 +75,7 @@ def interactive(cls):
         def add_block_entity(cls, x, y):
             manager = EntityManager.get()
             
-            if cls._entmgr is not manager:
+            if cls._entmgr != manager:
                 cls._entmgr = manager
                 cls.loaded = {}
             
