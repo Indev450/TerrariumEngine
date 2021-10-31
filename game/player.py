@@ -83,6 +83,8 @@ class Player(Entity):
 
         self.selected_item = 0
         
+        self.fall_damage = 0
+        
         self.hp = self.max_hp = config["player.max_hp"]
 
         self.blinking_timer = 0  # How long player have to blink
@@ -132,6 +134,17 @@ class Player(Entity):
             if self.blinking_timer <= 0:
                 self.blinking = False
                 self.blinking_timer2 = 0
+        
+        if not self.on_ground and self.yv > 15:
+            self.fall_damage += 50 * dtime
+        
+        if self.on_ground:
+            damage = int(self.fall_damage)
+            
+            if damage:
+                self.hurt(damage, knockback=0)
+            
+            self.fall_damage = 0
 
         if self.up:
             if self.on_ground:
