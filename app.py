@@ -37,7 +37,7 @@ class App:
 
         self.frame_rate = config["app.maxfps"]
 
-        self.screen = pg.display.set_mode((self.WIN_WIDTH, self.WIN_HEIGHT), pg.DOUBLEBUF)
+        self.screen = pg.display.set_mode((self.WIN_WIDTH, self.WIN_HEIGHT), pg.DOUBLEBUF | pg.HWSURFACE)
 
         pg.display.set_caption(config["app.caption"])
 
