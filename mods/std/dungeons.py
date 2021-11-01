@@ -15,12 +15,15 @@ def box_dungeon(mapgen):
 
 
 def generate_dungeon(mapgen, startx, starty):
-    stone = BlockDefHolder.id_by_strid('std:stone')
+    bricks = BlockDefHolder.id_by_strid('std:stone_bricks')
+    bricks_wall = BlockDefHolder.id_by_strid('std:stone_bricks_wall')
     
     for x in range(startx, startx+9):
         for y in range(starty, starty+10):
+            mapgen.put_background(x, y, bricks_wall)
+            
             if x in (startx, startx+8) or y in (starty, starty+9):
-                mapgen.put_foreground(x, y, stone)
+                mapgen.put_foreground(x, y, bricks)
             else:
                 mapgen.put_foreground(x, y, 0)
     
