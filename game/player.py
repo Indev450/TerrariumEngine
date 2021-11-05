@@ -141,7 +141,7 @@ class Player(Entity):
         if self.on_ground:
             damage = int(self.fall_damage)
             
-            if damage:
+            if damage >= 5:
                 self.hurt(damage, knockback=0)
             
             self.fall_damage = 0
