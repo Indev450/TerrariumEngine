@@ -15,3 +15,6 @@ world.entities
 
 # Config file
 config.json
+
+# Saves directory
+saves
