@@ -44,7 +44,7 @@ class Sound:
             traceback.print_stack()
             print(f'Error: sound {self.name} is not loaded')
     
-    def play_at(self, pos, fade_dist=80, min_volume=0):
+    def play_at(self, pos, fade_dist=80, min_volume=0.01):
         camera = Camera.get()
         
         if camera is None:
@@ -54,7 +54,7 @@ class Sound:
         distx = pos[0] - camera.x
         disty = pos[1] - camera.y
         
-        dist = (distx*distx + disty*disty)**0.5
+        dist = (distx*distx + disty*disty)**0.5 or 0.01  # To avoid zero division 
         
         volume = min(fade_dist/dist, 1.0)
         
