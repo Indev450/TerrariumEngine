@@ -10,11 +10,13 @@ class HittableEntity(Entity):
     
     DO_FALL_DAMAGE = True
     FALL_DAMAGE = 50  # Damage per second increased while falling
+    FALL_DAMAGE_SPEED = 15  # How fast entity should fall to take damage
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.hp = self.HP_MAX
         self.inv_timer = 0
+        self.fall_damage = 0
     
     def update(self, dtime):
         super().update(dtime)
@@ -25,10 +27,15 @@ class HittableEntity(Entity):
             self.update_falldamage(dtime)
     
     def update_falldamage(self, dtime):
-        if not self.on_ground and self.yv > 15:
-            self.fall_damage += self.FALL_DAMAGE * dtime
+        if not self.on_ground:
+            if self.yv*self.liquid_resistance > self.FALL_DAMAGE_SPEED:
+                self.fall_damage += self.FALL_DAMAGE * dtime
+            
+            else:
+                # If entity slowed down (in water, for example), cancel fall damage
+                self.fall_damage = 0
         
-        if self.on_ground:
+        if self.on_ground and self.fall_damage:
             damage = int(self.fall_damage)
             
             if damage >= 5:
