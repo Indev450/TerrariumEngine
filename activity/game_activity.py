@@ -56,6 +56,7 @@ class GameActivity(Activity):
         
         savepath = os.path.join('saves', path)
         self.worldpath = os.path.join(savepath, 'world.tworld')
+        self.liquids_path = os.path.join(savepath, 'world.liquids')
         self.metapath = os.path.join(savepath, 'world.meta')
         self.entitiespath = os.path.join(savepath, 'world.entities')
         
@@ -97,6 +98,12 @@ class GameActivity(Activity):
         file.close()
 
         self.world = World.new(*decoded)
+        
+        try:
+            file = open(self.liquids_path, 'rb')
+            self.world.liquid_manager.deserialize(file.read())
+        except FileNotFoundError:
+            pass
         
         self.entity_manager = EntityManager.new()
         self.entity_manager.load(self.entitiespath)
@@ -358,6 +365,8 @@ class GameActivity(Activity):
         self.entity_manager.draw(screen)
         
         self.decormanager.draw(screen)
+        
+        self.world.draw_liquids(screen)
 
     def pause(self):
         self.overlay.show('pause')
@@ -509,6 +518,9 @@ class GameActivity(Activity):
         
         self.meta_manager.save(self.metapath)
         self.entity_manager.save(self.entitiespath)
+        
+        with open(self.liquids_path, 'wb') as file:
+            file.write(self.world.liquid_manager.serialize())
         
         MetaManager.instance = None
         EntityManager.instance = None

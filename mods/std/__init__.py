@@ -11,6 +11,7 @@ from .anvil import Anvil
 from .dungeons import box_dungeon
 from .items import register_items
 from .crafting import register_craftitems, register_crafts
+from .liquids import Water
 
 
 required_mapgen_attributes = ['add_biome', 'add_ore', 'add_dungeon']
@@ -27,6 +28,8 @@ def on_load(modmanager):
     ChestItem.register()
     Furnace.register()
     Anvil.register()
+    
+    Water.register()
     
     register_items()
     register_craftitems()

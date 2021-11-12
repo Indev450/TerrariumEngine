@@ -55,6 +55,8 @@ def make_tree(cls):
                              velocity=(0, 0),
                              size=cls.SIZE)
             
+            self.ignore_liquids = True
+            
             self.hp = self.max_hp = cls.HP
             
             self.dec_max_hp_time = 0  # Will decrease max_hp to hp each half second

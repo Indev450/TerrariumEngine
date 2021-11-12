@@ -24,6 +24,8 @@ def interactive(cls):
             self.block = (position[0]//Block.WIDTH, position[1]//Block.HEIGHT)
             self.checkblock = (self.block[0], self.block[1] + 1)
             
+            self.ignore_liquids = True
+            
             self.add_tag('interactive')
         
         def on_interact(self, player):

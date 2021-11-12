@@ -52,10 +52,15 @@ class Entity(GameObject):
         self.xv, self.yv = velocity
 
         self.friction = 20
+        
+        # Resistance of current liquid that entity collide with
+        self.liquid_resistance = 1.0
 
         self.on_ground = False
         
         self.ignore_collision = False
+        
+        self.ignore_liquids = False
 
         self.world = World.get()
         
@@ -71,7 +76,6 @@ class Entity(GameObject):
     def update(self, dtime):
         """Called every frame. Updates entitys physics"""
         acceleration = self.xv - self.xv*self.BRAKING
-
         
         if not (self.xv > self.MAX_SPEED or self.xv < -self.MAX_SPEED):
             self.xv -= acceleration * dtime * self.friction
@@ -86,15 +90,25 @@ class Entity(GameObject):
                 self.yv = self.MAX_FALL
 
         self.on_ground = False
-        self.rect.y += self.yv
+        self.rect.y += self.yv*self.liquid_resistance
         
         if not self.ignore_collision:
             self.collide(False)
 
-        self.rect.x += int(self.xv)
+        self.rect.x += int(self.xv*self.liquid_resistance)
         
         if not self.ignore_collision:
             self.collide(True)
+        
+        if not self.ignore_liquids:
+            liquids = self.world.get_collide_liquids(self)
+            
+            if liquids != []:
+                for liquid in liquids:
+                    self.liquid_resistance = min(self.liquid_resistance, liquid.RESISTANCE)
+            
+            else:
+                self.liquid_resistance = 1.0
     
     def collide(self, by_x):
         """Checks collision for one dimension"""

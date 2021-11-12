@@ -60,6 +60,8 @@ def make_sapling(sapdef):
                 velocity=(0, 0),
                 size=self.SIZE)
             
+            self.ignore_liquids = True
+            
             self.image = self.TEXTURE
             
             self.block = (position[0]//Block.WIDTH, position[1]//Block.HEIGHT)

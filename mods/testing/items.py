@@ -6,6 +6,8 @@ from game.sound import getsound
 from game.block import place_mg_block, place_mg_block_keep
 from game.entity_manager import EntityManager
 from game.melee import do_swing, do_swing_keep
+from game.world import World
+from game.block import Block
 
 from .entities import SwordSwing
 
@@ -74,3 +76,18 @@ class Pistol(Item):
             position=player.rect.center,
             source_entity=player,
             angle=Vector2(0, 0).angle_to(Vector2(position) - Vector2(player.rect.center)))
+
+class WaterBucket(Item):
+    ID = 'testing:water_bucket'
+    image = gettexture(modpath('textures/items/tools/water_bucket.png'))
+    
+    cooldown = do_cooldown(0.05)
+    
+    @classmethod
+    def on_keep_press(cls, player, itemstack, position, press_time):
+        if not cls.cooldown(player):
+            return
+        
+        world = World.get()
+        
+        world.liquid_manager.add_liquid(position[0]//Block.WIDTH, position[1]//Block.HEIGHT, 'std:water')

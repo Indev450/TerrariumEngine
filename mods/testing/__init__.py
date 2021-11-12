@@ -1,4 +1,4 @@
-from .items import DebugPick, DebugAxe, DebugSword, MusicItem, Pistol
+from .items import DebugPick, DebugAxe, DebugSword, MusicItem, Pistol, WaterBucket
 from .blocks import Terminal
 from .entities import Bullet, SwordSwing
 
@@ -9,6 +9,7 @@ def on_load(modmanager):
     DebugSword.register()
     MusicItem.register()
     Pistol.register()
+    WaterBucket.register()
     
     Terminal.register()
     
@@ -38,3 +39,6 @@ def on_player_join(player):
         
     if not inv.has_item('testing:pistol'):
         inv.add_item('main', 'testing:pistol')
+        
+    if not inv.has_item('testing:water_bucket'):
+        inv.add_item('main', 'testing:water_bucket')

@@ -5,6 +5,7 @@ from utils.coords import neighbours
 import game.block as blockmod
 from .chunk import Chunk
 from .tick import Ticker
+from .liquid_manager import LiquidManager
 
 from .camera import Camera
 
@@ -40,6 +41,8 @@ class World:
         self.camera = Camera.get()
         
         self.ticker = Ticker.new()
+        
+        self.liquid_manager = LiquidManager(WeakObject(self))
     
     def get_ticker(self):
         return self.ticker
@@ -60,6 +63,29 @@ class World:
 
                     if rect.colliderect(entity.rect):
                         on_collide(block, rect)
+    
+    def get_collide_liquids(self, entity):
+        """Returns liquid types entity collide with"""
+        result = []
+        
+        for x in self.worldrange_x(entity.rect.left, entity.rect.right):
+            for y in self.worldrange_y(entity.rect.top, entity.rect.bottom):
+                l = self.liquid_manager.liquids.get((x, y))
+                
+                if l is not None:
+                    if l.type not in result:
+                        result.append(l.type)
+        
+        return result
+    
+    def is_submerged(self, entity):
+        """Returns is entity is suberged in any liquid"""
+        y = entity.top//blockmod.Block.WIDTH
+        for x in self.worldrange_x(entity.rect.left, entity.rect.right):
+            if self.liquid_manager.liquids.get((x, y)) is not None:
+                return True
+        
+        return False
 
     def worldrange_x(self, x1, x2):
         return range(max(0, x1//blockmod.Block.WIDTH), min(x2//blockmod.Block.WIDTH + 1, self.WORLD_WIDTH))
@@ -72,6 +98,19 @@ class World:
             map(
                 lambda chunk: chunk.draw(screen),
                 self.chunks_loaded))
+    
+    def draw_liquids(self, screen):
+        info = pg.display.Info()
+        cam_x, cam_y = self.camera.get_position()
+        
+        liq_section = pg.Rect(
+            int(cam_x / blockmod.Block.WIDTH) - 5,
+            int(cam_y / blockmod.Block.HEIGHT) - 5,
+            int(info.current_w / blockmod.Block.WIDTH) + 10,
+            int(info.current_h / blockmod.Block.HEIGHT) + 10,
+        )
+        
+        self.liquid_manager.draw(liq_section, screen)
 
     def set_block(self, x, y, layer, id):
         if not self.within_bounds(x, y) or 0 > layer >= 3:
@@ -173,6 +212,15 @@ class World:
         for chunk in self.chunks_loaded:
             if chunk.deltimer(dtime):
                 self.del_chunk(*self.chunk_pos(chunk.rect.x, chunk.rect.y))
+        
+        liq_section = pg.Rect(
+            int(cam_x / blockmod.Block.WIDTH) - 5,
+            int(cam_y / blockmod.Block.HEIGHT) - 5,
+            int(info.current_w / blockmod.Block.WIDTH) + 10,
+            int(info.current_h / blockmod.Block.HEIGHT) + 10,
+        )
+        
+        self.liquid_manager.update(liq_section, dtime)
 
     def bound_chunk_position(self, x, y):
         x = max(0, min(self.chunks_x-1, x))
