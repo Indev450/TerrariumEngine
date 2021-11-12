@@ -1,4 +1,4 @@
-from .entity import Entity
+from .hittable_entity import HittableEntity
 
 from .texture import gettiled, animtiled
 
@@ -16,7 +16,7 @@ from config import getcfg
 config = getcfg()
 
 
-class Player(Entity):
+class Player(HittableEntity):
     ID = 'builtin:player'
     
     SPEED = config["player.speed"]
@@ -26,6 +26,8 @@ class Player(Entity):
     HEIGHT = config["player.size"][1]
 
     TEXTURE = gettiled("resources/textures/player/player.png", 3, 3)
+    
+    HP_MAX = config["player.max_hp"]
     
     SND_HURT = getsound(config["player.hurt_sound"])
     SND_DEATH = getsound(config["player.death_sound"])
@@ -63,7 +65,7 @@ class Player(Entity):
         
         player.inventory.load(save['data']['inventory'])
         
-        player.hp = save['data'].get('hp', 100)
+        player.hp = save['data'].get('hp', cls.HP_MAX)
         
         return player
 
@@ -84,11 +86,8 @@ class Player(Entity):
         self.selected_item = 0
         
         self.fall_damage = 0
-        
-        self.hp = self.max_hp = config["player.max_hp"]
 
-        self.blinking_timer = 0  # How long player have to blink
-        self.blinking_timer2 = 0  # For blinking effect
+        self.blinking_timer = 0  # For blinking effect
         
         self.respawn_timer = 0
         
@@ -127,24 +126,6 @@ class Player(Entity):
             return
         
         super().update(dtime)
-        
-        if self.blinking_timer > 0:
-            self.blinking_timer -= dtime
-            
-            if self.blinking_timer <= 0:
-                self.blinking = False
-                self.blinking_timer2 = 0
-        
-        if not self.on_ground and self.yv > 15:
-            self.fall_damage += 50 * dtime
-        
-        if self.on_ground:
-            damage = int(self.fall_damage)
-            
-            if damage >= 5:
-                self.hurt(damage, knockback=0)
-            
-            self.fall_damage = 0
 
         if self.up:
             if self.on_ground:
@@ -171,31 +152,14 @@ class Player(Entity):
             'hp': self.hp,
         }
     
-    def hurt(self, damage, entity=None, knockback=5, invulnerable_time=1):
-        if self.blinking_timer > 0 or self.hp <= 0:
-            return
-        
-        self.blinking_timer = invulnerable_time
-        
-        self.hp -= damage
-        
-        if self.hp <= 0:
-            self.SND_DEATH.play(0)
-            self.respawn_timer = 5
-            return
-        
-        self.SND_HURT.play(0)
-        
-        if entity is not None:
-            if self.rect.x > entity.rect.x:
-                self.xv = knockback
-            else:
-                self.xv = -knockback
-        
-        self.yv = -knockback
+    def on_damage(self, damage, entity):
+        self.blinking_timer = 0
+    
+    def on_death(self, entity):
+        self.respawn_timer = 5
     
     def respawn(self):
-        self.hp = self.max_hp
+        self.hp = self.HP_MAX
         
         self.rect.topleft = self.respawn_pos
     
@@ -203,10 +167,10 @@ class Player(Entity):
         if self.hp <= 0:
             return
         
-        if self.blinking_timer > 0:
-            self.blinking_timer2 += 1
+        if self.inv_timer > 0:
+            self.blinking_timer += 1
             
-            if self.blinking_timer2 % 3 == 0:
+            if self.blinking_timer % 3 == 0:
                 return
         
         super().draw(screen)

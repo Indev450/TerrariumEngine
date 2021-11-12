@@ -21,9 +21,9 @@ class HealthBar(UIElement):
         self.healthbar_rect = pg.Rect(position, size)
     
     def draw(self, screen):
-        self.healthbar_rect.width = self.rect.width * self.player.hp / self.player.max_hp
+        self.healthbar_rect.width = self.rect.width * self.player.hp / self.player.HP_MAX
         
-        text_sf = app.App.FONT.render(f"{self.player.hp}/{self.player.max_hp}", True, "#FFFFFF")
+        text_sf = app.App.FONT.render(f"{self.player.hp}/{self.player.HP_MAX}", True, "#FFFFFF")
         
         pg.draw.rect(screen, "#222222", self.rect)
         pg.draw.rect(screen, "#FF3333", self.healthbar_rect)

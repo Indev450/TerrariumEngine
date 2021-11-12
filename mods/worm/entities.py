@@ -1,7 +1,8 @@
 from game.texture import gettexture, gettiled, animtiled
 from game.sound import getsound
-from game.entity import Entity
+from game.hittable_entity import HittableEntity
 from game.entity_manager import EntityManager
+from game.entity import Entity
 from game.world import World
 from game.block import Block
 
@@ -18,19 +19,7 @@ def do_death_particles(entmgr, position, srcvelocity):
     entmgr.newentity('worm:particle_smoke', None, position=position)
 
 
-def playsound(snd, player, entity, fade_dist=6, min_volume=0.1):
-    distx = entity.rect.centerx - player.rect.centerx
-    disty = entity.rect.centery - player.rect.centery
-    dist = (distx*distx + disty*disty)**0.5
-    
-    volume = min(Block.WIDTH*fade_dist/dist, 1.0)
-    
-    if volume > min_volume:
-        snd.sound.set_volume(volume)
-        snd.play()
-
-
-class WormHead(Entity):
+class WormHead(HittableEntity):
     ID = 'worm:worm_head'
     
     TEXTURE = gettiled(modpath('textures/entities/worm_head.png'), 2, 1)
@@ -43,11 +32,13 @@ class WormHead(Entity):
     }
     
     SND_CRUMBLE = getsound(modpath('sounds/crumble.wav'))
-    SND_EXPLOSION = getsound(modpath('sounds/explosion.wav'))
+    SND_DEATH = getsound(modpath('sounds/explosion.wav'))
     SND_HURT = getsound(modpath('sounds/hurt.wav'))
     
     XACC = 15
     YACC = 12
+    
+    HP_MAX = 100
     
     MAX_SPEED = 4
     
@@ -73,10 +64,6 @@ class WormHead(Entity):
         
         player = manager.get_tagged_entities('player')[0]
         
-        #self.rect.center = player.rect.center
-        
-        self.max_hp = self.hp = 100
-        
         self.ignore_collision = True
         
         self.child, _ = manager.newentity(WormBody.ID, None,
@@ -98,18 +85,18 @@ class WormHead(Entity):
         player = self.manager.get_tagged_entities('player')[0]
         
         if self.rect.colliderect(player.rect):
-            player.hurt(5, self)
+            player.hurt(5, entity=self, inv_time=1)
         
         if self.world.get_fg_block(bx, by) is None:
             if self.in_ground:
-                playsound(self.SND_CRUMBLE, player, self)
+                self.SND_CRUMBLE.play_at(self.rect.center)
                 
                 self.in_ground = False
                 self.friction = 20
         
         else:
             if not self.in_ground:
-                playsound(self.SND_CRUMBLE, player, self)
+                self.SND_CRUMBLE.play_at(self.rect.center)
                 
                 self.in_ground = True
             
@@ -127,22 +114,15 @@ class WormHead(Entity):
                 if self.yv < self.MAX_SPEED:
                     self.yv += self.YACC * dtime
     
-    def on_death(self):
+    def on_death(self, entity=None):
         self.child.on_death()
-        
-        playsound(self.SND_EXPLOSION, self.manager.get_tagged_entities('player')[0], self)
         
         do_death_particles(self.manager, self.rect.center, (self.xv, self.yv))
         
         self.manager.delentity(self.uuid)
     
-    def hurt(self, damage):
-        playsound(self.SND_HURT, self.manager.get_tagged_entities('player')[0], self)
-        
-        self.hp -= damage
-        
-        if self.hp <= 0:
-            self.on_death()
+    def do_knockback(self, knockback, entity=None):
+        pass  # Ignore knockback
 
 
 class WormBody(Entity):
@@ -184,7 +164,7 @@ class WormBody(Entity):
         player = self.manager.get_tagged_entities('player')[0]
         
         if self.rect.colliderect(player.rect):
-            player.hurt(5, self)
+            player.hurt(5, entity=self, inv_time=1)
     
     def move_to_parent(self):
         distx = self.rect.centerx - self.parent.rect.centerx
@@ -209,7 +189,7 @@ class WormBody(Entity):
         
         self.manager.delentity(self.uuid)
     
-    def hurt(self, damage):
+    def hurt(self, damage, entity=None, knockback=0, inv_time=0):
         self.parent.hurt(damage)
 
 
