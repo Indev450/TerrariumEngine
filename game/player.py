@@ -133,7 +133,9 @@ class Player(HittableEntity):
                 self.on_ground = False
             
             if self.yv < -5:
-                self.yv -= self.JUMP_KEEP * dtime
+                self.yv -= self.JUMP_KEEP * self.liquid_resistance * dtime
+            
+            # TODO - add swimming
 
         if self.left:
             self.xv -= self.SPEED * dtime

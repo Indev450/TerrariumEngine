@@ -84,10 +84,10 @@ class Entity(GameObject):
             self.xv = 0
 
         if not self.on_ground:
-            self.yv += self.GRAVITY * dtime
+            self.yv += self.GRAVITY * self.liquid_resistance * dtime
 
-            if self.yv < self.MAX_FALL:
-                self.yv = self.MAX_FALL
+            if self.yv < self.MAX_FALL*self.liquid_resistance:
+                self.yv = self.MAX_FALL*self.liquid_resistance
 
         self.on_ground = False
         self.rect.y += self.yv*self.liquid_resistance
