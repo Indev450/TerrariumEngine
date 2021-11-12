@@ -54,7 +54,7 @@ class MusicItem(Item):
     
     @classmethod
     def on_press(cls, player, itemstack, position):
-        cls.sound.play()
+        cls.sound.play_at(position)
 
 
 class Pistol(Item):

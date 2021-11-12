@@ -3,6 +3,8 @@ import time
 
 import pygame as pg
 
+from .camera import Camera
+
 from config import getcfg
 
 
@@ -41,6 +43,24 @@ class Sound:
         else:
             traceback.print_stack()
             print(f'Error: sound {self.name} is not loaded')
+    
+    def play_at(self, pos, fade_dist=80, min_volume=0):
+        camera = Camera.get()
+        
+        if camera is None:
+            print("Warning: cannot get camera position for Sound.play_at")
+            self.play()
+        
+        distx = pos[0] - camera.x
+        disty = pos[1] - camera.y
+        
+        dist = (distx*distx + disty*disty)**0.5
+        
+        volume = min(fade_dist/dist, 1.0)
+        
+        if volume > min_volume:
+            self.sound.set_volume(volume*self.volume)
+            self.play()
 
 
 def getsound(name, volume=1.0, min_wait=0.1):
