@@ -12,11 +12,16 @@ class HittableEntity(Entity):
     FALL_DAMAGE = 50  # Damage per second increased while falling
     FALL_DAMAGE_SPEED = 15  # How fast entity should fall to take damage
     
+    IMMUNE_TO = []
+    
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.hp = self.HP_MAX
         self.inv_timer = 0
         self.fall_damage = 0
+        
+        # Separe set to allow mutability (some resistance effects for example)
+        self.immune_to = set(self.IMMUNE_TO)
     
     def update(self, dtime):
         super().update(dtime)
@@ -25,6 +30,10 @@ class HittableEntity(Entity):
         
         if self.DO_FALL_DAMAGE:
             self.update_falldamage(dtime)
+        
+        for liquid in self.collide_liquids:
+            if liquid.DAMAGE != 0:
+                self.hurt((liquid.DAMAGE, liquid.DAMAGE_TYPE), inv_time=1)
     
     def update_falldamage(self, dtime):
         if not self.on_ground:
@@ -44,7 +53,13 @@ class HittableEntity(Entity):
             self.fall_damage = 0
     
     def hurt(self, damage, entity=None, knockback=0, inv_time=0):
-        if self.inv_timer > 0 or self.hp <= 0:
+        if isinstance(damage, tuple):
+            damage, damage_type = damage
+        
+        else:
+            damage, damage_type = damage, "normal"
+        
+        if self.inv_timer > 0 or self.hp <= 0 or damage_type in self.immune_to:
             return
         
         self.inv_timer = inv_time

@@ -61,6 +61,8 @@ class Entity(GameObject):
         self.ignore_collision = False
         
         self.ignore_liquids = False
+        
+        self.collide_liquids = []
 
         self.world = World.get()
         
@@ -101,7 +103,7 @@ class Entity(GameObject):
             self.collide(True)
         
         if not self.ignore_liquids:
-            liquids = self.world.get_collide_liquids(self)
+            self.collide_liquids = liquids = self.world.get_collide_liquids(self)
             
             if liquids != []:
                 for liquid in liquids:

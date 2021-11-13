@@ -35,7 +35,7 @@ class LiquidDef:
     DAMAGE = 0  # How much damage will any entity take every second beeing in this
                 # liquid?
     
-    DAMAGE_TYPE = ""  # What type of damage this liquid have? ("lava" for example)
+    DAMAGE_TYPE = "normal"  # What type of damage this liquid have? ("lava" for example)
     
     RESISTANCE = 0.7  # Entity's speed in liquid will be multiplied at this value
     
