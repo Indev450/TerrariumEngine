@@ -69,6 +69,40 @@ class AnimatedTexture(Texture):
                 self.index = 0
 
 
+class RotateTexture(Texture):
+    
+    def __init__(self, texture, rotate_time, start_angle, end_angle):
+        self.texture = texture
+        self.start_angle = start_angle
+        self.end_angle = end_angle
+        self.rotate_time = rotate_time
+        self.timer = 0
+        
+        AnimatedTexture.instances.append(self)
+    
+    def load(self, force=False):
+        self.texture.load(force)
+    
+    def get(self):
+        angle = self.get_angle()
+        surf = pg.transform.rotate(self.texture.get(), abs(angle))
+        
+        if angle < 0:
+            surf = pg.transform.flip(surf, True, False)
+        
+        return surf
+        
+    
+    def get_angle(self):
+        return self.start_angle + (self.timer / self.rotate_time) * (self.end_angle - self.start_angle)
+    
+    def update(self, dtime):
+        self.timer += dtime
+        
+        if self.timer > self.rotate_time:
+            self.timer = 0
+
+
 class TiledTexture(Texture):
     """Very useful texture for using tile maps.
     Has interface to easily get some textures"""

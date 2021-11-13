@@ -1,4 +1,4 @@
-from game.texture import gettexture, gettiled, animtiled
+from game.texture import gettexture, RotateTexture
 
 from game.projectile import Projectile
 from game.melee import Swing
@@ -41,24 +41,13 @@ class SwordSwing(Swing):
     
     SIZE = (64, 64)
     
-    OFFSET = (20, -20)
+    OFFSET = (13, -20)
     
     DAMAGE = 15
     
-    TEXTURE = gettiled(modpath('textures/entities/sword_swing.png'), 3, 2)
+    TEXTURE = gettexture(modpath('textures/entities/sword_swing.png'))
     
     TTL = 0.25
-    
-    ANIMSPEC = {
-        'right': {
-            'speed': TTL/3,
-            'tiles': [(0, 0), (1, 0), (2, 0)],
-        },
-        'left': {
-            'speed': TTL/3,
-            'tiles': [(0, 1), (1, 1), (2, 1)],
-        },
-    }
     
     def __init__(self, parent,
                  facing_left=True,
@@ -70,4 +59,4 @@ class SwordSwing(Swing):
             manager=manager,
             uuid=uuid)
         
-        self.image = animtiled(self.TEXTURE, self.ANIMSPEC, 'left' if facing_left else 'right')
+        self.image = RotateTexture(self.TEXTURE, self.TTL, 0, 90 if facing_left else -90)
