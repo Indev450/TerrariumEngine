@@ -4,6 +4,8 @@ from pygame.math import Vector2
 
 from game.entity import Entity
 
+from game.block import Block
+
 from game.texture import gettiled
 
 from mods.manager import modpath
@@ -34,7 +36,7 @@ class WormParticleMetal(Entity):
         
         self.frameno = randint(0, 3)
         
-        self.ignore_collision = True
+        self.ignore_collision = self.world.get_fg_block(int(position[0]/Block.WIDTH), int(position[1]/Block.HEIGHT)) is not None
         
         self.image = self.TEXTURE
         
