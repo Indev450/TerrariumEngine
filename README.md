@@ -32,6 +32,7 @@ Mouse wheel - select item from hotbar
     - Parallax
     - Biomes and ores generation
     - Crafting
+    - Liquids
 - JSON modding API
     - Blocks
 
@@ -40,8 +41,7 @@ Mouse wheel - select item from hotbar
     - Tile based light
     - 'Multiblocks'
     - Multiplayer
-    - Better UI
-    - Liquids
+    - Better UI code
     - Better player texture
 - JSON modding api
     - Parallax
