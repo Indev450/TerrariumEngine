@@ -178,7 +178,8 @@ class LiquidManager:
             if liquids.get(liquid.id) is None:
                 liquids[liquid.id] = []
             
-            liquids[liquid.id].append((pos, int(liquid.level)))
+            if int(liquid.level) > 0:
+                liquids[liquid.id].append((pos, int(liquid.level)))
         
         for liquid_id, liquid_list in liquids.items():
             name = liquid_id.encode()
