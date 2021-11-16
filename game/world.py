@@ -73,7 +73,7 @@ class World:
                 l = self.liquid_manager.liquids.get((x, y))
                 
                 if l is not None:
-                    if l.type not in result:
+                    if l.level > 1 and l.type not in result:
                         result.append(l.type)
         
         return result
