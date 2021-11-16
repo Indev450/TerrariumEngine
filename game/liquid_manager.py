@@ -16,10 +16,10 @@ class Liquid(GameObject):
         self.level = level
     
     def draw(self, screen):
-        if self.level < 1 or self.level > 5:
+        if self.level < 0.01 or int(self.level) > 5:
             return
         
-        self.image.select(x=self.level-1, y=0)
+        self.image.select(x=abs(int(self.level-1)), y=0)
         
         super().draw(screen)
 
@@ -87,7 +87,7 @@ class LiquidManager:
                 if self.liquids.get(src) is None:
                     continue
                 
-                if self.liquids[src].level < 1:
+                if self.liquids[src].level < 0.1:
                     del self.liquids[src]
                     continue
                 
@@ -154,7 +154,7 @@ class LiquidManager:
                 return True
         
         else:
-            diff = max(abs(src.level - dst.level)//2, 1)
+            diff = abs(src.level - dst.level)/2
             
             if dst.level > src.level:
                 dst.level -= diff
@@ -178,7 +178,7 @@ class LiquidManager:
             if liquids.get(liquid.id) is None:
                 liquids[liquid.id] = []
             
-            liquids[liquid.id].append((pos, liquid.level))
+            liquids[liquid.id].append((pos, int(liquid.level)))
         
         for liquid_id, liquid_list in liquids.items():
             name = liquid_id.encode()
